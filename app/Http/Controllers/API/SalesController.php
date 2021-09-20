@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\Controller;
+use App\Http\Requests\API\SaleFormRequest;
 
 class SalesController extends APIController
 {
@@ -104,6 +104,11 @@ class SalesController extends APIController
             $status = false;
         }
         return $this->sendResult($message,$data,$errors,$status);
+    }
+
+    public function store_sale_data(SaleFormRequest $request)
+    {
+
     }
 
 

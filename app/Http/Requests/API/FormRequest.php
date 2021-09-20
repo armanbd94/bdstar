@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\API;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Validation\Validator;
@@ -46,7 +46,9 @@ abstract class FormRequest extends LaravelFormRequest
         throw new HttpResponseException(
             response()->json([
                 'status'=> false,
-                'errors'=> $validator->errors()
+                'errors'=> $validator->errors(),
+                "data" => [],
+                "message" => 'Validation Erros!',
             ])
         );
     }
