@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\Customer\Entities\Customer;
 use App\Http\Requests\API\SaleFormRequest;
+use Modules\Product\Entities\WarehouseProduct;
 
 class SalesController extends APIController
 {
@@ -108,8 +111,276 @@ class SalesController extends APIController
 
     public function store_sale_data(SaleFormRequest $request)
     {
+        $errors  = [];
+        $data    = [];
+        $message = "";
+        $status  = true;
+        DB::beginTransaction();
+        try {
+            $customer = Customer::with('coa')->find($request->customer_id);
+            $warehouse_id = auth()->user()->warehouse->id;
+            $sale_data = [
+                'memo_no' => $request->memo_no, 
+                'warehouse_id' =>  $warehouse_id, 
+                'district_id' => $customer->district_id, 
+                'upazila_id' => $customer->upazila_id, 
+                'route_id' => $customer->route_id, 
+                'area_id' => $customer->area_id, 
+                'salesmen_id' => $request->salesmen_id, 
+                'customer_id' => $customer->id, 
+                'item'             => $request->item,
+                'total_qty'        => $request->total_qty,
+                'total_discount'   => $request->total_discount ? $request->total_discount : 0,
+                'total_tax'        => $request->total_tax ? $request->total_tax : 0,
+                'total_price'      => $request->total_price,
+                'order_tax_rate'   => $request->order_tax_rate,
+                'order_tax'        => $request->order_tax,
+                'order_discount'   => $request->order_discount ? $request->order_discount : 0,
+                'shipping_cost'    => $request->shipping_cost ? $request->shipping_cost : 0,
+                'labor_cost'       => $request->labor_cost ? $request->labor_cost : 0,
+                'grand_total'      => $request->grand_total ,
+                'previous_due'     => $request->previous_due ? $request->previous_due : 0,
+                'net_total'        => $request->grand_total + ($request->previous_due ? $request->previous_due : 0), 
+                'paid_amount'      => $request->paid_amount ? $request->paid_amount : 0,
+                'due_amount'       => (($request->grand_total + ($request->previous_due ? $request->previous_due : 0)) - ($request->paid_amount ? $request->paid_amount : 0)),
+                'payment_status'   => $request->payment_status,
+                'payment_method'   => $request->payment_method ? $request->payment_method : null,
+                'account_id'       => $request->account_id ? $request->account_id : null,
+                'reference_no' => $request->reference_no ? $request->reference_no : null, 
+                'note' => $request->note, 
+                'sale_date' => $request->sale_date, 
+                'created_by' => auth()->user()->name
+            ];
 
+            //payment data for account transaction
+            $payment_data = [
+                'payment_method' => $request->payment_method ? $request->payment_method : null,
+                'account_id'     => $request->account_id ? $request->account_id : null,
+                'paid_amount'    => $request->paid_amount ? $request->paid_amount : 0,
+            ];
+
+            if($request->hasFile('document')){
+                $sale_data['document'] = $this->upload_file($request->file('document'),SALE_DOCUMENT_PATH);
+            }
+            $sale  = $this->model->create($sale_data);
+
+            $saleData = $this->model->with('sale_products')->find($sale->id);
+            //purchase products
+            $products = [];
+            $direct_cost = [];
+            if($request->has('products'))
+            {
+                foreach ($request->products as $key => $value) {
+                    $unit = Unit::where('unit_name',$value['unit'])->first();
+                    if($unit->operator == '*'){
+                        $qty = $value['qty'] * $unit->operation_value;
+                    }else{
+                        $qty = $value['qty'] / $unit->operation_value;
+                    }
+
+                    $products[] = [
+                        'sale_id'          => $sale->id,
+                        'product_id'       => $value['id'],
+                        'batch_no'         => $value['batch_no'],
+                        'qty'              => $value['qty'],
+                        'sale_unit_id'     => $unit ? $unit->id : null,
+                        'net_unit_price'   => $value['net_unit_price'],
+                        'discount'         => 0,
+                        'tax_rate'         => $value['tax_rate'],
+                        'tax'              => $value['tax'],
+                        'total'            => $value['subtotal']
+                    ];
+                    
+                    $product = DB::table('production_products as pp')
+                    ->selectRaw('pp.*')
+                    ->join('productions as p','pp.production_id','=','p.id')
+                    ->where([
+                        ['p.batch_no',$value['batch_no']],
+                        ['p.warehouse_id', $warehouse_id],
+                        ['pp.product_id',$value['id']],
+                    ])
+                    ->first();
+                    if($product){
+                        $direct_cost[] = $qty * ($product ? $product->per_unit_cost : 0);
+                    }
+
+                    $warehouse_product = WarehouseProduct::where([
+                        ['batch_no',$value['batch_no']],
+                        ['warehouse_id', $warehouse_id],
+                        ['product_id',$value['id']],['qty','>',0],
+                    ])->first();
+                    if($warehouse_product)
+                    {
+                        $warehouse_product->qty -= $qty;
+                        $warehouse_product->update();
+                    }
+
+                    
+                }
+                if(count($products) > 0)
+                {
+                    SaleProduct::insert($products);
+                }
+            }
+
+            $sum_direct_cost = array_sum($direct_cost);
+            $total_tax = ($request->total_tax ? $request->total_tax : 0) + ($request->order_tax ? $request->order_tax : 0);
+            
+            if(empty($sale))
+            {
+                if($request->hasFile('document')){
+                    $this->delete_file($sale_data['document'], SALE_DOCUMENT_PATH);
+                }
+            }
+
+            
+
+            $data = $this->sale_balance_add($sale->id,$request->memo_no,$request->grand_total,$total_tax,
+            $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id);
+
+            if($sale)
+            {
+                $status = true;
+                $message = 'Data to stored successfully!';
+            }else{
+                $status = false;
+                $message = 'Failed to store data!';
+            }
+            DB::commit();
+        } catch (Exception $e) {
+            DB::rollback();
+            $status = false;
+            $message = $e->getMessage();
+        }
+        return $this->sendResult($message,$data,$errors,$status);
     }
 
+    private function sale_balance_add(int $sale_id, $invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id) {
+
+        //Inventory Credit
+        $coscr = array(
+            'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('inventory'))->value('id'),
+            'warehouse_id'        => $warehouse_id,
+            'voucher_no'          => $invoice_no,
+            'voucher_type'        => 'INVOICE',
+            'voucher_date'        => $sale_date,
+            'description'         => 'Inventory Credit For Invoice No '.$invoice_no,
+            'debit'               => 0,
+            'credit'              => $sum_direct_cost,
+            'posted'              => 1,
+            'approve'             => 1,
+            'created_by'          => auth()->user()->name,
+            'created_at'          => date('Y-m-d H:i:s')
+        ); 
+
+            // customer Debit
+            $sale_coa_transaction = array(
+            'chart_of_account_id' => $customer_coa_id,
+            'warehouse_id'        => $warehouse_id,
+            'voucher_no'          => $invoice_no,
+            'voucher_type'        => 'INVOICE',
+            'voucher_date'        => $sale_date,
+            'description'         => 'Customer debit For Invoice No -  ' . $invoice_no . ' Customer ' .$customer_name,
+            'debit'               => $grand_total,
+            'credit'              => 0,
+            'posted'              => 1,
+            'approve'             => 1,
+            'created_by'          => auth()->user()->name,
+            'created_at'          => date('Y-m-d H:i:s')
+        );
+
+        $product_sale_income = array(
+            'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('product_sale'))->value('id'),
+            'warehouse_id'        => $warehouse_id,
+            'voucher_no'          => $invoice_no,
+            'voucher_type'        => 'INVOICE',
+            'voucher_date'        => $sale_date,
+            'description'         => 'Sale Income For Invoice NO - ' . $invoice_no . ' Customer ' .$customer_name,
+            'debit'               => 0,
+            'credit'              => $grand_total,
+            'posted'              => 1,
+            'approve'             => 1,
+            'created_by'          => auth()->user()->name,
+            'created_at'          => date('Y-m-d H:i:s')
+        ); 
+
+        Transaction::insert([
+            $coscr, $sale_coa_transaction, $product_sale_income
+        ]);
+
+        if($total_tax){
+            $tax_info = array(
+                'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('tax'))->value('id'),
+                'warehouse_id'        => $warehouse_id,
+                'voucher_no'          => $invoice_no,
+                'voucher_type'        => 'INVOICE',
+                'voucher_date'        => $sale_date,
+                'description'         => 'Sale Total Tax For Invoice NO - ' . $invoice_no . ' Customer ' .$customer_name,
+                'debit'               => $total_tax,
+                'credit'              => 0,
+                'posted'              => 1,
+                'approve'             => 1,
+                'created_by'          => auth()->user()->name,
+                'created_at'          => date('Y-m-d H:i:s')
+            ); 
+            Transaction::create($tax_info);
+        }
+        
+
+        if(!empty($payment_data['paid_amount']))
+        {
+        
+            /****************/
+            $customer_credit = array(
+                'chart_of_account_id' => $customer_coa_id,
+                'warehouse_id'        => $warehouse_id,
+                'voucher_no'          => $invoice_no,
+                'voucher_type'        => 'INVOICE',
+                'voucher_date'        => $sale_date,
+                'description'         => 'Customer credit for Paid Amount For Customer Invoice NO- ' . $invoice_no . ' Customer- ' . $customer_name,
+                'debit'               => 0,
+                'credit'              => $payment_data['paid_amount'],
+                'posted'              => 1,
+                'approve'             => 1,
+                'created_by'          => auth()->user()->name,
+                'created_at'          => date('Y-m-d H:i:s')
+            );
+            if($payment_data['payment_method'] == 1){
+                //Cah In Hand debit
+                $payment = array(
+                    'chart_of_account_id' => $payment_data['account_id'],
+                    'warehouse_id'        => $warehouse_id,
+                    'voucher_no'          => $invoice_no,
+                    'voucher_type'        => 'INVOICE',
+                    'voucher_date'        => $sale_date,
+                    'description'         => 'Cash in Hand in Sale for Invoice No - ' . $invoice_no . ' customer- ' .$customer_name,
+                    'debit'               => $payment_data['paid_amount'],
+                    'credit'              => 0,
+                    'posted'              => 1,
+                    'approve'             => 1,
+                    'created_by'          => auth()->user()->name,
+                    'created_at'          => date('Y-m-d H:i:s')
+                );
+            }else{
+                // Bank Ledger
+                $payment = array(
+                    'chart_of_account_id' => $payment_data['account_id'],
+                    'warehouse_id'        => $warehouse_id,
+                    'voucher_no'          => $invoice_no,
+                    'voucher_type'        => 'INVOICE',
+                    'voucher_date'        => $sale_date,
+                    'description'         => 'Paid amount for customer  Invoice No - ' . $invoice_no . ' customer -' . $customer_name,
+                    'debit'               => $payment_data['paid_amount'],
+                    'credit'              => 0,
+                    'posted'              => 1,
+                    'approve'             => 1,
+                    'created_by'          => auth()->user()->name,
+                    'created_at'          => date('Y-m-d H:i:s')
+                );
+            }
+            Transaction::insert([$customer_credit,$payment]);
+            
+        }
+    }
 
 }
