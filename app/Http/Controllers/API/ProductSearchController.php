@@ -59,23 +59,26 @@ class ProductSearchController extends APIController
         $product = DB::table('warehouse_product as wp')
         ->join('products as p','wp.product_id','=','p.id')
         ->leftjoin('taxes as t','p.tax_id','=','t.id')
+        ->leftjoin('units as u','p.base_unit_id','=','u.id')
         ->where([
             ['wp.warehouse_id',auth()->user()->warehouse_id],
             ['wp.product_id',$id]
         ])
-        ->selectRaw('wp.*,p.name,p.code,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate')
+        ->selectRaw('wp.*,p.name,p.code,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
         ->first();
 
         if($product)
         {
-            $data['id']         = $product->product_id;
-            $data['name']       = $product->name;
-            $data['code']       = $product->code;
-            $data['price']      = $product->price;
-            $data['stock_qty']  = $product->qty;
-            $data['tax_name']   = $product->tax_name ?? 'No Tax';
-            $data['tax_rate']   = $product->tax_rate ?? 0;
-            $data['tax_method'] = $product->tax_method;//1=Exclude,2=Include
+            $data['id']             = $product->product_id;
+            $data['name']           = $product->name;
+            $data['code']           = $product->code;
+            $data['base_unit_id']   = $product->base_unit_id;
+            $data['base_unit_name'] = $product->unit_name;
+            $data['net_unit_price'] = $product->price;
+            $data['stock_qty']      = $product->qty;
+            $data['tax_name']       = $product->tax_name ?? 'No Tax';
+            $data['tax_rate']       = $product->tax_rate ?? 0;
+            $data['tax_method']     = $product->tax_method;            //1=Exclude,2=Include
         }else{
             $message = 'No data found!';
             $status = false;

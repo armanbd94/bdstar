@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use Exception;
+use App\Models\Unit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Modules\Customer\Entities\Customer;
@@ -24,7 +25,7 @@ class SalesController extends APIController
         ->where('c.id',$id)
         ->first();
 
-        $data['percentage'] = $customer_group_data ? $customer_group_data->percentage : 0;
+        $data['percentage'] = $customer_group_data ? number_format($customer_group_data->percentage,2,'.','') : number_format(0,2,'.','');
 
         $customer_previous_balance = DB::table('transactions as t')
                 ->leftjoin('chart_of_accounts as coa','t.chart_of_account_id','=','coa.id')
@@ -34,7 +35,7 @@ class SalesController extends APIController
                 ->where('t.approve',1)
                 ->first();
 
-        $data['previous_due'] = $customer_previous_balance ? $customer_previous_balance->balance : 0;
+        $data['previous_due'] = $customer_previous_balance ? number_format($customer_previous_balance->balance,2,'.','') : number_format(0,2,'.','');
         return $this->sendResult($message,$data,$errors,$status);
     }
 
@@ -118,38 +119,38 @@ class SalesController extends APIController
         DB::beginTransaction();
         try {
             $customer = Customer::with('coa')->find($request->customer_id);
-            $warehouse_id = auth()->user()->warehouse->id;
+            $warehouse_id = auth()->user()->warehouse_id;
             $sale_data = [
-                'memo_no' => $request->memo_no, 
-                'warehouse_id' =>  $warehouse_id, 
-                'district_id' => $customer->district_id, 
-                'upazila_id' => $customer->upazila_id, 
-                'route_id' => $customer->route_id, 
-                'area_id' => $customer->area_id, 
-                'salesmen_id' => $request->salesmen_id, 
-                'customer_id' => $customer->id, 
-                'item'             => $request->item,
-                'total_qty'        => $request->total_qty,
-                'total_discount'   => $request->total_discount ? $request->total_discount : 0,
-                'total_tax'        => $request->total_tax ? $request->total_tax : 0,
-                'total_price'      => $request->total_price,
-                'order_tax_rate'   => $request->order_tax_rate,
-                'order_tax'        => $request->order_tax,
-                'order_discount'   => $request->order_discount ? $request->order_discount : 0,
-                'shipping_cost'    => $request->shipping_cost ? $request->shipping_cost : 0,
-                'labor_cost'       => $request->labor_cost ? $request->labor_cost : 0,
-                'grand_total'      => $request->grand_total ,
-                'previous_due'     => $request->previous_due ? $request->previous_due : 0,
-                'net_total'        => $request->grand_total + ($request->previous_due ? $request->previous_due : 0), 
-                'paid_amount'      => $request->paid_amount ? $request->paid_amount : 0,
-                'due_amount'       => (($request->grand_total + ($request->previous_due ? $request->previous_due : 0)) - ($request->paid_amount ? $request->paid_amount : 0)),
-                'payment_status'   => $request->payment_status,
-                'payment_method'   => $request->payment_method ? $request->payment_method : null,
-                'account_id'       => $request->account_id ? $request->account_id : null,
-                'reference_no' => $request->reference_no ? $request->reference_no : null, 
-                'note' => $request->note, 
-                'sale_date' => $request->sale_date, 
-                'created_by' => auth()->user()->name
+                'memo_no'        => $request->memo_no,
+                'warehouse_id'   => $warehouse_id,
+                'district_id'    => $customer->district_id,
+                'upazila_id'     => $customer->upazila_id,
+                'route_id'       => $customer->route_id,
+                'area_id'        => $customer->area_id,
+                'salesmen_id'    => auth()->user()->id,
+                'customer_id'    => $customer->id,
+                'item'           => $request->item,
+                'total_qty'      => $request->total_qty,
+                'total_discount' => 0,
+                'total_tax'      => $request->total_tax ? $request->total_tax : 0,
+                'total_price'    => $request->total_price,
+                'order_tax_rate' => $request->order_tax_rate,
+                'order_tax'      => $request->order_tax,
+                'order_discount' => $request->order_discount ? $request->order_discount : 0,
+                'shipping_cost'  => $request->shipping_cost ? $request->shipping_cost : 0,
+                'labor_cost'     => $request->labor_cost ? $request->labor_cost : 0,
+                'grand_total'    => $request->grand_total,
+                'previous_due'   => $request->previous_due ? $request->previous_due : 0,
+                'net_total'      => $request->net_total,
+                'paid_amount'    => $request->paid_amount ? $request->paid_amount : 0,
+                'due_amount'     => $request->due_amount ?  $request->due_amount : 0,
+                'payment_status' => $request->payment_status,
+                'payment_method' => $request->payment_method ? $request->payment_method : null,
+                'account_id'     => $request->account_id ? $request->account_id : null,
+                'reference_no'   => $request->reference_no ? $request->reference_no : null,
+                'note'           => $request->note,
+                'sale_date'      => $request->sale_date,
+                'created_by'     => auth()->user()->name
             ];
 
             //payment data for account transaction
@@ -171,7 +172,7 @@ class SalesController extends APIController
             if($request->has('products'))
             {
                 foreach ($request->products as $key => $value) {
-                    $unit = Unit::where('unit_name',$value['unit'])->first();
+                    $unit = Unit::find($value['base_unit_id']);
                     if($unit->operator == '*'){
                         $qty = $value['qty'] * $unit->operation_value;
                     }else{
@@ -181,7 +182,6 @@ class SalesController extends APIController
                     $products[] = [
                         'sale_id'          => $sale->id,
                         'product_id'       => $value['id'],
-                        'batch_no'         => $value['batch_no'],
                         'qty'              => $value['qty'],
                         'sale_unit_id'     => $unit ? $unit->id : null,
                         'net_unit_price'   => $value['net_unit_price'],
@@ -195,7 +195,6 @@ class SalesController extends APIController
                     ->selectRaw('pp.*')
                     ->join('productions as p','pp.production_id','=','p.id')
                     ->where([
-                        ['p.batch_no',$value['batch_no']],
                         ['p.warehouse_id', $warehouse_id],
                         ['pp.product_id',$value['id']],
                     ])
@@ -205,7 +204,6 @@ class SalesController extends APIController
                     }
 
                     $warehouse_product = WarehouseProduct::where([
-                        ['batch_no',$value['batch_no']],
                         ['warehouse_id', $warehouse_id],
                         ['product_id',$value['id']],['qty','>',0],
                     ])->first();
@@ -214,8 +212,6 @@ class SalesController extends APIController
                         $warehouse_product->qty -= $qty;
                         $warehouse_product->update();
                     }
-
-                    
                 }
                 if(count($products) > 0)
                 {
@@ -241,7 +237,10 @@ class SalesController extends APIController
             if($sale)
             {
                 $status = true;
-                $message = 'Data to stored successfully!';
+                $message = 'Data has been stored successfully!';
+                $data    = [
+                    'sale_id'=>$sale->id
+                ];
             }else{
                 $status = false;
                 $message = 'Failed to store data!';

@@ -18,5 +18,6 @@
     "StockReturn": true,
     "HRM": true,
     "Loan": true,
-    "Report": true
+    "Report": true,
+    "Sale": true
 }
