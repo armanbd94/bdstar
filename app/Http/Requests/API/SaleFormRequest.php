@@ -20,6 +20,7 @@ class SaleFormRequest extends FormRequest
         $this->rules['order_discount']  = ['nullable','numeric','gte:0'];
         $this->rules['shipping_cost']   = ['nullable','numeric','gte:0'];
         $this->rules['labor_cost']      = ['nullable','numeric','gte:0'];
+        $this->rules['total_commission']      = ['nullable','numeric','gte:0'];
 
         if(request()->has('products'))
         {

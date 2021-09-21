@@ -5,13 +5,18 @@ namespace App\Http\Controllers\API;
 use Exception;
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Modules\Sale\Entities\Sale;
 use Illuminate\Support\Facades\DB;
+use Modules\Sale\Entities\SaleProduct;
 use Modules\Customer\Entities\Customer;
+use Modules\Account\Entities\Transaction;
 use App\Http\Requests\API\SaleFormRequest;
+use App\Traits\UploadAble;
 use Modules\Product\Entities\WarehouseProduct;
 
 class SalesController extends APIController
 {
+    use UploadAble;
     public function customer_data(int $id)
     {
         $errors  = [];
@@ -118,39 +123,42 @@ class SalesController extends APIController
         $status  = true;
         DB::beginTransaction();
         try {
+            // dd($request->all());
             $customer = Customer::with('coa')->find($request->customer_id);
             $warehouse_id = auth()->user()->warehouse_id;
             $sale_data = [
-                'memo_no'        => $request->memo_no,
-                'warehouse_id'   => $warehouse_id,
-                'district_id'    => $customer->district_id,
-                'upazila_id'     => $customer->upazila_id,
-                'route_id'       => $customer->route_id,
-                'area_id'        => $customer->area_id,
-                'salesmen_id'    => auth()->user()->id,
-                'customer_id'    => $customer->id,
-                'item'           => $request->item,
-                'total_qty'      => $request->total_qty,
-                'total_discount' => 0,
-                'total_tax'      => $request->total_tax ? $request->total_tax : 0,
-                'total_price'    => $request->total_price,
-                'order_tax_rate' => $request->order_tax_rate,
-                'order_tax'      => $request->order_tax,
-                'order_discount' => $request->order_discount ? $request->order_discount : 0,
-                'shipping_cost'  => $request->shipping_cost ? $request->shipping_cost : 0,
-                'labor_cost'     => $request->labor_cost ? $request->labor_cost : 0,
-                'grand_total'    => $request->grand_total,
-                'previous_due'   => $request->previous_due ? $request->previous_due : 0,
-                'net_total'      => $request->net_total,
-                'paid_amount'    => $request->paid_amount ? $request->paid_amount : 0,
-                'due_amount'     => $request->due_amount ?  $request->due_amount : 0,
-                'payment_status' => $request->payment_status,
-                'payment_method' => $request->payment_method ? $request->payment_method : null,
-                'account_id'     => $request->account_id ? $request->account_id : null,
-                'reference_no'   => $request->reference_no ? $request->reference_no : null,
-                'note'           => $request->note,
-                'sale_date'      => $request->sale_date,
-                'created_by'     => auth()->user()->name
+                'memo_no'            => $request->memo_no,
+                'warehouse_id'       => $warehouse_id,
+                'district_id'        => $customer->district_id,
+                'upazila_id'         => $customer->upazila_id,
+                'route_id'           => $customer->route_id,
+                'area_id'            => $customer->area_id,
+                'salesmen_id'        => auth()->user()->id,
+                'customer_id'        => $customer->id,
+                'item'               => $request->item,
+                'total_qty'          => $request->total_qty,
+                'total_discount'     => 0,
+                'total_tax'          => $request->total_tax ? $request->total_tax : 0,
+                'total_price'        => $request->total_price,
+                'order_tax_rate'     => $request->order_tax_rate,
+                'order_tax'          => $request->order_tax,
+                'order_discount'     => $request->order_discount ? $request->order_discount : 0,
+                'shipping_cost'      => $request->shipping_cost ? $request->shipping_cost : 0,
+                'labor_cost'         => $request->labor_cost ? $request->labor_cost : 0,
+                'grand_total'        => $request->grand_total,
+                'previous_due'       => $request->previous_due ? $request->previous_due : 0,
+                'net_total'          => $request->net_total,
+                'paid_amount'        => $request->paid_amount ? $request->paid_amount : 0,
+                'due_amount'         => $request->due_amount ?  $request->due_amount : 0,
+                'sr_commission_rate' => auth()->user()->cpr,
+                'total_commission'   => $request->total_commission ? $request->total_commission :0,
+                'payment_status'     => $request->payment_status,
+                'payment_method'     => $request->payment_method ? $request->payment_method : null,
+                'account_id'         => $request->account_id ? $request->account_id : null,
+                'reference_no'       => $request->reference_no ? $request->reference_no : null,
+                'note'               => $request->note,
+                'sale_date'          => $request->sale_date,
+                'created_by'         => auth()->user()->name
             ];
 
             //payment data for account transaction
@@ -160,12 +168,13 @@ class SalesController extends APIController
                 'paid_amount'    => $request->paid_amount ? $request->paid_amount : 0,
             ];
 
-            if($request->hasFile('document')){
-                $sale_data['document'] = $this->upload_file($request->file('document'),SALE_DOCUMENT_PATH);
+            if(!empty($request->document)){
+                $sale_data['document'] = $this->upload_base64_image($request->document,SALE_DOCUMENT_PATH);
             }
-            $sale  = $this->model->create($sale_data);
 
-            $saleData = $this->model->with('sale_products')->find($sale->id);
+            $sale  = Sale::create($sale_data);
+
+            $saleData = Sale::with('sale_products')->find($sale->id);
             //purchase products
             $products = [];
             $direct_cost = [];
@@ -224,15 +233,16 @@ class SalesController extends APIController
             
             if(empty($sale))
             {
-                if($request->hasFile('document')){
+                if(!empty($sale_data['document'])){
                     $this->delete_file($sale_data['document'], SALE_DOCUMENT_PATH);
                 }
             }
 
             
 
-            $data = $this->sale_balance_add($sale->id,$request->memo_no,$request->grand_total,$total_tax,
-            $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id);
+            $data = $this->sale_balance_add($request->memo_no,$request->grand_total,$total_tax,
+            $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,
+            $payment_data, $warehouse_id);
 
             if($sale)
             {
@@ -254,7 +264,7 @@ class SalesController extends APIController
         return $this->sendResult($message,$data,$errors,$status);
     }
 
-    private function sale_balance_add(int $sale_id, $invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id) {
+    private function sale_balance_add($invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id) {
 
         //Inventory Credit
         $coscr = array(
