@@ -410,4 +410,72 @@ class SalesController extends APIController
         return $this->sendResult($message,$data,$errors,$status);
     }
 
+    public function sale_view(int $id)
+    {
+        $errors  = [];
+        $data    = [];
+        $message = "";
+        $status  = true;
+
+        $sale = DB::table('sales as s')
+        ->leftJoin('customers as c','s.customer_id','=','c.id')
+        ->select('s.id','s.memo_no', 's.item', 's.total_qty', 's.total_discount', 's.total_tax', 's.total_price', 's.order_tax_rate', 's.order_tax', 
+        's.order_discount', 's.shipping_cost', 's.labor_cost', 's.grand_total', 's.previous_due', 's.net_total', 's.paid_amount', 
+        's.due_amount','s.sr_commission_rate','s.total_commission', 's.payment_status',  's.note', 's.sale_date', 
+        's.delivery_status', 's.delivery_date','c.name as customer_name','c.shop_name as customer_shop_name','c.address as customer_address')
+        ->where([['s.id',$id],['s.salesmen_id',auth()->user()->id]])
+        ->first();
+        if($sale)
+        {
+            $products = DB::table('sale_products as sp')
+                ->leftJoin('products as p','sp.product_id','=','p.id')
+                ->leftJoin('units as u','sp.sale_unit_id','=','u.id')
+                ->selectRaw('p.name,p.code,u.unit_name,sp.qty,sp.net_unit_price,sp.tax,sp.total')
+                ->where('sp.sale_id',$sale->id)
+                ->get();
+            if($products)
+            {
+                $data = [
+                    "id"                 => $sale->id,
+                    "memo_no"            => $sale->memo_no,
+                    "item"               => $sale->item,
+                    "total_qty"          => $sale->total_qty,
+                    "total_discount"     => $sale->total_discount,
+                    "total_tax"          => $sale->total_tax,
+                    "total_price"        => $sale->total_price,
+                    "order_tax_rate"     => $sale->order_tax_rate,
+                    "order_tax"          => $sale->order_tax,
+                    "order_discount"     => $sale->order_discount,
+                    "shipping_cost"      => $sale->shipping_cost,
+                    "labor_cost"         => $sale->labor_cost,
+                    "grand_total"        => $sale->grand_total,
+                    "previous_due"       => $sale->previous_due,
+                    "net_total"          => $sale->net_total,
+                    "paid_amount"        => $sale->paid_amount,
+                    "due_amount"         => $sale->due_amount,
+                    "sr_commission_rate" => $sale->sr_commission_rate,
+                    "total_commission"   => $sale->total_commission,
+                    "payment_status"     => $sale->payment_status,
+                    "note"               => $sale->note,
+                    "sale_date"          => $sale->sale_date,
+                    "delivery_status"    => $sale->delivery_status,
+                    "delivery_date"      => $sale->delivery_date,
+                    "customer_name"      => $sale->customer_name,
+                    "customer_shop_name" => $sale->customer_shop_name,
+                    "customer_address"   => $sale->customer_address,
+                    'sale_products'      => $products
+                ];
+            }else{
+                $status = false;
+                $message = 'No data found!';
+            }
+        }else{
+            $status = false;
+            $message = 'No data found!';
+        }
+        return $this->sendResult($message,$data,$errors,$status);
+    }
+
+
+
 }
