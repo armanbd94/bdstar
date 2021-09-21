@@ -392,4 +392,22 @@ class SalesController extends APIController
         }
     }
 
+    public function sales_list(Request $request)
+    {
+        $errors  = [];
+        $data    = [];
+        $message = "";
+        $status  = true;
+
+        $sales = DB::table('sales')->where('salesmen_id',auth()->user()->id)->orderBy('id','desc')->paginate(10);
+        if(!$sales->isEmpty())
+        {
+            $data = $sales;
+        }else{
+            $status = false;
+            $message = 'No data found!';
+        }
+        return $this->sendResult($message,$data,$errors,$status);
+    }
+
 }
