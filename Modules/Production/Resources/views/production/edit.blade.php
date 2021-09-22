@@ -110,26 +110,6 @@
                                                                 <label for="exp_date">Exp. Date</label>
                                                                 <input type="text" class="form-control date" name="production[{{ $key+1 }}][exp_date]" id="production_{{ $key+1 }}_exp_date" value="{{ $item->exp_date }}" readonly />
                                                             </div>
-                                                            <div class="form-group col-md-3 required">
-                                                                <label for="has_coupon">This Product has Coupon?</label>
-                                                                <select name="production[{{ $key+1 }}][has_coupon]" id="production_{{ $key+1 }}_has_coupon"  onchange="couponInputField(this.value,{{ $key+1 }})" class="form-control selectpicker">
-                                                                    <option value="">Select Please</option>
-                                                                    <option value="1" {{ $item->has_coupon == 1 ? 'selected' : '' }}>Yes</option>
-                                                                    <option value="2" {{ $item->has_coupon == 2 ? 'selected' : '' }}>No</option>
-                                                                </select>
-                                                            </div>
-                                                            <div class="form-group col-md-4 required coupon_{{ $key+1 }} {{ $item->has_coupon == 2 ? 'd-none' : '' }}">
-                                                                <label for="total_coupon">Total Coupon</label>
-                                                                <input type="text" class="form-control" value="{{ $item->total_coupon }}" name="production[{{ $key+1 }}][total_coupon]" id="production_{{ $key+1 }}_total_coupon" />
-                                                            </div>
-                                                            <div class="form-group col-md-4 required coupon_{{ $key+1 }} {{ $item->has_coupon == 2 ? 'd-none' : '' }}">
-                                                                <label for="coupon_price">Coupon Price</label>
-                                                                <input type="text" class="form-control" value="{{ $item->coupon_price }}" name="production[{{ $key+1 }}][coupon_price]" id="production_{{ $key+1 }}_coupon_price" />
-                                                            </div>
-                                                            <div class="form-group col-md-4 required coupon_{{ $key+1 }} {{ $item->has_coupon == 2 ? 'd-none' : '' }}">
-                                                                <label for="coupon_exp_date">Exp. Date</label>
-                                                                <input type="text" class="form-control date" value="{{ $item->coupon_exp_date }}" name="production[{{ $key+1 }}][coupon_exp_date]" id="production_{{ $key+1 }}_coupon_exp_date" readonly />
-                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -242,10 +222,7 @@ function generateDate(number,tab)
     $('#production_'+tab+'_exp_date').val(exp_date.toISOString().slice(0, 10));
 }
 
-function couponInputField(value,tab)
-{
-    (value == 1) ? $('.coupon_'+tab).removeClass('d-none') : $('.coupon_'+tab).addClass('d-none');
-}
+
 function check_material_stock()
 {
     let form = document.getElementById('store_or_update_form');

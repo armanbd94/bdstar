@@ -8,8 +8,7 @@ use Modules\Production\Entities\ProductionProduct;
 
 class Production extends BaseModel
 {
-    protected $fillable = ['batch_no', 'warehouse_id', 'start_date', 'end_date', 'item', 'status', 'production_status',
-    'transfer_status', 'transfer_date', 'created_by', 'modified_by'];
+    protected $fillable = ['batch_no', 'warehouse_id', 'start_date', 'end_date', 'item', 'status', 'production_status','created_by', 'modified_by'];
 
     public function warehouse()
     {

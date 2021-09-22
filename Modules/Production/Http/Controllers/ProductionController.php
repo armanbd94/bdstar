@@ -224,10 +224,6 @@ class ProductionController extends BaseController
                                     'year'            => $product['year'],
                                     'mfg_date'        => $product['mfg_date'],
                                     'exp_date'        => $product['exp_date'],
-                                    'has_coupon'      => $product['has_coupon'],
-                                    'total_coupon'    => $product['has_coupon'] == 1 ? $product['total_coupon'] : null,
-                                    'coupon_price'    => $product['has_coupon'] == 1 ? $product['coupon_price'] : null,
-                                    'coupon_exp_date' => $product['has_coupon'] == 1 ? $product['coupon_exp_date'] : null,
                                 ];
                                 $productData = ProductionProduct::create($product_data);
                                 if($product){
@@ -244,10 +240,7 @@ class ProductionController extends BaseController
                                         }
                                         $production_product->materials()->sync($materials);
                                     }
-                                    if($product['has_coupon'] == 1)
-                                    {
-                                        ProductionCoupon::insert($this->generateCouponCode($production_product->id,$production->batch_no,$product['total_coupon']));
-                                    }
+
                                 }
                             }
                             $output = ['status' => 'success','message' => 'Data has been saved successfully'];
@@ -322,30 +315,12 @@ class ProductionController extends BaseController
                                 $production_product = ProductionProduct::find($product['production_product_id']);
                                 if($production_product)
                                 {
-                                    $has_coupon = $production_product->has_coupon;
-                                    $total_coupon = $production_product->total_coupon;
                                     $production_product->update([
                                         'product_id'      => $product['product_id'],
                                         'year'            => $product['year'],
                                         'mfg_date'        => $product['mfg_date'],
                                         'exp_date'        => $product['exp_date'],
-                                        'has_coupon'      => $product['has_coupon'],
-                                        'total_coupon'    => $product['has_coupon'] == 1 ? $product['total_coupon'] : null,
-                                        'coupon_price'    => $product['has_coupon'] == 1 ? $product['coupon_price'] : null,
-                                        'coupon_exp_date' => $product['has_coupon'] == 1 ? $product['coupon_exp_date'] : null,
                                     ]);
-
-                                    if($product['has_coupon'] == 1 && $has_coupon == 1)
-                                    {
-                                        if($total_coupon != $product['total_coupon']){
-                                            $delete_coupon = ProductionCoupon::where('production_product_id',$product['production_product_id'])->delete();
-                                            if($delete_coupon){
-                                                ProductionCoupon::insert($this->generateCouponCode($product['production_product_id'],$request->batch_no,$product['total_coupon']));
-                                            }
-                                        }
-                                    }elseif ($product['has_coupon'] == 1 && $has_coupon == 2) {
-                                        ProductionCoupon::insert($this->generateCouponCode($product['production_product_id'],$request->batch_no,$product['total_coupon']));
-                                    }
 
                                     if (!empty($product['materials']) && count($product['materials']) > 0) {
                                         foreach ($product['materials'] as $material) {
@@ -499,10 +474,6 @@ class ProductionController extends BaseController
                                     $product->materials()->detach();
                                 }
                                 
-                                if(!$product->coupons->isEmpty())
-                                {
-                                    $product->coupons()->delete();
-                                }
                                 $product->delete();
                             }
                         }
@@ -521,33 +492,7 @@ class ProductionController extends BaseController
         }
     }
 
-    
 
-    private function generateCouponCode(int $production_product_id,int $batch_no,int $total_coupon)
-    {
-        $chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        $coupon_code = [];
-        for ($coupon = 1; $coupon <= $total_coupon; $coupon++) {
-            $code  = "";
-            for ($i = 0; $i < 10; $i++) {
-                $code .= $chars[mt_rand(0, strlen($chars)-1)];
-            }
-
-            $code_exist = ProductionCoupon::where('coupon_code',$code)->first();
-            if($code_exist)
-            {
-                $this->generateCouponCode($production_product_id,$batch_no,$total_coupon);
-            }else{
-                $coupon_code[] = [
-                    'production_product_id' => $production_product_id,
-                    'batch_no'              => $batch_no,
-                    'coupon_code'           => $code,
-                    'created_at'            => date('Y-m-d H:i:s')
-                ];
-            }
-        }
-        return $coupon_code;
-    }
 
     public function product_material_list(Request $request)
     {

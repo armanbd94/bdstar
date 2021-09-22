@@ -28,7 +28,6 @@ class ProductionRequest extends FormRequest
                 $this->rules['production.'.$key.'.year']       = ['required'];
                 $this->rules['production.'.$key.'.mfg_date']   = ['required','date','date_format:Y-m-d'];
                 $this->rules['production.'.$key.'.exp_date']   = ['required','date','date_format:Y-m-d','after_or_equal:production.'.$key.'.mfg_date'];
-                $this->rules['production.'.$key.'.has_coupon'] = ['required'];
 
                 $this->messages['production.'.$key.'.product_id.required']     = 'This product name field is required';
                 $this->messages['production.'.$key.'.year.required']           = 'This year field is required';
@@ -39,23 +38,7 @@ class ProductionRequest extends FormRequest
                 $this->messages['production.'.$key.'.end_date.date']           = 'This end date value must be date';
                 $this->messages['production.'.$key.'.end_date.date_format']    = 'This end date format must be '.date('Y-m-d');
                 $this->messages['production.'.$key.'.end_date.after_or_equal'] = 'This end date must be equal or greater than mfg date';
-                $this->messages['production.'.$key.'.has_coupon.required']     = 'This has coupon field is required';
-                if(!empty($value['has_coupon']) && $value['has_coupon'] == 1)
-                {
-                    $this->rules['production.'.$key.'.total_coupon']    = ['required','numeric','gt:0'];
-                    $this->rules['production.'.$key.'.coupon_price']    = ['required','numeric','gt:0'];
-                    $this->rules['production.'.$key.'.coupon_exp_date'] = ['required','date','date_format:Y-m-d'];
 
-                    $this->messages['production.'.$key.'.total_coupon.required']       = 'This tptal coupon field is required';
-                    $this->messages['production.'.$key.'.total_coupon.numeric']        = 'This tptal coupon field value must be numeric';
-                    $this->messages['production.'.$key.'.total_coupon.gt']             = 'This tptal coupon field value must be greater than 0 ';
-                    $this->messages['production.'.$key.'.coupon_price.required']       = 'This coupon price field is required';
-                    $this->messages['production.'.$key.'.coupon_price.numeric']        = 'This coupon price field value must be numeric';
-                    $this->messages['production.'.$key.'.coupon_price.gt']             = 'This coupon price field value must be greater than 0 ';
-                    $this->messages['production.'.$key.'.coupon_exp_date.required']    = 'This end date field is required';
-                    $this->messages['production.'.$key.'.coupon_exp_date.date']        = 'This end date value must be date';
-                    $this->messages['production.'.$key.'.coupon_exp_date.date_format'] = 'This end date format must be '.date('Y-m-d');
-                }
 
                 if(!empty($value['materials']) && count($value['materials']) > 0)
                 {
