@@ -145,11 +145,10 @@ class Salesmen extends Authenticatable implements JWTSubject
     private function get_datatable_query()
     { 
         if (permission('sales-representative-bulk-delete')){
-            $this->column_order = [null,'id','id','name','username','phone','warehouse_id','district_id','upazila_id','email','status',null];
+            $this->column_order = [null,'id','id','name','username','monthly_target_value', 'cpr','phone','warehouse_id','district_id','upazila_id','email','status',null];
         }else{
-            $this->column_order = ['id','id','name','username','phone','warehouse_id','district_id','upazila_id','email','status',null];
+            $this->column_order = ['id','id','name','username','monthly_target_value', 'cpr','phone','warehouse_id','district_id','upazila_id','email','status',null];
         }
-        
 
         $query = self::with('district','upazila');
 

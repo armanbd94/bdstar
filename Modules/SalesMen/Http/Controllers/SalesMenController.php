@@ -78,7 +78,6 @@ class SalesMenController extends BaseController
                     $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->name . '">'.self::ACTION_BUTTON['Delete'].'</a>';
                 }
 
-
                 $row = [];
                 if(permission('sr-bulk-delete')){
                     $row[] = row_checkbox($value->id);//custom helper function to show the table each row checkbox
@@ -88,6 +87,7 @@ class SalesMenController extends BaseController
                 $row[] = $value->name;
                 $row[] = $value->username;
                 $row[] = number_format($value->monthly_target_value,2,'.','');
+                $row[] = number_format($value->cpr,2,'.','');
                 $row[] = $value->phone;
                 $row[] = $value->warehouse->name;
                 $row[] = $value->district->name;

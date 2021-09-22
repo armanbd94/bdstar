@@ -100,6 +100,7 @@
                                         <th>Name</th>
                                         <th>Username</th>
                                         <th>Monthly Target Value</th>
+                                        <th>Commission Rate(%)</th>
                                         <th>Phone</th>
                                         <th>Warehouse</th>
                                         <th>District</th>
@@ -165,9 +166,9 @@ $(document).ready(function(){
         },
         "columnDefs": [{
             @if (permission('sr-bulk-delete'))
-            "targets": [0,12],
+            "targets": [0,13],
             @else
-            "targets": [11],
+            "targets": [12],
             @endif
                 
                 "orderable": false,
@@ -175,20 +176,18 @@ $(document).ready(function(){
             },
             {
                 @if (permission('sr-bulk-delete'))
-                "targets": [1,2,11],
+                "targets": [1,2,4,7,8,9,10,11,12],
                 @else
-                "targets": [0,1,10],
+                "targets": [0,1,3,6,7,8,9,10,11],
                 @endif
-                
                 "className": "text-center"
             },
             {
                 @if (permission('sr-bulk-delete'))
-                "targets": [5],
+                "targets": [5,6],
                 @else
-                "targets": [4],
+                "targets": [4,5],
                 @endif
-                
                 "className": "text-right"
             }
         ],
