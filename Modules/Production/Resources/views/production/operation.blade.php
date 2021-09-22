@@ -54,13 +54,6 @@
                                             <th class="text-center">Exp. Date</th>
                                             <th class="text-center">Unit Name</th>
                                             <th class="text-center">Finish Goods Qty</th>
-                                            @if ($item->has_coupon == 1)
-                                            <th class="text-center">Total Coupon</th>
-                                            <th class="text-center">Coupon Price</th>
-                                            <th class="text-center">Coupon Exp. Date</th>
-                                            <th class="text-center">QR Code</th>
-                                            @endif
-                                            
                                         </thead>
                                         <tbody>
                                             <tr>
@@ -71,17 +64,6 @@
                                                     <input type="text" class="form-control text-center" value="{{ $item->base_unit_qty }}" name="production[{{ $key+1 }}][fg_qty]" id="production_{{ $key+1 }}_fg_qty" onkeyup="per_unit_cost('{{ $key+1 }}')">
                                                     <input type="hidden" class="form-control" name="production[{{ $key+1 }}][production_product_id]" value="{{ $item->id }}">
                                                 </td>
-                                                @if ($item->has_coupon == 1)
-                                                <td class="text-center">{{ $item->total_coupon }}</td>
-                                                <td class="text-center">{{ number_format($item->coupon_price,2,'.','') }}</td>
-                                                <td class="text-center">{{ date('d-M-Y',strtotime($item->coupon_exp_date)) }}</td>
-                                                <td class="text-center">
-                                                    <button type="button" class="btn btn-icon btn-outline-success btn-sm mr-2" data-toggle="tooltip" data-theme="dark" title="QR Code"
-                                                    onclick="show_qrcode_modal('{{ $item->id }}','{{ $production->batch_no }}','{{ $item->product->name }}')">
-                                                        <i class="fas fa-qrcode"></i>
-                                                    </button>
-                                                </td>
-                                                @endif
                                             </tr>
                                         </tbody>
                                     </table>
@@ -162,7 +144,6 @@
         <!--end::Card-->
     </div>
 </div>
-@include('production::production.qrcode-modal')
 @include('production::production.production-status-modal')
 @endsection
 

@@ -58,12 +58,8 @@
                                 <option value="{{ $key }}">{{ $value }}</option>
                             @endforeach
                         </x-form.selectbox>
-                        <x-form.selectbox labelName="Transfer Status" name="transfer_status" col="col-md-3" class="selectpicker">
-                            @foreach (TRANSFER_STATUS as $key => $value)
-                                <option value="{{ $key }}">{{ $value }}</option>
-                            @endforeach
-                        </x-form.selectbox>
-                        <div class="col-md-6">   
+
+                        <div class="col-md-9">   
                             <div style="margin-top:28px;">    
                                 <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
                                 data-toggle="tooltip" data-theme="dark" title="Reset">
@@ -93,7 +89,6 @@
                                         <th>Item</th>
                                         <th>Approval Status</th>
                                         <th>Production Status</th>
-                                        <th>Transfer Status</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -162,12 +157,12 @@
                 }
             },
             "columnDefs": [{
-                    "targets": [9],
+                    "targets": [8],
                     "orderable": false,
                     "className": "text-center"
                 },
                 {
-                    "targets": [0,1,2,3,4,5,6,7,8],
+                    "targets": [0,1,2,3,4,5,6,7],
                     "className": "text-center"
                 }
 
@@ -189,7 +184,7 @@
                     "orientation": "landscape", //portrait
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
-                        columns: ':visible:not(:eq(9))' 
+                        columns: ':visible:not(:eq(8))' 
                     },
                     customize: function (win) {
                         $(win.document.body).addClass('bg-white');
@@ -207,7 +202,7 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                        columns: ':visible:not(:eq(9))' 
+                        columns: ':visible:not(:eq(8))' 
                     }
                 },
                 {
@@ -217,7 +212,7 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                        columns: ':visible:not(:eq(9))' 
+                        columns: ':visible:not(:eq(8))' 
                     },
                 },
                 {
@@ -229,7 +224,7 @@
                     "orientation": "landscape", //portrait
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
-                        columns: ':visible:not(:eq(9))' 
+                        columns: ':visible:not(:eq(8))' 
                     },
                     customize: function(doc) {
                         doc.defaultStyle.fontSize = 7; //<-- set fontsize to 16 instead of 10 
@@ -249,7 +244,7 @@
             $('#form-filter')[0].reset();
             $('#form-filter .selectpicker').selectpicker('refresh');
             $('input[name="start_date"]').val('');
-                $('input[name="end_date"]').val('');
+            $('input[name="end_date"]').val('');
             table.ajax.reload();
         });
     

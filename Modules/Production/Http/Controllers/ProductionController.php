@@ -96,7 +96,6 @@ class ProductionController extends BaseController
                     $row[] = $value->item;
                     $row[] = APPROVE_STATUS_LABEL[$value->status];
                     $row[] = PRODUCTION_STATUS_LABEL[$value->production_status];
-                    $row[] = $value->production_status == 3 ? TRANSFER_STATUS_LABEL[$value->transfer_status] : '-';
                     $row[] = action_button($action);//custom helper function for action button
                     $data[] = $row;
                 }

@@ -71,7 +71,7 @@ class Production extends BaseModel
     private function get_datatable_query()
     {
 
-        $this->column_order = ['id', 'batch_no', 'warehouse_id', 'start_date', 'end_date', 'item','status', 'production_status', 'transfer_status', null];
+        $this->column_order = ['id', 'batch_no', 'warehouse_id', 'start_date', 'end_date', 'item','status', 'production_status', null];
         
         
         $query = self::with('warehouse:id,name');
