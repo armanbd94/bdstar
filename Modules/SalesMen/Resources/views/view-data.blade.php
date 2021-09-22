@@ -16,22 +16,27 @@
                     <td><b>Monthly Target Value</b></td><td><b>:</b></td><td>{{  number_format($salesmen->monthly_target_value,2,'.','')  }} Tk</td>
                 </tr>
                 <tr>
+                    <td><b>Commission Rate</b></td><td><b>:</b></td><td>{{  number_format($salesmen->cpr,2,'.','')  }}%</td>
                     <td><b>Warehouse</b></td><td><b>:</b></td><td>{{  $salesmen->warehouse->name  }}</td>
+                    
+                </tr>
+                <tr>
                     <td><b>District</b></td><td><b>:</b></td><td>{{  $salesmen->district->name  }}</td>
-                </tr>
-                <tr>
                     <td><b>Upazila</b></td><td><b>:</b></td><td>{{  $salesmen->upazila->name  }}</td>
+                    
+                </tr>
+                <tr>
                     <td><b>Address</b></td><td><b>:</b></td><td>{{  $salesmen->address  }}</td>
-                </tr>
-                <tr>
                     <td><b>Status</b></td><td><b>:</b></td><td>{!! STATUS_LABEL[$salesmen->status] !!}</td>
+                    
+                </tr>
+                <tr>
                     <td><b>Created By</b></td><td><b>:</b></td><td>{{  $salesmen->created_by  }}</td>
-                </tr>
-                <tr>
                     <td><b>Modified By</b></td><td><b>:</b></td><td>{{  $salesmen->modified_by  }}</td>
-                    <td><b>Create Date</b></td><td><b>:</b></td><td>{{  $salesmen->created_at ? date(config('settings.date_format'),strtotime($salesmen->created_at)) : ''  }}</td>
+                    
                 </tr>
                 <tr>
+                    <td><b>Create Date</b></td><td><b>:</b></td><td>{{  $salesmen->created_at ? date(config('settings.date_format'),strtotime($salesmen->created_at)) : ''  }}</td>
                     <td><b>Modified Date</b></td><td><b>:</b></td><td>{{  $salesmen->updated_at ? date(config('settings.date_format'),strtotime($salesmen->updated_at)) : ''  }}</td>
                 </tr>
             </table>
