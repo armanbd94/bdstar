@@ -135,7 +135,7 @@ class Sale extends BaseModel
     private function get_datatable_query()
     {
         $this->column_order = ['s.id','s.memo_no', 's.salesmen_id','s.custoemr_id', 's.item','s.total_price','s.order_tax_rate','s.order_tax', 
-        's.order_discount','s.labor_cost','s.shipping_cost','s.grand_total','s.previous_due','s.net_total', 's.paid_amount', 's.due_amount', 's.sale_date', 
+        's.order_discount','s.labor_cost','s.shipping_cost','s.grand_total','s.previous_due','s.net_total', 's.paid_amount', 's.due_amount','s.sr_commission_rate','s.total_commission', 's.sale_date', 
         's.payment_status','s.payment_method','s,delivery_status','s.delivery_date', null];
 
         $query = DB::table('sales as s')
@@ -147,8 +147,7 @@ class Sale extends BaseModel
         ->join('locations as d', 'c.district_id', '=', 'd.id')
         ->join('locations as u', 'c.upazila_id', '=', 'u.id')
         ->join('locations as r', 'c.route_id', '=', 'r.id')
-        ->join('locations as a', 'c.area_id', '=', 'a.id')
-        ->where('s.warehouse_id',auth()->user()->warehouse->id);
+        ->join('locations as a', 'c.area_id', '=', 'a.id');
 
         //search query
         if (!empty($this->_memo_no)) {
@@ -160,9 +159,6 @@ class Sale extends BaseModel
                 ->whereDate('s.sale_date', '<=',$this->_to_date);
         }
 
-        if (!empty($this->_warehouse_id)) {
-            $query->where('s.warehouse_id', $this->_warehouse_id);
-        }
         if (!empty($this->_salesmen_id)) {
             $query->where('s.salesmen_id', $this->_salesmen_id);
         }
@@ -215,7 +211,7 @@ class Sale extends BaseModel
 
     public function count_all()
     {
-        return DB::table('sales')->where('warehouse_id',auth()->user()->warehouse->id)->get()->count();
+        return DB::table('sales')->get()->count();
     }
     /******************************************
      * * * End :: Custom Datatable Code * * *
