@@ -49,11 +49,6 @@
                                     @endforeach
                                 </x-form.selectbox> 
 
-                                <x-form.selectbox labelName="Product Type" name="product_type" required="required" col="col-md-4" class="selectpicker">
-                                    @foreach (PRODUCT_TYPE as $key => $value)
-                                        <option value="{{ $key }}">{{ $value }}</option>
-                                    @endforeach
-                                </x-form.selectbox> 
 
                                 <x-form.selectbox labelName="Category" name="category_id" required="required" col="col-md-4" class="selectpicker">
                                     @if (!$categories->isEmpty())
@@ -82,11 +77,9 @@
                                     <select name="unit_id" id="unit_id"  class="form-control selectpicker" data-live-search="true"  data-live-search-placeholder="Search"></select>
                                 </div>
         
+                                <x-form.textbox labelName="Unit Price" name="unit_price" required="required" col="col-md-4" />
+                                <x-form.textbox labelName="Base Unit Price" name="base_unit_price" required="required" col="col-md-4" />
                                 
-                                <x-form.textbox labelName="TP (Price) Base Unit" name="base_unit_price" required="required" col="col-md-4" />
-                                <x-form.textbox labelName="TP (Price) Unit" name="unit_price" required="required" col="col-md-4" />
-                                <x-form.textbox labelName="MRP (Price) Base Unit" name="base_unit_mrp" required="required" col="col-md-4" />
-                                <x-form.textbox labelName="MRP (Price) Unit" name="unit_mrp" required="required" col="col-md-4" />
                                 
                                 <x-form.textbox labelName="Alert Quantity" name="alert_quantity"  col="col-md-4" />
         

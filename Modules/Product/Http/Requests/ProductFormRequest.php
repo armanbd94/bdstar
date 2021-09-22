@@ -17,7 +17,6 @@ class ProductFormRequest extends FormRequest
     {
         $this->rules['name']              = ['required','string','unique:products,name'];
         $this->rules['code']              = ['required','string','unique:products,code'];
-        $this->rules['product_type']      = ['required'];
         $this->rules['category_id']       = ['required'];
         $this->rules['barcode_symbology'] = ['required'];
         $this->rules['tax_id']            = ['nullable','numeric'];
@@ -33,9 +32,7 @@ class ProductFormRequest extends FormRequest
         $this->rules['base_unit_id']    = ['required'];
         $this->rules['unit_id']         = ['required'];
         $this->rules['alert_quantity']  = ['nullable','numeric','gte:0'];
-        $this->rules['base_unit_mrp']   = ['required','numeric','gt:0'];
         $this->rules['base_unit_price'] = ['required','numeric','gt:0'];
-        $this->rules['unit_mrp']        = ['required','numeric','gt:0'];
         $this->rules['unit_price']      = ['required','numeric','gt:0'];
         
         $this->messages['unit_id.required']      = 'The unit field is required';

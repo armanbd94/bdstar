@@ -91,14 +91,11 @@ class ProductController extends BaseController
                     $row[] = $no;
                     $row[] = $this->table_image(PRODUCT_IMAGE_PATH,$value->image,$value->name);
                     $row[] = $value->name;
-                    $row[] = PRODUCT_TYPE_LABEL[$value->product_type];
                     $row[] = $value->category->name;
                     $row[] = number_format($value->cost,2,'.','');
                     $row[] = $value->base_unit->unit_name.' ('.$value->base_unit->unit_code.')';
                     $row[] = $value->unit->unit_name.' ('.$value->unit->unit_code.')';
-                    $row[] = number_format($value->unit_mrp,2,'.','');
                     $row[] = number_format($value->unit_price,2,'.','');
-                    $row[] = number_format($value->base_unit_mrp,2,'.','');
                     $row[] = number_format($value->base_unit_price,2,'.','');
                     $row[] = $value->unit_qty ?? 0;
                     $row[] = $value->base_unit_qty ?? 0;

@@ -85,15 +85,12 @@
                                         <th>Sl</th>
                                         <th>Image</th>
                                         <th>Name</th>
-                                        <th>Product Type</th>
                                         <th>Category</th>
                                         <th>Cost Base Unit</th>
                                         <th>Base Unit</th>
                                         <th>Unit</th>
-                                        <th>MRP (Price) Unit</th>
-                                        <th>TP (Price) Unit</th>
-                                        <th>MRP (Price) Base Unit</th>
-                                        <th>TP (Price) Base Unit</th>
+                                        <th>Unit Price</th>
+                                        <th>Base Unit Price</th>
                                         <th>Stock Qty Unit</th>
                                         <th>Stock Qty Base Unit</th>
                                         <th>Alert Qty</th>
@@ -152,26 +149,26 @@
             },
             "columnDefs": [{
                     @if (permission('product-bulk-delete'))
-                    "targets": [0,17],
+                    "targets": [0,14],
                     @else 
-                    "targets": [16],
+                    "targets": [13],
                     @endif
                     "orderable": false,
                     "className": "text-center"
                 },
                 {
                     @if (permission('product-bulk-delete'))
-                    "targets": [1,2,4,5,6,7,8,13,14,15,16],
+                    "targets": [1,2,4,6,7,10,11,12,13],
                     @else 
-                    "targets": [0,1,3,4,5,6,7,12,13,14,15],
+                    "targets": [0,1,3,5,6,9,10,11,12],
                     @endif
                     "className": "text-center"
                 },
                 {
                     @if (permission('product-bulk-delete'))
-                    "targets": [9,10,11,12],
+                    "targets": [5,8,9],
                     @else 
-                    "targets": [8,9,10,11],
+                    "targets": [4,7,8],
                     @endif
                     "className": "text-right"
                 }
@@ -195,9 +192,9 @@
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
                         @if (permission('product-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(17))' 
+                        columns: ':visible:not(:eq(0),:eq(14))' 
                         @else 
-                        columns: ':visible:not(:eq(16))' 
+                        columns: ':visible:not(:eq(13))' 
                         @endif
                     },
                     customize: function (win) {
@@ -216,10 +213,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                         @if (permission('product-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(17))' 
+                        @if (permission('product-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(14))' 
                         @else 
-                        columns: ':visible:not(:eq(16))' 
+                        columns: ':visible:not(:eq(13))' 
                         @endif
                     }
                 },
@@ -230,10 +227,10 @@
                     "title": "{{ $page_title }} List",
                     "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                     "exportOptions": {
-                         @if (permission('product-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(17))' 
+                        @if (permission('product-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(14))' 
                         @else 
-                        columns: ':visible:not(:eq(16))' 
+                        columns: ':visible:not(:eq(13))' 
                         @endif
                     },
                 },
@@ -246,10 +243,10 @@
                     "orientation": "landscape", //portrait
                     "pageSize": "A4", //A3,A5,A6,legal,letter
                     "exportOptions": {
-                         @if (permission('product-bulk-delete'))
-                        columns: ':visible:not(:eq(0),:eq(17))' 
+                        @if (permission('product-bulk-delete'))
+                        columns: ':visible:not(:eq(0),:eq(14))' 
                         @else 
-                        columns: ':visible:not(:eq(16))' 
+                        columns: ':visible:not(:eq(13))' 
                         @endif
                     },
                     customize: function(doc) {

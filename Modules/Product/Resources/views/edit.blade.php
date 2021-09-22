@@ -61,11 +61,6 @@
                                     @endforeach
                                 </x-form.selectbox> 
 
-                                <x-form.selectbox labelName="Product Type" name="product_type" required="required" col="col-md-4" class="selectpicker">
-                                    @foreach (PRODUCT_TYPE as $key => $value)
-                                        <option value="{{ $key }}" {{ $product->product_type == $key ? 'selected' : '' }}>{{ $value }}</option>
-                                    @endforeach
-                                </x-form.selectbox> 
 
                                 <x-form.selectbox labelName="Category" name="category_id" required="required" col="col-md-4" class="selectpicker">
                                     @if (!$categories->isEmpty())
@@ -105,10 +100,9 @@
                                     @endif
                                     </select>
                                 </div>
-                                <x-form.textbox labelName="TP (Price) Base Unit" name="base_unit_price" value="{{ $product->base_unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
-                                <x-form.textbox labelName="TP (Price) Unit" name="unit_price" value="{{ $product->unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
-                                <x-form.textbox labelName="MRP (Price) Base Unit" name="base_unit_mrp" value="{{ $product->base_unit_mrp }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
-                                <x-form.textbox labelName="MRP (Price) Unit" name="unit_mrp" value="{{ $product->unit_mrp }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
+                                
+                                <x-form.textbox labelName="Unit Price" name="unit_price" value="{{ $product->unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
+                                <x-form.textbox labelName="Base Unit Price" name="base_unit_price" value="{{ $product->base_unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
                                 <x-form.textbox labelName="Alert Quantity" name="alert_quantity" value="{{ $product->alert_quantity }}"  col="col-md-4 alert-qty" placeholder="Enter product alert qty"/>
                                 
 

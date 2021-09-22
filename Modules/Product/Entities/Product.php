@@ -78,9 +78,9 @@ class Product extends BaseModel
     {
         //set column sorting index table column name wise (should match with frontend table header)
         if (permission('product-bulk-delete')){
-            $this->column_order = [null,'id', 'id', 'name', 'product_type', 'category_id', 'cost', 'base_unit_qty', 'unit_qty','unit_mrp', 'unit_price','base_unit_mrp', 'base_unit_price',  'unit_qty', 'base_unit_qty','alert_quantity', 'status', null];
+            $this->column_order = [null,'id', 'id', 'name', 'category_id', 'cost', 'base_unit_qty', 'unit_qty', 'unit_price', 'base_unit_price',  'unit_qty', 'base_unit_qty','alert_quantity', 'status', null];
         }else{
-            $this->column_order = ['id', 'id', 'name', 'product_type', 'category_id', 'cost','base_unit_qty', 'unit_qty', 'unit_mrp', 'unit_price','base_unit_mrp', 'base_unit_price','unit_qty', 'base_unit_qty','alert_quantity', 'status', null];
+            $this->column_order = ['id', 'id', 'name', 'category_id', 'cost','base_unit_qty', 'unit_qty',  'unit_price', 'base_unit_price','unit_qty', 'base_unit_qty','alert_quantity', 'status', null];
         }
         
         $query = self::with('category:id,name');

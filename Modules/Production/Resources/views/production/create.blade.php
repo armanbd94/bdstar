@@ -56,7 +56,7 @@
                             <x-form.selectbox labelName="Warehouse" name="warehouse_id" required="required"  col="col-md-4" class="selectpicker">
                                 @if (!$warehouses->isEmpty())
                                     @foreach ($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                        <option value="{{ $warehouse->id }}" {{ $warehouse->id == 1 ? 'selected' : '' }}>{{ $warehouse->name }}</option>
                                     @endforeach
                                 @endif
                             </x-form.selectbox>
@@ -107,26 +107,6 @@
                                                         <div class="form-group col-md-3 required">
                                                             <label for="exp_date">Exp. Date</label>
                                                             <input type="text" class="form-control date" name="production[1][exp_date]" id="production_1_exp_date" value="{{ date('Y-m-d',strtotime('+1 year')) }}" readonly />
-                                                        </div>
-                                                        <div class="form-group col-md-3 required">
-                                                            <label for="has_coupon">This Product has Coupon?</label>
-                                                            <select name="production[1][has_coupon]" id="production_1_has_coupon"  onchange="couponInputField(this.value,1)" class="form-control selectpicker">
-                                                                <option value="">Select Please</option>
-                                                                <option value="1">Yes</option>
-                                                                <option value="2">No</option>
-                                                            </select>
-                                                        </div>
-                                                        <div class="form-group col-md-4 required coupon_1 d-none">
-                                                            <label for="total_coupon">Total Coupon</label>
-                                                            <input type="text" class="form-control" name="production[1][total_coupon]" id="production_1_total_coupon" />
-                                                        </div>
-                                                        <div class="form-group col-md-4 required coupon_1 d-none">
-                                                            <label for="coupon_price">Coupon Price</label>
-                                                            <input type="text" class="form-control" name="production[1][coupon_price]" id="production_1_coupon_price" />
-                                                        </div>
-                                                        <div class="form-group col-md-4 required coupon_1 d-none">
-                                                            <label for="coupon_exp_date">Exp. Date</label>
-                                                            <input type="text" class="form-control date" name="production[1][coupon_exp_date]" id="production_1_coupon_exp_date" readonly />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -197,26 +177,6 @@ $(document).ready(function () {
                                                     <div class="form-group col-md-3 required">
                                                         <label for="exp_date">Exp. Date</label>
                                                         <input type="text" class="form-control date" name="production[`+tab+`][exp_date]" id="production_`+tab+`_exp_date" value="{{ date('Y-m-d',strtotime('+1 year')) }}" readonly />
-                                                    </div>
-                                                    <div class="form-group col-md-3 required">
-                                                        <label for="has_coupon">This Product has Coupon?</label>
-                                                        <select name="production[`+tab+`][has_coupon]" id="production_`+tab+`_has_coupon"  onchange="couponInputField(this.value,`+tab+`)" class="form-control selectpicker">
-                                                            <option value="">Select Please</option>
-                                                            <option value="1">Yes</option>
-                                                            <option value="2">No</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="form-group col-md-4 required coupon_`+tab+` d-none">
-                                                        <label for="total_coupon">Total Coupon</label>
-                                                        <input type="text" class="form-control" name="production[`+tab+`][total_coupon]" id="production_`+tab+`_total_coupon" />
-                                                    </div>
-                                                    <div class="form-group col-md-4 required coupon_`+tab+` d-none">
-                                                        <label for="coupon_price">Coupon Price</label>
-                                                        <input type="text" class="form-control" name="production[`+tab+`][coupon_price]" id="production_`+tab+`_coupon_price" />
-                                                    </div>
-                                                    <div class="form-group col-md-4 required coupon_`+tab+` d-none">
-                                                        <label for="coupon_exp_date">Exp. Date</label>
-                                                        <input type="text" class="form-control date" name="production[`+tab+`][coupon_exp_date]" id="production_`+tab+`_coupon_exp_date" readonly />
                                                     </div>
                                                 </div>
                                             </div>
@@ -304,10 +264,7 @@ function generateDate(number,tab)
     $('#production_'+tab+'_exp_date').val(exp_date.toISOString().slice(0, 10));
 }
 
-function couponInputField(value,tab)
-{
-    (value == 1) ? $('.coupon_'+tab).removeClass('d-none') : $('.coupon_'+tab).addClass('d-none');
-}
+
 function check_material_stock()
 {
     let form = document.getElementById('store_or_update_form');
