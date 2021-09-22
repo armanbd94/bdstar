@@ -26,7 +26,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <h4 class="bg-primary text-center text-white p-3">{{ $product->name }}</h4>
+                        <h4 class="text-center p-3">{{ $product->name }}</h4>
                     </div>
                     @if (!empty($product->image))
                     <div class="col-md-3">
@@ -36,49 +36,40 @@
                     <div class="col-md-9 pt-5 table-responsive">
                         <table class="table table-borderless table-hover">
                             <tr>
-                                <td><b>Product Type</b></td> <td class="text-center"><b>:</b></td> <td>{{ PRODUCT_TYPE[$product->product_type] }}</td>
                                 <td><b>Category</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->category->name }}</td>
-                            </tr>
-                            <tr>
                                 <td><b>Barcode Symbol</b></td> <td class="text-center"><b>:</b></td> <td>{{ BARCODE_SYMBOL[$product->barcode_symbology] }}</td>
+                            </tr>
+                            <tr>
                                 <td><b>Barcode</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->code }}</td>
-                            </tr>
-                            <tr>
                                 <td><b>Cost</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->cost,2) }}</td>
+                            </tr>
+                            <tr>
                                 <td><b>Base Unit</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->base_unit->unit_name.'('.$product->base_unit->unit_code.')' }}</td>
-                            </tr>
-                            <tr>
                                 <td><b>Unit</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->unit->unit_name.'('.$product->unit->unit_name.')' }}</td>
-                                <td><b>MRP (Price) Base Unit</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->base_unit_mrp,2) }}</td>
                             </tr>
                             <tr>
-                                <td><b>TP (Price) Base Unit</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->base_unit_price,2) }}</td>
-                                <td><b>MRP (Price) Unit</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->unit_mrp,2) }}</td>
+                                <td><b>Base Unit Price</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->base_unit_price,2) }}</td>
+                                <td><b>Unit Price</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->unit_price,2) }}</td>
                             </tr>
                             <tr>
-                                <td><b>TP (Price) Unit</b></td> <td class="text-center"><b>:</b></td> <td>BDT {{ number_format($product->unit_price,2) }}</td>
                                 <td><b>Stock Qunatity Base Unit</b></td> <td class="text-center"><b>:</b></td> <td>{{ number_format($product->base_unit_qty,2) }}</td>
-                            </tr>
-                            <tr>
                                 <td><b>Stock Qunatity Unit</b></td> <td class="text-center"><b>:</b></td> <td>{{ number_format($product->unit_qty,2) }}</td>
+                            </tr>
+                            <tr>
                                 <td><b>Alert Quantity</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->alert_quantity }}</td>
-                            </tr>
-                            <tr>
                                 <td><b>Tax</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->tax->rate }}%</td>
+                            </tr>
+                            <tr>
                                 <td><b>Tax Method</b></td> <td class="text-center"><b>:</b></td> <td>{{ TAX_METHOD[$product->tax_method] }}</td>
-                            </tr>
-                            @if (Auth::user()->role_id == 1 || Auth::user()->role_id == 2)
-                            <tr>
                                 <td><b>Created By</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->created_by }}</td>
-                                <td><b>Created At</b></td> <td class="text-center"><b>:</b></td> <td>{{ date('j-F-Y h:i:sA',strtotime($product->created_at)) }}</td>
                             </tr>
-                            @if($product->modified_by)
                             <tr>
-                                <td><b>Updated By</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->modified_by }}</td>
-                                <td><b>Updated At</b></td> <td class="text-center"><b>:</b></td> <td>{{ date('j-F-Y h:i:sA',strtotime($product->updated_at)) }}</td>
+                                <td><b>Created At</b></td> <td class="text-center"><b>:</b></td> <td>{{ date('j-F-Y h:i:sA',strtotime($product->created_at)) }}</td>
+                                <td><b>Updated By</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->modified_by ? $product->modified_by : '' }}</td>
                             </tr>
-                            @endif
-                            @endif
+                            <tr>
+                                <td><b>Updated At</b></td> <td class="text-center"><b>:</b></td> <td>{{ $product->modified_by ? date('j-F-Y h:i:sA',strtotime($product->updated_at)) : '' }}</td>
+                            </tr>
                         </table>
                     </div>
                 </div>
