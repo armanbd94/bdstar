@@ -92,7 +92,7 @@ class CustomerController extends BaseController
                     }
                     if(!empty($value->avatar))
                     {
-                        $avatar =  "<img src='".ASM_BASE_PATH."storage/".CUSTOMER_AVATAR_PATH.$value->avatar."' alt='".$value->name."' style='width:50px;'/>";
+                        $avatar =  "<img src='".asset("storage/".CUSTOMER_AVATAR_PATH.$value->avatar)."' alt='".$value->name."' style='width:50px;'/>";
                     }else{
                         $avatar =  "<img src='".asset("images/male.svg")."' alt='Default Image' style='width:50px;'/>";
                     }
@@ -135,7 +135,7 @@ class CustomerController extends BaseController
                     if($request->hasFile('avatar')){
                         $avatar  = $this->upload_file($request->file('avatar'),CUSTOMER_AVATAR_PATH);
                         if(!empty($request->old_avatar)){
-                            $this->delete_file($request->old_avatar, SALESMEN_AVATAR_PATH);
+                            $this->delete_file($request->old_avatar, CUSTOMER_AVATAR_PATH);
                         }  
                     }
                     $collection   = $collection->merge(compact('avatar'));

@@ -26,7 +26,7 @@ class CustomerFormRequest extends FormRequest
         $this->rules['route_id']          = ['required'];
         $this->rules['address']           = ['required','string'];
         $this->rules['previous_balance']  = ['nullable','numeric','gt:0'];
-        $this->rules['avatar']                = ['nullable','image', 'mimes:png,jpg,jpeg'];
+        $this->rules['avatar']                = ['nullable','image', 'mimes:png,jpg,jpeg,svg'];
         if(request()->update_id){
             $this->rules['mobile'][3] = 'unique:customers,mobile,'.request()->update_id;
             $this->rules['email'][4]  = 'unique:customers,email,'.request()->update_id;
