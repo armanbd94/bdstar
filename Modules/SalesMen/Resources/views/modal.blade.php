@@ -55,6 +55,7 @@
                             </div>
                             <x-form.textbox labelName="NID No." name="nid_no" col="col-md-6" placeholder="Enter NID no."/>
                             <x-form.textbox labelName="Monthly Target Value" name="monthly_target_value" col="col-md-6" placeholder="Enter monthly target value"/>
+                            <x-form.textbox labelName="Commission Percentage(%)" name="cpr" col="col-md-6" placeholder="Enter commission percentage"/>
                             <x-form.selectbox labelName="Warehouse" name="warehouse_id" required="required" col="col-md-6" class="selectpicker" onchange="setDistrictData();getUpazilaList(2);">
                                 @if (!$warehouses->isEmpty())
                                 @foreach ($warehouses as $warehouse)

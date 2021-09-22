@@ -14,7 +14,7 @@ class Salesmen extends Authenticatable implements JWTSubject
     protected $table= 'salesmen';
 
     protected $fillable = [ 'name', 'username', 'phone','email', 'avatar', 'password',
-     'warehouse_id', 'district_id', 'upazila_id','nid_no','monthly_target_value', 'address', 'status', 'created_by', 'modified_by'];
+     'warehouse_id', 'district_id', 'upazila_id','nid_no','monthly_target_value', 'cpr','address', 'status', 'created_by', 'modified_by'];
 
     protected $hidden = [
         'password',

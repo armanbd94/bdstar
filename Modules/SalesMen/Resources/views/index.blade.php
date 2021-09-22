@@ -368,6 +368,7 @@ $(document).ready(function(){
                         $('#store_or_update_form #address').val(data.address);
                         $('#store_or_update_form #nid_no').val(data.nid_no);
                         $('#store_or_update_form #monthly_target_value').val(data.monthly_target_value);
+                        $('#store_or_update_form #cpr').val(data.cpr);
                         $('#store_or_update_form #old_avatar').val(data.avatar);
                         $('#store_or_update_form .selectpicker').selectpicker('refresh');
 

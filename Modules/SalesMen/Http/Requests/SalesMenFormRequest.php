@@ -22,14 +22,17 @@ class SalesMenFormRequest extends FormRequest
         $this->rules['email']                 = ['nullable', 'string', 'email', 'unique:salesmen,email'];
         $this->rules['password']              = ['required', 'string', 'min:8', 'confirmed'];
         $this->rules['password_confirmation'] = ['required', 'string', 'min:8'];
-        $this->rules['avatar']                = ['nullable','image', 'mimes:png,jpg,jpeg'];
+        $this->rules['avatar']                = ['nullable','image', 'mimes:png,jpg,jpeg,svg'];
         $this->rules['address']               = ['nullable', 'string'];
         $this->rules['warehouse_id']          = ['required'];
-        $this->rules['district_name']           = ['required'];
+        $this->rules['district_name']         = ['required'];
         $this->rules['district_id']           = ['required'];
         $this->rules['upazila_id']            = ['required'];
         $this->rules['nid_no']                = ['nullable'];
-        $this->rules['monthly_target_value']  = ['nullable','numeric','gt:0'];
+        $this->rules['monthly_target_value']  = ['nullable','numeric','gte:0'];
+        $this->rules['cpr']                   = ['nullable','gte:0'];
+
+        
         if(request()->update_id){
             $this->rules['username'][3]              = 'unique:salesmen,username,'.request()->update_id;
             $this->rules['phone'][3]                 = 'unique:salesmen,phone,'.request()->update_id;
@@ -52,6 +55,8 @@ class SalesMenFormRequest extends FormRequest
 
     public function messages()
     {
+        $this->messages['cpr.nullable'] = ['The commission percentage value could be nullable'];
+        $this->messages['cpr.gte']       = ['The commission percentage value must be greater than or equal 0'];
         return $this->messages;
     }
 
