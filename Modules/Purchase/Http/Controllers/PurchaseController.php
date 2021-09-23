@@ -203,11 +203,10 @@ class PurchaseController extends BaseController
                             $shipping_cost = $request->shipping_cost ? floatval($request->shipping_cost) : 0;
 
                             if($material->tax_method == 1){
-
                                 if($unit->operator == '*'){
-                                    $material_cost = (floatval($value['net_unit_cost'] + ($value['discount'] / $value['qty'])) / $unit->operation_value) + (($labor_cost / $value['qty'])  / $unit->operation_value) + $shipping_cost;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) / $unit->operation_value;
                                 }elseif ($unit->operator == '/') {
-                                    $material_cost = (floatval($value['net_unit_cost'] + ($value['discount'] / $value['qty'])) * $unit->operation_value ) + (($labor_cost / $value['qty'])  * $unit->operation_value) + $shipping_cost;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) * $unit->operation_value;
                                 }
                             }else{
                                 if($unit->operator == '*'){
@@ -217,7 +216,7 @@ class PurchaseController extends BaseController
                                 }
                                 
                             }
-
+                            dd('ok');
                             $materials[$value['id']] = [
                                 'qty'              => $value['qty'],
                                 'received'         => $value['received'],
@@ -533,9 +532,9 @@ class PurchaseController extends BaseController
                             if($material->tax_method == 1){
 
                                 if($unit->operator == '*'){
-                                    $material_cost = (floatval($value['net_unit_cost'] + ($value['discount'] / $value['qty'])) / $unit->operation_value) + (($labor_cost / $value['qty'])  / $unit->operation_value) + $shipping_cost;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) / $unit->operation_value;
                                 }elseif ($unit->operator == '/') {
-                                    $material_cost = (floatval($value['net_unit_cost'] + ($value['discount'] / $value['qty'])) * $unit->operation_value ) + (($labor_cost / $value['qty'])  * $unit->operation_value) + $shipping_cost;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) * $unit->operation_value;
                                 }
                             }else{
                                 if($unit->operator == '*'){
