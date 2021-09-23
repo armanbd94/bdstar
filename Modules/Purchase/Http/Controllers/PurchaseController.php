@@ -216,7 +216,6 @@ class PurchaseController extends BaseController
                                 }
                                 
                             }
-                            dd('ok');
                             $materials[$value['id']] = [
                                 'qty'              => $value['qty'],
                                 'received'         => $value['received'],
@@ -243,7 +242,7 @@ class PurchaseController extends BaseController
                                 $warehouse_material->save();
                             }else{
                                 WarehouseMaterial::create([
-                                    'warehouse_id' => $request->warehouse_id,
+                                    'warehouse_id' => $warehouse_id,
                                     'material_id'  => $value['id'],
                                     'qty'          => $qty
                                 ]);

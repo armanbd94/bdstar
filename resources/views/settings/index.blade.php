@@ -154,7 +154,7 @@
 @endsection
 
 @push('scripts')
-<script src="js/spartan-multi-image-picker-min.js"></script>
+<script src="js/spartan-multi-image-picker.min.js"></script>
 <script>
 $(document).ready(function(){
    
