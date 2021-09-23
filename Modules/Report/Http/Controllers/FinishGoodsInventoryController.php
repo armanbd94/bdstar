@@ -62,14 +62,13 @@ class FinishGoodsInventoryController extends BaseController
                     $row[] = $value->batch_no;
                     $row[] = $value->product_name;
                     $row[] = $value->product_code;
-                    $row[] = PRODUCT_TYPE[$value->product_type];
                     $row[] = $value->unit_name;
                     $row[] = $value->base_unit_name;
                     $row[] = number_format($value->unit_price,2,'.','');
                     $row[] = number_format($value->base_unit_price,2,'.','');
                     $row[] = number_format($value->per_unit_cost,2,'.','');
-                    $row[] = $value->base_unit_qty;
-                    $row[] = $unit_qty;
+                    $row[] = number_format($value->base_unit_qty,4,'.','');
+                    $row[] = number_format($unit_qty,4,'.','');
                     $row[] = number_format(($value->unit_price * $unit_qty),2,'.','');
                     $data[] = $row;
                 }

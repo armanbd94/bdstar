@@ -72,7 +72,7 @@ class FinishGoodsReport extends BaseModel
    private function get_datatable_query()
    {
 
-       $this->column_order = ['pp.id', 'p.end_date','p.batch_no', 'pro.name','pro.code', 'pro.product_type','pro.unit_id',
+       $this->column_order = ['pp.id', 'p.end_date','p.batch_no', 'pro.name','pro.code', 'pro.unit_id',
         'pro.base_unit_id','pro.unit_price','pro.base_unit_price','pp.per_unit_cost',null,'pp.base_unit_qty',null];
        
        
@@ -82,7 +82,7 @@ class FinishGoodsReport extends BaseModel
        ->leftjoin('units as bu','pro.base_unit_id','=','bu.id')
        ->leftjoin('units as u','pro.unit_id','=','u.id')
        ->where([['p.status',1],['p.production_status',3]])
-       ->selectRaw('pp.*,p.batch_no,p.end_date,pro.name as product_name,pro.code as product_code,pro.product_type,pro.base_unit_price,pro.unit_price,
+       ->selectRaw('pp.*,p.batch_no,p.end_date,pro.name as product_name,pro.code as product_code,pro.base_unit_price,pro.unit_price,
        bu.unit_name as base_unit_name,u.unit_name as unit_name,u.operator as unit_operator,u.operation_value as unit_operation_value');
        //search query
        if (!empty($this->_batch_no)) {

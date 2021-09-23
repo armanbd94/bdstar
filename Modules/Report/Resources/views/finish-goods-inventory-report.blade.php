@@ -60,7 +60,6 @@
                                         <th>Batch No.</th>
                                         <th>Product Name</th>
                                         <th>Barcode</th>
-                                        <th>Type</th>
                                         <th>Unit</th>
                                         <th>Base Unit</th>
                                         <th>TP (Price) Unit</th>
@@ -74,7 +73,6 @@
                                 <tbody></tbody>
                                 <tfoot>
                                     <tr class="bg-primary">
-                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -187,15 +185,15 @@ $(document).ready(function(){
             }
         },
         "columnDefs": [{
-                "targets": [11,13],
+                "targets": [11,12],
                 "orderable": false,
             },
             {
-                "targets": [0,1,2,3,4,5,6,7,11,12],
+                "targets": [0,1,2,3,4,5,6,7,11],
                 "className": "text-center"
             },
             {
-                "targets": [8,9,10,13],
+                "targets": [8,9,10,12],
                 "className": "text-right"
             }
 
@@ -289,17 +287,17 @@ $(document).ready(function(){
                         i : 0;
             };
 
-            total = api.column(13).data().reduce( function (a, b) {
+            total = api.column(12).data().reduce( function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0 );
 
             // Total over this page
-            pageTotal = api.column(13, { page: 'current'}).data().reduce( function (a, b) {
+            pageTotal = api.column(12, { page: 'current'}).data().reduce( function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0 );
 
             // Update footer
-            $( api.column(13).footer() ).html('= '+number_format(total));
+            $( api.column(12).footer() ).html('= '+number_format(total));
         }
     });
 
