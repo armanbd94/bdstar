@@ -95,7 +95,6 @@ class SalesReportController extends BaseController
 
                     $row[] = $product['name'];
                     $row[] = $product['code'];
-                    $row[] = $product['batch_no'];
                     $row[] = $product['unit'];
                     $row[] = $product['qty'];
                     $row[] = $product['price'];
@@ -144,13 +143,12 @@ class SalesReportController extends BaseController
         ->select('sp.*','p.name','p.code','u.unit_name','u.unit_code')
         ->where('sp.sale_id',$sale_id)
         ->get();
-        $name = $code = $batch_no = $unit = $qty = $price = $tax = $subtotal = '';         
+        $name = $code = $unit = $qty = $price = $tax = $subtotal = '';         
         if($return_products)
         {
             foreach ($return_products as $item) {
                 $name       .= "<li class='pl-3'>".$item->name."</li>";
                 $code       .= "<li class='pl-3'>".$item->code."</li>";
-                $batch_no   .= "<li class='pl-3'>".$item->batch_no."</li>";
                 $unit       .= "<li>".$item->unit_name."</li>";
                 $qty        .= "<li>".number_format($item->qty,2,'.','')."</li>";
                 $price      .= "<li class='pr-3'>".number_format($item->net_unit_price,2,'.','')."</li>";
@@ -161,7 +159,6 @@ class SalesReportController extends BaseController
         return [ 
             'name'  => '<ul style="list-style:none;margin:0;padding:0;">'.$name.'</ul>',
             'code'     => '<ul style="list-style:none;margin:0;padding:0;">'.$code.'</ul>',
-            'batch_no' => '<ul style="list-style:none;margin:0;padding:0;">'.$batch_no.'</ul>',
             'unit'     => '<ul style="list-style:none;margin:0;padding:0;">'.$unit.'</ul>',
             'qty'      => '<ul style="list-style:none;margin:0;padding:0;">'.$qty.'</ul>',
             'price'    => '<ul style="list-style:none;margin:0;padding:0;">'.$price.'</ul>',

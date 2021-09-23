@@ -63,7 +63,7 @@
                         <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" onchange="getSalesmenList(this.value)" class="selectpicker">
                             @if (!$warehouses->isEmpty())
                             @foreach ($warehouses as $id => $name)
-                                <option value="{{ $id }}" data-name="{{ $name }}">{{ $name }}</option>
+                                <option value="{{ $id }}" {{ $id == 1 ? 'selected' : '' }} data-name="{{ $name }}">{{ $name }}</option>
                             @endforeach
                             @endif
                         </x-form.selectbox>
@@ -121,7 +121,6 @@
 
                                         <th>Product Description</th>
                                         <th>Code</th>
-                                        <th>Batch No</th>
                                         <th>Sale Unit</th>
                                         <th>Quantity</th>
                                         <th>Net Sale Unit Price</th>
@@ -150,7 +149,6 @@
                                 <tbody></tbody>
                                 <tfoot>
                                     <tr class="bg-primary">
-                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -253,15 +251,15 @@ $(document).ready(function(){
         },
         "columnDefs": [
             {
-                "targets": [9,10,11,12,13,14,15,16],
+                "targets": [9,10,11,12,13,14,15],
                 "orderable": false,
             },
             {
-                "targets": [0,1,2,3,4,5,6,8,9,10,11,12,13,29,30,31],
+                "targets": [0,1,2,3,4,5,6,8,9,10,11,12,29,30],
                 "className": "text-center"
             },
             {
-                "targets": [14,15,16,18,19,20,21,22,23,24,25,26,27,28],
+                "targets": [13,14,15,16,18,19,20,21,22,23,24,25,26,27],
                 "className": "text-right"
             },
 
@@ -369,10 +367,10 @@ $(document).ready(function(){
                         i : 0;
             };
             const jsonData = table.ajax.json();
-            $(api.column(29).footer()).html('Total Due Amount = '+number_format(jsonData.total_due)+' Tk');
-            $(api.column(17).footer()).html(jsonData.total_items);
-            const column_index = [18,20,21,22,23,24,27,28];
-            for (let index = 18; index <= 28; index++) {
+            $(api.column(28).footer()).html('Total Due Amount = '+number_format(jsonData.total_due)+' Tk');
+            $(api.column(16).footer()).html(jsonData.total_items);
+            const column_index = [17,19,20,21,22,23,24,27];
+            for (let index = 17; index <= 27; index++) {
                     // Total over this page
                 if(column_index.includes(index))
                 {
@@ -395,28 +393,28 @@ $(document).ready(function(){
 
                      let column_text = '';
                      switch (index) {
-                        case 18:
+                        case 17:
                             column_text = 'On Date Total ';
                             break;
-                        case 20:
+                        case 19:
                             column_text = 'On Date Total Tax ';
                             break;
-                        case 21:
+                        case 20:
                             column_text = 'On Date Total Discount ';
                             break;
-                        case 22:
+                        case 21:
                             column_text = 'On Date Total Labor Cost ';
                             break;
-                        case 23:
+                        case 22:
                             column_text = 'On Date Total Shipping Cost';
                             break;
-                        case 24:
+                        case 23:
                             column_text = 'On Date Grand Total ';
                             break;
-                        case 27:
+                        case 24:
                             column_text = 'On Date Total Paid ';
                             break;
-                        case 28:
+                        case 27:
                             column_text = 'On Date Due Amount ';
                             break;
                     }

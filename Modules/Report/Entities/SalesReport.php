@@ -55,7 +55,7 @@ class SalesReport extends BaseModel
     public function sale_products()
     {
         return $this->belongsToMany(Product::class,'sale_products','sale_id','product_id','id','id')
-        ->withPivot('id', 'batch_no','qty', 'sale_unit_id', 'net_unit_price', 'discount', 'tax_rate', 'tax', 'total')
+        ->withPivot('id', 'qty', 'sale_unit_id', 'net_unit_price', 'discount', 'tax_rate', 'tax', 'total')
         ->withTimestamps(); 
     }
 
