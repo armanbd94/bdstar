@@ -20,7 +20,7 @@
                     <!--begin::Button-->
                     <button type="button" class="btn btn-primary btn-sm mr-3" id="print-invoice"> <i class="fas fa-print"></i> Print</button>
                     
-                    <a href="{{ route('sale.return.list') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
+                    <a href="{{ route('sale.return') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
                         <i class="fas fa-arrow-left"></i> Back</a>
                     <!--end::Button-->
                 </div>
@@ -341,7 +341,7 @@
                                         <td width="50%">
                                             <div class="invoice-to">
                                                 <div class="text-grey-light"><b>INVOICE TO</b></div>
-                                                <div class="to">{{ $sale->customer->company_name }}</div>
+                                                <div class="to"><b>{{ $sale->customer->shop_name }}</b></div>
                                                 <div class="to">{{ $sale->customer->name }}</div>
                                                 <div class="phone">{{ $sale->customer->mobile }}</div>
                                                 @if($sale->customer->email)<div class="email">{{ $sale->customer->email }}</div>@endif
@@ -351,8 +351,9 @@
                                         <td width="50%" class="text-right">
                                             <h4 class="name m-0">Return</h4>
                                             <div class="m-0 date"><b>Return No.: {{ $sale->return_no }}</b></div>
-                                            <div class="m-0 date"><b>Invoice No.: </b>{{ $sale->invoice_no }}</div>
-                                            <div class="m-0 date"><b>Date:</b>{{ date('d-M-Y',strtotime($sale->return_date)) }}</div>
+                                            <div class="m-0 date"><b>Memo No.: </b>{{ $sale->memo_no }}</div>
+                                            <div class="m-0 date"><b>Return Date:</b>{{ date('d-M-Y',strtotime($sale->return_date)) }}</div>
+                                            <div class="m-0 date"><b>Order Received By:</b>{{ $sale->sale->salesmen->name }}</div>
                                         </td>
                                     </tr>
                                 </table>
@@ -360,7 +361,8 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center">SL</th>
-                                            <th class="text-left">DESCRIPTION</th>
+                                            <th class="text-left">PRODUCT NAME</th>
+                                            <th class="text-center">CODE</th>
                                             <th class="text-center">QUANTITY</th>
                                             <th class="text-right">PRICE</th>
                                             <th class="text-right">DEDUCTION (%)</th>
@@ -380,6 +382,7 @@
                                                 <tr>
                                                     <td class="text-center no">{{ $key+1 }}</td>
                                                     <td class="text-left">{{ $item->product->name }}</td>
+                                                    <td class="text-center">{{ $item->product->code }}</td>
                                                     <td class="text-center qty">{{ $item->return_qty.' '.$unit_name }}</td>
                                                     <td class="text-right price">{{ number_format($item->product_rate,2) }}</td>
                                                     <td class="text-right discount">{{ number_format($item->deduction_rate,2) }}</td>
@@ -396,11 +399,11 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="4" rowspan="3" class="text-left">
+                                            <td colspan="5" rowspan="3" class="text-left">
                                                 <h6><b>Reason:</b></h6>
                                                 <p class="text-justify font-weight-normal">{{ $sale->reason }}</p>
                                             </td>
-                                            <td colspan="1"  class="text-right">TOTAL DEDUCTION</td>
+                                            <td  class="text-right">TOTAL DEDUCTION</td>
                                             <td class="text-right">
                                                 @if (config('settings.currency_position') == 2)
                                                     {{ number_format($sale->total_deduction,2) }} {{ config('settings.currency_symbol') }}
@@ -420,7 +423,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="1"  class="text-right">NET RETURN AMOUNT</td>
+                                            <td colspan="1"  class="text-right">TOTAL RETURN AMOUNT</td>
                                             <td class="text-right">
                                                 @if (config('settings.currency_position') == 2)
                                                     {{ number_format($sale->grand_total,2) }} {{ config('settings.currency_symbol') }}
@@ -437,14 +440,14 @@
                                             <div class="font-size-10" style="width:250px;float:left;">
                                                 <p style="margin:0;padding:0;"></p>
                                                 <p class="dashed-border"></p>
-                                                <p style="margin:0;padding:0;">Received By</p>
+                                                <p style="margin:0;padding:0;">Customer Signature & Date</p>
                                             </div>
                                         </td>
                                         <td class="text-center">
                                             <div class="font-size-10" style="width:250px;float:right;">
-                                                <p style="margin:35px 0 0 0;padding:0;"><b class="text-uppercase">{{ $sale->created_by }}</b><br> {{ date('d-M-Y h:i:s A',strtotime($sale->created_at)) }}</p>
+                                                <p style="margin:35px 0 0 0;padding:0;">{{ $sale->created_by }}<br> {{ date('d-M-Y h:i:s A',strtotime($sale->created_at)) }}</p>
                                                 <p class="dashed-border"></p>
-                                                <p style="margin:0;padding:0;">Generated By</p>
+                                                <p style="margin:0;padding:0;">Authorised By</p>
                                             </div>
                                         </td>
                                     </tr>

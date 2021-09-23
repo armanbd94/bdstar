@@ -20,7 +20,7 @@
                     <!--begin::Button-->
                     <button type="button" class="btn btn-primary btn-sm mr-3" id="print-invoice"> <i class="fas fa-print"></i> Print</button>
                     
-                    <a href="{{ route('purchase.return.list') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
+                    <a href="{{ route('purchase.return') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
                         <i class="fas fa-arrow-left"></i> Back</a>
                     <!--end::Button-->
                 </div>

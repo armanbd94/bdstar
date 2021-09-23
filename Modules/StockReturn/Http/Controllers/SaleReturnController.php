@@ -4,6 +4,7 @@ namespace Modules\StockReturn\Http\Controllers;
 
 use App\Models\Unit;
 use Illuminate\Http\Request;
+use Modules\Sale\Entities\Sale;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Modules\Product\Entities\Product;
@@ -28,7 +29,8 @@ class SaleReturnController extends BaseController
         if(permission('sale-return-access')){
             $this->setPageData('Sale Return','Sale Return','fas fa-file',[['name' => 'Sale Return']]);
             $data = [
-                'customers'  => Customer::where('status',1)->get(),
+                'salesmen'    => DB::table('salesmen')->where('status',1)->select('name','id','phone')->get(),
+                'locations'   => DB::table('locations')->where('status', 1)->get(),
             ];
             return view('stockreturn::sale.index',$data);
         }else{
@@ -45,17 +47,29 @@ class SaleReturnController extends BaseController
                 if (!empty($request->return_no)) {
                     $this->model->setReturnNo($request->return_no);
                 }
-                if (!empty($request->invoice_no)) {
-                    $this->model->setInvoiceNo($request->invoice_no);
+                if (!empty($request->memo_no)) {
+                    $this->model->setMemoNo($request->memo_no);
                 }
-                if (!empty($request->from_date)) {
-                    $this->model->setFromDate($request->from_date);
+                if (!empty($request->start_date)) {
+                    $this->model->setStartDate($request->start_date);
                 }
-                if (!empty($request->to_date)) {
-                    $this->model->setToDate($request->to_date);
+                if (!empty($request->end_date)) {
+                    $this->model->setEndDate($request->end_date);
+                }
+                if (!empty($request->salesmen_id)) {
+                    $this->model->setSalesmenID($request->salesmen_id);
                 }
                 if (!empty($request->customer_id)) {
                     $this->model->setCustomerID($request->customer_id);
+                }
+                if (!empty($request->area_id)) {
+                    $this->model->setAreaID($request->area_id);
+                }
+                if (!empty($request->upazila_id)) {
+                    $this->model->setUpazilaID($request->upazila_id);
+                }
+                if (!empty($request->route_id)) {
+                    $this->model->setRouteID($request->route_id);
                 }
 
                 $this->set_datatable_default_properties($request);//set datatable default properties
@@ -65,24 +79,22 @@ class SaleReturnController extends BaseController
                 foreach ($list as $value) {
                     $no++;
                     $action = '';
-                    if (permission('sale-return-view')) {
-                        $action .= ' <a class="dropdown-item view_data" href="'.route("sale.return.list.show",$value->id).'">'.self::ACTION_BUTTON['View'].'</a>';
-                    }
-
-                    if (permission('sale-return-delete')) {
-                        $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->return_no . '">'.self::ACTION_BUTTON['Delete'].'</a>';
-                    }
-
+                    $action .= ' <a class="dropdown-item view_data" href="'.route("sale.return.show",$value->id).'">'.self::ACTION_BUTTON['View'].'</a>';
+                    $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->return_no . '">'.self::ACTION_BUTTON['Delete'].'</a>';
                     $row = [];
-                    if(permission('sale-return-bulk-delete')){
-                        $row[] = row_checkbox($value->id);
-                    }
                     $row[] = $no;
                     $row[] = $value->return_no;
-                    $row[] = $value->invoice_no;
-                    $row[] = $value->customer->name.($value->customer->mobile ? ' ( '.$value->customer->mobile.')' : '');
-                    $row[] = date(config('settings.date_format'),strtotime($value->return_date));
-                    $row[] = number_format($value->grand_total,2);
+                    $row[] = $value->memo_no;
+                    $row[] = $value->shop_name.' - '.$value->customer_name;
+                    $row[] = $value->salesman_name;
+                    $row[] = $value->upazila_name;
+                    $row[] = $value->route_name;
+                    $row[] = $value->area_name;
+                    $row[] = $value->total_return_items.'('.$value->total_return_qty.')';
+                    $row[] = date('d-M-Y',strtotime($value->return_date));
+                    $row[] = number_format($value->total_deduction,2,'.','');
+                    $row[] = number_format($value->grand_total,2,'.','');
+                    $row[] = number_format($value->deducted_sr_commission,2,'.','');
                     $row[] = action_button($action);//custom helper function for action button
                     $data[] = $row;
                 }
@@ -97,23 +109,34 @@ class SaleReturnController extends BaseController
     public function store(SaleReturnRequest $request)
     {
         if($request->ajax()){
-            if(permission('sale-return-add')){
+            if(permission('sale-return-access')){
                 // dd($request->all());
                 DB::beginTransaction();
                 try {
+
+                    $sr_commission_rate = $request->sr_commission_rate ? $request->sr_commission_rate : 0;
+                    if($sr_commission_rate > 0)
+                    {
+                        $deducted_commission = $request->grand_total_price * ($sr_commission_rate/100);
+                    }else{
+                        $deducted_commission = 0;
+                    }
+                    $warehouse_id = $request->warehouse_id;
                     $sale_return_date = [
-                        'return_no'        => 'SRINV-'.date('ymd').rand(1,999),
-                        'invoice_no'       => $request->invoice_no,
-                        'customer_id'      => $request->customer_id,
-                        'total_price'      => $request->total_price,
-                        'total_deduction'  => $request->total_deduction ? $request->total_deduction : null,
-                        'tax_rate'         => $request->tax_rate ? $request->tax_rate : null,
-                        'total_tax'        => $request->total_tax ? $request->total_tax : null,
-                        'grand_total'      => $request->grand_total_price,
-                        'reason'           => $request->reason,
-                        'date'             => $request->sale_date,
-                        'return_date'      => $request->return_date,
-                        'created_by'       => Auth::user()->name
+                        'return_no'              => 'SRINV-'.date('ymd').rand(1,999),
+                        'memo_no'                => $request->memo_no,
+                        'warehouse_id'           => $warehouse_id,
+                        'customer_id'            => $request->customer_id,
+                        'total_price'            => $request->total_price,
+                        'total_deduction'        => $request->total_deduction ? $request->total_deduction : null,
+                        'tax_rate'               => $request->tax_rate ? $request->tax_rate : null,
+                        'total_tax'              => $request->total_tax ? $request->total_tax : null,
+                        'grand_total'            => $request->grand_total_price,
+                        'deducted_sr_commission' => $deducted_commission,
+                        'reason'                 => $request->reason,
+                        'date'                   => $request->sale_date,
+                        'return_date'            => $request->return_date,
+                        'created_by'             => Auth::user()->name
                     ];
 
                     $sale_return  = $this->model->create($sale_return_date);
@@ -131,8 +154,8 @@ class SaleReturnController extends BaseController
                                 }
 
                                 $products[] = [
-                                    'sale_return_id'    => $sale_return->id,
-                                    'invoice_no'         => $request->invoice_no,
+                                    'sale_return_id'     => $sale_return->id,
+                                    'memo_no'            => $request->memo_no,
                                     'product_id'         => $value['id'],
                                     'return_qty'         => $value['return_qty'],
                                     'unit_id'            => $unit ? $unit->id : null,
@@ -142,14 +165,9 @@ class SaleReturnController extends BaseController
                                     'total'              => $value['total']
                                 ];
 
-                                $product = Product::find($value['id']);
-                                if($product){
-                                    $product->qty += $qty;
-                                    $product->update();
-                                }
                                 $warehouse_product = WarehouseProduct::where([
-                                    'warehouse_id'=>$request->warehouse_id,
-                                    'product_id'=>$value['id'],
+                                    'warehouse_id'=> $warehouse_id,
+                                    'product_id'  => $value['id'],
                                     ])->first();
                                 if($warehouse_product){
                                     $warehouse_product->qty += $qty;
@@ -168,7 +186,8 @@ class SaleReturnController extends BaseController
                     $customer = Customer::with('coa')->find($request->customer_id);
                     $customer_credit = array(
                         'chart_of_account_id' => $customer->coa->id,
-                        'voucher_no'          => $request->invoice_no,
+                        'warehouse_id'        => $warehouse_id,
+                        'voucher_no'          => $request->memo_no,
                         'voucher_type'        => 'Return',
                         'voucher_date'        => $request->return_date,
                         'description'         => 'Customer '.$customer->name.' credit for Product Return Invoice NO- ' . $request->invoice_no,
@@ -197,10 +216,15 @@ class SaleReturnController extends BaseController
 
     public function show(int $id)
     {
-        if(permission('sale-return-view')){
+        if(permission('sale-return-access')){
             $this->setPageData('Sale Return Details','Sale Return Details','fas fa-file',[['name' => 'Sale Return Details']]);
-            $sale = $this->model->with('return_products','customer')->find($id);
-            return view('stockreturn::sale.details',compact('sale'));
+            $sale = $this->model->with('return_products','customer','sale')->find($id);
+            if($sale)
+            {
+                return view('stockreturn::sale.details',compact('sale'));
+            }else{
+                return redirect('sale.return')->with('error','No Data Available');
+            }
         }else{
             return $this->access_blocked();
         }
@@ -209,14 +233,13 @@ class SaleReturnController extends BaseController
     public function delete(Request $request)
     {
         if($request->ajax()){
-            if(permission('sale-return-delete'))
+            if(permission('sale-return-access'))
             {
                 DB::beginTransaction();
                 try {
     
                     $saleData = $this->model->with('sale','return_products')->find($request->id);
-                    $invoice_no = $saleData->invoice_no;
-    
+                    
                     if(!$saleData->return_products->isEmpty())
                     {
                         
@@ -228,11 +251,7 @@ class SaleReturnController extends BaseController
                             }else{
                                 $return_qty = $return_qty / $sale_unit->operation_value;
                             }
-                            $product_data = Product::find($return_product->product_id);
-                            if($product_data){
-                                $product_data->qty -= $return_qty;
-                                $product_data->update();
-                            }
+
                             $warehouse_product = WarehouseProduct::where([
                                 'warehouse_id'=> $saleData->sale->warehouse_id,
                                 'product_id'=> $return_product->product_id,
@@ -244,7 +263,7 @@ class SaleReturnController extends BaseController
                         }
                         $saleData->return_products()->delete();
                     }
-                    Transaction::where(['voucher_no'=>$invoice_no,'voucher_type'=>'Return'])->delete();
+                    Transaction::where(['voucher_no'=>$saleData->memo_no,'voucher_type'=>'Return'])->delete();
     
                     $result = $saleData->delete();
                     if($result)
@@ -267,67 +286,4 @@ class SaleReturnController extends BaseController
         }
     }
 
-    public function bulk_delete(Request $request)
-    {
-        if($request->ajax()){
-            if(permission('sale-return-bulk-delete')){
-                
-                    DB::beginTransaction();
-                    try {
-                        foreach ($request->ids as $id) {
-                            $saleData = $this->model->with('sale','return_products')->find($id);
-                            $invoice_no = $saleData->invoice_no;
-            
-                            if(!$saleData->return_products->isEmpty())
-                            {
-                                
-                                foreach ($saleData->return_products as  $return_product) {
-                                    $return_qty = $return_product->return_qty;
-                                    $sale_unit = Unit::find($return_product->unit_id);
-                                    if($sale_unit->operator == '*'){
-                                        $return_qty = $return_qty * $sale_unit->operation_value;
-                                    }else{
-                                        $return_qty = $return_qty / $sale_unit->operation_value;
-                                    }
-                                    $product_data = Product::find($return_product->product_id);
-                                    if($product_data){
-                                        $product_data->qty -= $return_qty;
-                                        $product_data->update();
-                                    }
-                                    $warehouse_product = WarehouseProduct::where([
-                                        'warehouse_id'=> $saleData->sale->warehouse_id,
-                                        'product_id'=> $return_product->product_id,
-                                        ])->first();
-                                    if($warehouse_product){
-                                        $warehouse_product->qty -= $return_qty;
-                                        $warehouse_product->update();
-                                    }
-                                }
-                                $saleData->return_products()->delete();
-                            }
-                            Transaction::where(['voucher_no'=>$invoice_no,'voucher_type'=>'Return'])->delete();
-            
-                            $result = $saleData->delete();
-                            if($result)
-                            {
-                                $output = ['status' => 'success','message' => 'Data has been deleted successfully'];
-                            }else{
-                                $output = ['status' => 'error','message' => 'Failed to delete data'];
-                            }
-                        }
-                        DB::commit();
-                    } catch (\Exception $e) {
-                        DB::rollBack();
-                        $output = ['status'=>'error','message'=>$e->getMessage()];
-                    }
-                    return response()->json($output);
-                
-            }else{
-                $output = $this->access_blocked();
-            }
-            return response()->json($output);
-        }else{
-            return response()->json($this->access_blocked());
-        }
-    }
 }

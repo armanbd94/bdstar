@@ -14,15 +14,15 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::group(['middleware' => ['auth']], function () {
-    Route::get('purchase-return', 'StockReturnController@index')->name('return');
+    Route::get('return', 'StockReturnController@index')->name('return');
     Route::group(['prefix' => 'return', 'as'=>'return.'], function () {
-        // Route::get('sale', 'StockReturnController@return_sale')->name('sale');
+        Route::get('sale', 'StockReturnController@return_sale')->name('sale');
         Route::get('purchase', 'StockReturnController@return_purchase')->name('purchase');
     });
    
     //Sale Return Routes
-    Route::get('sale-return-list', 'SaleReturnController@index')->name('sale.return.list');
-    Route::group(['prefix' => 'sale-return-list', 'as'=>'sale.return.list.'], function () {
+    Route::get('sale-return', 'SaleReturnController@index')->name('sale.return');
+    Route::group(['prefix' => 'sale-return', 'as'=>'sale.return.'], function () {
         Route::post('datatable-data', 'SaleReturnController@get_datatable_data')->name('datatable.data');
         Route::post('store', 'SaleReturnController@store')->name('store');
         Route::get('{id}/show', 'SaleReturnController@show')->name('show');
@@ -31,8 +31,8 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     //Purchase Return Routes
-    Route::get('purchase-return-list', 'PurchaseReturnController@index')->name('purchase.return.list');
-    Route::group(['prefix' => 'purchase-return-list', 'as'=>'purchase.return.list.'], function () {
+    Route::get('purchase-return', 'PurchaseReturnController@index')->name('purchase.return.list');
+    Route::group(['prefix' => 'purchase-return', 'as'=>'purchase.return.'], function () {
         Route::post('datatable-data', 'PurchaseReturnController@get_datatable_data')->name('datatable.data');
         Route::post('store', 'PurchaseReturnController@store')->name('store');
         Route::get('{id}/show', 'PurchaseReturnController@show')->name('show');

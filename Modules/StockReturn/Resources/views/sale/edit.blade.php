@@ -3,7 +3,6 @@
 @section('title', $page_title)
 
 @push('styles')
-<link rel="stylesheet" href="css/jquery-ui.css" />
 <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
 @endpush
 
@@ -18,7 +17,7 @@
                 </div>
                 <div class="card-toolbar">
                     <!--begin::Button-->
-                    <a href="{{ route('sale.return.list') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
+                    <a href="{{ route('sale.return') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
                         <i class="fas fa-arrow-left"></i> Back</a>
                     <!--end::Button-->
                 </div>
@@ -34,11 +33,10 @@
                         @csrf
                         <div class="row">
                             <input type="hidden" name="customer_id" value="{{ $sale->customer_id }}">
-                            <input type="hidden" name="warehouse_id" value="{{ $sale->warehouse_id }}">
 
                             <div class="form-group col-md-3 required">
-                                <label for="invoice_no">Invoice No.</label>
-                                <input type="text" class="form-control" name="invoice_no" id="invoice_no" value="{{ $sale->invoice_no }}"  readonly />
+                                <label for="memo_no">Memo No.</label>
+                                <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{ $sale->memo_no }}"  readonly />
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label for="sale_date">Sold Date</label>
@@ -49,25 +47,41 @@
                                 <input type="text" class="form-control date" name="return_date" id="return_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
                             <div class="form-group col-md-3 required">
-                                <label for="sale_date">Customer Name</label>
-                                <input type="text" class="form-control" name="customer_name" id="customer_name" value="{{ $sale->customer->name }}" readonly />
+                                <label>Warehouse</label>
+                                <input type="text" class="form-control" value="{{ $sale->warehouse->name }}" readonly />
+                                <input type="hidden" class="form-control" name="warehouse_id" value="{{ $sale->warehouse_id }}" />
                             </div>
                             <div class="form-group col-md-3 required">
-                                <label for="sale_date">Warehouse Name</label>
-                                <input type="text" class="form-control" name="warehouse_name" id="warehouse_name" value="{{ $sale->warehouse->name }}" readonly />
+                                <label>Order Received By</label>
+                                <input type="text" class="form-control" value="{{ $sale->salesmen->name }}" readonly />
+                                <input type="hidden" class="form-control" name="sr_commission_rate" value="{{ $sale->sr_commission_rate }}" />
                             </div>
+                            <div class="form-group col-md-3 required">
+                                <label>Route</label>
+                                <input type="text" class="form-control" value="{{ $sale->route->name }}" readonly />
+                            </div>
+                            <div class="form-group col-md-3 required">
+                                <label>Area</label>
+                                <input type="text" class="form-control" value="{{ $sale->area->name }}" readonly />
+                            </div>
+
+                            <div class="form-group col-md-3 required">
+                                <label for="customer_name">Customer Name</label>
+                                <input type="text" class="form-control" name="customer_name" id="customer_name" value="{{ $sale->customer->shop_name.' - '.$sale->customer->name }}" readonly />
+                            </div>
+                            
 
                             <div class="col-md-12">
                                 <table class="table table-bordered" id="product_table">
                                     <thead class="bg-primary">
-                                        <th >Name</th>
-                                        <th  class="text-center">Code</th>
-                                        <th  class="text-center">Unit</th>
-                                        <th  class="text-center">Sold Qty</th>
-                                        <th  class="text-center">Return Qty</th>
-                                        <th  class="text-right">Net Unit Price</th>
-                                        <th  class="text-right">Deduction (%)</th>
-                                        <th  class="text-right">Subtotal</th>
+                                        <th>Name</th>
+                                        <th class="text-center">Code</th>
+                                        <th class="text-center">Unit</th>
+                                        <th class="text-center">Sold Qty</th>
+                                        <th class="text-center">Return Qty</th>
+                                        <th class="text-right">Net Unit Price</th>
+                                        <th class="text-right">Deduction (%)</th>
+                                        <th class="text-right">Subtotal</th>
                                         <th>Check Return</th>
                                     </thead>
                                     <tbody>
@@ -80,8 +94,12 @@
                                                         $unit_name = DB::table('units')->where('id',$sale_product->pivot->sale_unit_id)->value('unit_name');
                                                         
                                                         $total_return_qty = \DB::table('sale_return_products')
-                                                        ->where('invoice_no',$sale->invoice_no)
-                                                        ->where('product_id',$sale_product->pivot->product_id)->sum('return_qty');
+                                                        ->where([
+                                                            ['memo_no',$sale->memo_no],
+                                                            ['product_id',$sale_product->pivot->product_id],
+                                                            ['batch_no', $sale_product->pivot->batch_no]
+                                                        ])
+                                                        ->sum('return_qty');
                                                         $sold_qty = $sale_product->pivot->qty - $total_return_qty;
 
       
@@ -103,6 +121,7 @@
                                                     </td>
                                                     <input type="hidden" class="product-id" name="products[{{ $key+1 }}][id]"  value="{{ $sale_product->pivot->product_id }}">
                                                     <input type="hidden" class="product-code" name="products[{{ $key+1 }}][code]" value="{{ $sale_product->code }}">
+                                                    <input type="hidden" class="product-batch" name="products[{{ $key+1 }}][batch_no]" value="{{ $sale_product->pivot->batch_no }}">
                                                     <input type="hidden" class="sale-unit" name="products[{{ $key+1 }}][unit]" value="{{ $unit_name }}">
                                                     <input type="hidden" class="deduction_amount deduction_amount_{{ $key+1 }}" name="products[{{ $key+1 }}][deduction_amount]" >
                                                     <input type="hidden" class="subtotal subtotal_{{ $key+1 }}" name="products[{{ $key+1 }}][total]" >
@@ -113,7 +132,7 @@
                                     </tbody>
                                     <tfoot>
                                         <tr>
-                                            <td colspan="6" rowspan="3">
+                                            <td colspan="5" rowspan="3">
                                                 <label  for="reason">Reason</label>
                                                 <textarea class="form-control" name="reason" id="reason"></textarea><br>
                                             </td>
@@ -155,7 +174,7 @@
 @endsection
 
 @push('scripts')
-<script src="js/jquery-ui.js"></script>
+<script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
 $(document).ready(function () {
@@ -224,7 +243,7 @@ function save_data(){
     }else{
         let form = document.getElementById('sale_update_form');
         let formData = new FormData(form);
-        let url = "{{route('sale.return.list.store')}}";
+        let url = "{{route('sale.return.store')}}";
         $.ajax({
             url: url,
             type: "POST",
@@ -254,7 +273,7 @@ function save_data(){
                 } else {
                     notification(data.status, data.message);
                     if (data.status == 'success') {
-                        window.location.replace("{{ route('sale.return.list') }}");
+                        window.location.replace("{{ route('sale.return') }}");
                     }
                 }
 

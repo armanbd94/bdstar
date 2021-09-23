@@ -129,7 +129,7 @@ $(document).ready(function(){
             zeroRecords: '<strong class="text-danger">No Data Found</strong>'
         },
         "ajax": {
-            "url": "{{route('purchase.return.list.datatable.data')}}",
+            "url": "{{route('purchase.return.datatable.data')}}",
             "type": "POST",
             "data": function (data) {
                 data.return_no       = $("#form-filter #return_no").val();
@@ -284,7 +284,7 @@ $(document).ready(function(){
         let id    = $(this).data('id');
         let name  = $(this).data('name');
         let row   = table.row($(this).parent('tr'));
-        let url   = "{{ route('purchase.return.list.delete') }}";
+        let url   = "{{ route('purchase.return.delete') }}";
         delete_data(id, url, table, row, name);
     });
 
@@ -303,7 +303,7 @@ $(document).ready(function(){
                 icon: 'warning',
             });
         }else{
-            let url = "{{route('purchase.return.list.bulk.delete')}}";
+            let url = "{{route('purchase.return.bulk.delete')}}";
             bulk_delete(ids,url,table,rows);
         }
     }

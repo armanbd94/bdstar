@@ -3,7 +3,8 @@
 @section('title', $page_title)
 
 @push('styles')
-<link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<link href="plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css" />
+<link href="css/daterangepicker.min.css" rel="stylesheet" type="text/css" />
 @endpush
 
 @section('content')
@@ -31,25 +32,57 @@
             <div class="card-header flex-wrap py-5">
                 <form method="POST" id="form-filter" class="col-md-12 px-0">
                     <div class="row">
+                        <div class="form-group col-md-3">
+                            <label for="name">Choose Your Date</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control daterangepicker-filed">
+                                <input type="hidden" id="start_date" name="start_date">
+                                <input type="hidden" id="end_date" name="end_date">
+                            </div>
+                        </div>
                         <x-form.textbox labelName="Return No." name="return_no" col="col-md-3" />
-                        <x-form.textbox labelName="Invoice No." name="invoice_no" col="col-md-3" />
-                        <div class="form-group col-md-3">
-                            <label for="from_date">From Date</label>
-                            <input type="text" class="form-control date" name="from_date" id="from_date" readonly />
-                        </div>
-                        <div class="form-group col-md-3">
-                            <label for="to_date">To Date</label>
-                            <input type="text" class="form-control date" name="to_date" id="to_date" readonly />
-                        </div>
-                        <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="selectpicker">
-                            @if (!$customers->isEmpty())
-                                @foreach ($customers as $value)
-                                    <option value="{{ $value->id }}">{{ $value->name.($value->mobile ? ' - '.$value->mobile : '') }}</option>
+                        <x-form.textbox labelName="Memo No." name="memo_no" col="col-md-3" />
+
+                        <x-form.selectbox labelName="Salesman" name="salesmen_id" col="col-md-3" class="selectpicker">
+                            @if (!$salesmen->isEmpty())
+                                @foreach ($salesmen as $value)
+                                    <option value="{{ $value->id }}">{{ $value->name.' - '.$value->phone }}</option>
                                 @endforeach
                             @endif
                         </x-form.selectbox>
 
-                        <div class="col-md-9">
+                        <x-form.selectbox labelName="Upazila" name="upazila_id" col="col-md-3" class="selectpicker" onchange="getRouteList(this.value)">
+                            @if (!$locations->isEmpty())
+                                @foreach ($locations as $location)
+                                    @if ($location->type == 2 && $location->parent_id == auth()->user()->district_id)
+                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                    @endif
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
+
+                        <x-form.selectbox labelName="Route" name="route_id" col="col-md-3" class="selectpicker" onchange="getAreaList(this.value);">
+                            @if (!$locations->isEmpty())
+                                @foreach ($locations as $location)
+                                    @if ($location->type == 3 && $location->grand_parent_id == auth()->user()->district_id)
+                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                    @endif
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
+
+                        <x-form.selectbox labelName="Area" name="area_id" col="col-md-3" class="selectpicker" onchange="customer_list(this.value)">
+                            @if (!$locations->isEmpty())
+                                @foreach ($locations as $location)
+                                    @if ($location->type == 4 && $location->grand_grand_parent_id == auth()->user()->district_id)
+                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                    @endif
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
+                        <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="selectpicker"/>
+
+                        <div class="col-md-12">
                             <div style="margin-top:28px;">     
                                     <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
                                     data-toggle="tooltip" data-theme="dark" title="Reset">
@@ -71,20 +104,19 @@
                             <table id="dataTable" class="table table-bordered table-hover">
                                 <thead class="bg-primary">
                                     <tr>
-                                        @if (permission('sale-return-bulk-delete'))
-                                        <th>
-                                            <div class="custom-control custom-checkbox">
-                                                <input type="checkbox" class="custom-control-input" id="select_all" onchange="select_all()">
-                                                <label class="custom-control-label" for="select_all"></label>
-                                            </div>
-                                        </th>
-                                        @endif
                                         <th>Sl</th>
                                         <th>Return No.</th>
-                                        <th>Invoice No.</th>
+                                        <th>Memo No.</th>
                                         <th>Customer Name</th>
+                                        <th>Salesman</th>
+                                        <th>Upazila</th>
+                                        <th>Route</th>
+                                        <th>Area</th>
+                                        <th>Total Item</th>
                                         <th>Return Date</th>
+                                        <th>Total Deduction</th>
                                         <th>Grand Total</th>
+                                        <th>Deducted SR Commission</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -102,11 +134,23 @@
 @endsection
 
 @push('scripts')
-<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script src="plugins/custom/datatables/datatables.bundle.js" type="text/javascript"></script>
+<script src="js/moment.js"></script>
+<script src="js/knockout-3.4.2.js"></script>
+<script src="js/daterangepicker.min.js"></script>
 <script>
 var table;
 $(document).ready(function(){
-    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
+    $('.daterangepicker-filed').daterangepicker({
+        callback: function(startDate, endDate, period){
+            var start_date = startDate.format('YYYY-MM-DD');
+            var end_date   = endDate.format('YYYY-MM-DD');
+            var title = start_date + ' To ' + end_date;
+            $(this).val(title);
+            $('input[name="start_date"]').val(start_date);
+            $('input[name="end_date"]').val(end_date);
+        }
+    });
     table = $('#dataTable').DataTable({
         "processing": true, //Feature control the processing indicator
         "serverSide": true, //Feature control DataTable server side processing mode
@@ -126,53 +170,34 @@ $(document).ready(function(){
             zeroRecords: '<strong class="text-danger">No Data Found</strong>'
         },
         "ajax": {
-            "url": "{{route('sale.return.list.datatable.data')}}",
+            "url": "{{route('sale.return.datatable.data')}}",
             "type": "POST",
             "data": function (data) {
-                data.return_no       = $("#form-filter #return_no").val();
-                data.invoice_no       = $("#form-filter #invoice_no").val();
-                data.from_date       = $("#form-filter #from_date").val();
-                data.to_date         = $("#form-filter #to_date").val();
-                data.customer_id     = $("#form-filter #customer_id option:selected").val();
-                data._token          = _token;
+                data.return_no   = $("#form-filter #return_no").val();
+                data.memo_no     = $("#form-filter #memo_no").val();
+                data.start_date  = $("#form-filter #start_date").val();
+                data.end_date    = $("#form-filter #end_date").val();
+                data.customer_id = $("#form-filter #customer_id").val();
+                data.salesmen_id = $("#form-filter #salesmen_id").val();
+                data.upazila_id  = $("#form-filter #upazila_id").val();
+                data.route_id    = $("#form-filter #route_id").val();
+                data.area_id     = $("#form-filter #area_id").val();
+                data._token      = _token;
             }
         },
         "columnDefs": [{
-                @if(permission('stock-return-bulk-delete'))
-                "targets": [0,7],
-                @else
-                "targets": [6],
-                @endif
+                "targets": [8,13],
                 "orderable": false,
                 "className": "text-center"
             },
             {
-                @if(permission('stock-return-bulk-delete'))
-                "targets": [1,2,3,5],
-                @else
-                "targets": [0,1,2,4],
-                @endif
+                "targets": [0,1,2,5,6,7,9],
                 "className": "text-center"
             },
             {
-
-                @if(permission('stock-return-bulk-delete'))
-                "targets": [6],
-                @else
-                "targets": [5],
-                @endif
+                "targets": [10,11,12],
                 "className": "text-right"
             },
-            {
-
-                @if(permission('stock-return-bulk-delete'))
-                "targets": [4],
-                @else
-                "targets": [3],
-                @endif
-                "orderable": false,
-            },
-
         ],
         "dom": "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6' <'float-right'B>>>" +
             "<'row'<'col-sm-12'tr>>" +
@@ -190,11 +215,7 @@ $(document).ready(function(){
                 "orientation": "landscape", //portrait
                 "pageSize": "legal", //A3,A5,A6,legal,letter
                 "exportOptions": {
-                    @if(permission('stock-return-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(7))' 
-                    @else
-                    columns: ':visible:not(:eq(6))' 
-                    @endif
+                    columns: ':visible:not(:eq(13))'
                 },
                 customize: function (win) {
                     $(win.document.body).addClass('bg-white');
@@ -212,11 +233,7 @@ $(document).ready(function(){
                 "title": "{{ $page_title }} List",
                 "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                 "exportOptions": {
-                       @if(permission('stock-return-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(7))' 
-                    @else
-                    columns: ':visible:not(:eq(6))' 
-                    @endif
+                    columns: ':visible:not(:eq(13))'
                 }
             },
             {
@@ -226,11 +243,7 @@ $(document).ready(function(){
                 "title": "{{ $page_title }} List",
                 "filename": "{{ strtolower(str_replace(' ','-',$page_title)) }}-list",
                 "exportOptions": {
-                       @if(permission('stock-return-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(7))' 
-                    @else
-                    columns: ':visible:not(:eq(6))' 
-                    @endif
+                    columns: ':visible:not(:eq(13))'
                 }
             },
             {
@@ -242,11 +255,7 @@ $(document).ready(function(){
                 "orientation": "landscape", //portrait
                 "pageSize": "legal", //A3,A5,A6,legal,letter
                 "exportOptions": {
-                       @if(permission('stock-return-bulk-delete'))
-                    columns: ':visible:not(:eq(0),:eq(7))' 
-                    @else
-                    columns: ':visible:not(:eq(6))' 
-                    @endif
+                    columns: ':visible:not(:eq(13))'
                 },
                 customize: function(doc) {
                     doc.defaultStyle.fontSize = 7; //<-- set fontsize to 16 instead of 10 
@@ -254,15 +263,7 @@ $(document).ready(function(){
                     doc.pageMargins = [5,5,5,5];
                 }  
             },
-            @if (permission('stock-return-bulk-delete'))
-            {
-                'className':'btn btn-danger btn-sm delete_btn d-none text-white',
-                'text':'Delete',
-                action:function(e,dt,node,config){
-                    multi_delete();
-                }
-            }
-            @endif
+
         ],
     });
 
@@ -281,30 +282,62 @@ $(document).ready(function(){
         let id    = $(this).data('id');
         let name  = $(this).data('name');
         let row   = table.row($(this).parent('tr'));
-        let url   = "{{ route('sale.return.list.delete') }}";
+        let url   = "{{ route('sale.return.delete') }}";
         delete_data(id, url, table, row, name);
     });
-
-    function multi_delete(){
-        let ids = [];
-        let rows;
-        $('.select_data:checked').each(function(){
-            ids.push($(this).val());
-            rows = table.rows($('.select_data:checked').parents('tr'));
-        });
-        if(ids.length == 0){
-            Swal.fire({
-                type:'error',
-                title:'Error',
-                text:'Please checked at least one row of table!',
-                icon: 'warning',
-            });
-        }else{
-            let url = "{{route('sale.return.list.bulk.delete')}}";
-            bulk_delete(ids,url,table,rows);
-        }
-    }
-
 });
+
+function customer_list()
+{
+    let route_id = document.getElementById('route_id').value;
+    let area_id = document.getElementById('area_id').value;
+    $.ajax({
+        url:"{{ url('customer-list') }}",
+        type:"POST",
+        data:{route_id:route_id,area_id:area_id,_token:_token},
+        dataType:"JSON",
+        success:function(data){
+            html = `<option value="">Select Please</option>`;
+            $.each(data, function(key, value) {
+                html += `<option value="${value.id}">${value.name} - ${value.mobile} (${value.shop_name})</option>`;
+            });
+            $('#form-filter #customer_id').empty().append(html);
+            $('#form-filter #customer_id.selectpicker').selectpicker('refresh');
+      
+        },
+    });
+
+}
+function getRouteList(upazila_id){
+    $.ajax({
+        url:"{{ url('upazila-id-wise-route-list') }}/"+upazila_id,
+        type:"GET",
+        dataType:"JSON",
+        success:function(data){
+            html = `<option value="">Select Please</option>`;
+            $.each(data, function(key, value) {
+                html += '<option value="'+ key +'">'+ value +'</option>';
+            });
+            $('#form-filter #route_id').empty().append(html);
+            $('.selectpicker').selectpicker('refresh');
+        },
+    });
+}
+function getAreaList(route_id,selector,area_id=''){
+    $.ajax({
+        url:"{{ url('route-id-wise-area-list') }}/"+route_id,
+        type:"GET",
+        dataType:"JSON",
+        success:function(data){
+            html = `<option value="">Select Please</option>`;
+            $.each(data, function(key, value) {
+                html += '<option value="'+ key +'">'+ value +'</option>';
+            });
+            $('#form-filter #area_id').empty().append(html);
+            $('.selectpicker').selectpicker('refresh');
+        },
+    });
+}
+
 </script>
 @endpush

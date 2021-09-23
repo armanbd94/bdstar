@@ -17,7 +17,7 @@
                 </div>
                 <div class="card-toolbar">
                     <!--begin::Button-->
-                    <a href="{{ route('purchase.return.list') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
+                    <a href="{{ route('purchase.return') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
                         <i class="fas fa-arrow-left"></i> Back</a>
                     <!--end::Button-->
                 </div>
@@ -217,7 +217,7 @@ function save_data(){
     }else{
         let form = document.getElementById('purchase_return_form');
         let formData = new FormData(form);
-        let url = "{{route('purchase.return.list.store')}}";
+        let url = "{{route('purchase.return.store')}}";
         $.ajax({
             url: url,
             type: "POST",
@@ -247,7 +247,7 @@ function save_data(){
                 } else {
                     notification(data.status, data.message);
                     if (data.status == 'success') {
-                        window.location.replace("{{ route('purchase.return.list') }}");
+                        window.location.replace("{{ route('purchase.return') }}");
                     }
                 }
 
