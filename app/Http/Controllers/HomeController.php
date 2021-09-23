@@ -61,30 +61,12 @@ class HomeController extends BaseController
             ->whereDate('date','<=',$end_date)
             ->sum('amount');
 
-            $coupon_data = DB::table('received_coupons as rc')
-            ->leftJoin('production_coupons as pc','rc.coupon_id','=','pc.id')
-            ->leftJoin('production_products as pp','pc.production_product_id','=','pp.id')
-            ->leftJoin('salesmen as s','rc.salesmen_id','=','s.id')
-            ->select(DB::raw("SUM(pp.coupon_price) as coupon_payment_grand_value"),DB::raw("COUNT(rc.id) as total_coupon_received"))
-            ->where('pc.status',1)
-            ->whereDate('rc.created_at','>=',$start_date)
-            ->whereDate('rc.created_at','<=',$end_date)
-            ->first();
-            $total_coupon_payment = 0;
-            $total_coupon_received = 0;
-            if($coupon_data)
-            {
-                $total_coupon_payment = $coupon_data->coupon_payment_grand_value ? $coupon_data->coupon_payment_grand_value : 0;
-                $total_coupon_received = $coupon_data->total_coupon_received ? $coupon_data->total_coupon_received : 0;
-            }
 
             $data = [
                 'sale'     => $sale,
                 'purchase' => $purchase,
                 'income'   => $income,
                 'expense'  => $expense,
-                'total_coupon_received' => $total_coupon_received,
-                'total_coupon_payment'  => $total_coupon_payment,
             ];
             return response()->json($data);
         }
