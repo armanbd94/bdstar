@@ -577,7 +577,6 @@ $(document).ready(function () {
     });
 
     $('#salesmen_id').on('change',function(){
-        alert($('#salesmen_id option:selected').data('cpr'));
         $('#sr_commission_rate').val($('#salesmen_id option:selected').data('cpr'));
     });
     $('#payment_status').on('change',function(){

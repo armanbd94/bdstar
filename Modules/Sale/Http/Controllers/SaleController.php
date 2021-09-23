@@ -434,8 +434,7 @@ class SaleController extends BaseController
         if(permission('sale-view')){
             $this->setPageData('Sale Details','Sale Details','fas fa-file',[['name'=>'Sale','link' => route('sale')],['name' => 'Sale Details']]);
             $sale = $this->model->with('sale_products','customer','salesmen')->find($id);
-            $due_invoices = $this->model->where([['customer_id',$sale->customer_id],['payment_status','<>',1],['id','<',$sale->id]])->get();
-            return view('sale::details',compact('sale','due_invoices'));
+            return view('sale::details',compact('sale'));
         }else{
             return $this->access_blocked();
         }
@@ -659,6 +658,27 @@ class SaleController extends BaseController
                         $output = ['status' => 'error','message' => 'Failed to delete data'];
                     }
                     DB::commit();
+                } catch (Exception $e) {
+                    DB::rollback();
+                    $output = ['status' => 'error','message' => $e->getMessage()];
+                }
+                return response()->json($output);
+            }else{
+                return response()->json($this->unauthorized());
+            }
+        }else{
+            return response()->json($this->unauthorized());
+        }
+    }
+
+    public function bulk_delete(Request $request)
+    {
+        if($request->ajax()){
+            if(permission('sale-bulk-delete'))
+            {
+                DB::beginTransaction();
+                try {
+
                 } catch (Exception $e) {
                     DB::rollback();
                     $output = ['status' => 'error','message' => $e->getMessage()];
