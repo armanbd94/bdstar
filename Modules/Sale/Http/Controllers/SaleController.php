@@ -678,7 +678,51 @@ class SaleController extends BaseController
             {
                 DB::beginTransaction();
                 try {
-
+                    foreach ($request->ids as $id) {
+                        $saleData = $this->model->with('sale_products')->find($id);
+                        $old_document = $saleData ? $saleData->document : '';
+        
+                        if(!$saleData->sale_products->isEmpty())
+                        {
+                            
+                            foreach ($saleData->sale_products as  $sale_product) {
+                                $sold_qty = $sale_product->pivot->qty ? $sale_product->pivot->qty : 0;
+                                $sale_unit = Unit::find($sale_product->pivot->sale_unit_id);
+                                if($sale_unit->operator == '*'){
+                                    $sold_qty = $sold_qty * $sale_unit->operation_value;
+                                }else{
+                                    $sold_qty = $sold_qty / $sale_unit->operation_value;
+                                }
+    
+                                $warehouse_product = WarehouseProduct::where([
+                                    ['warehouse_id', $saleData->warehouse_id],
+                                    ['product_id',$sale_product->pivot->product_id]
+                                ])->first();
+                                if($warehouse_product)
+                                {
+                                    $warehouse_product->qty += $sold_qty;
+                                    $warehouse_product->update();
+                                }
+                                SaleProduct::where('sale_id',$request->sale_id)->delete();
+                                
+                            }
+                            
+                        }
+                        Transaction::where(['voucher_no'=>$saleData->memo_no,'voucher_type'=>'INVOICE'])->delete();
+        
+                        $result = $saleData->delete();
+                        if($result)
+                        {
+                            if($old_document != '')
+                            {
+                                $this->delete_file($old_document,SALE_DOCUMENT_PATH);
+                            }
+                            $output = ['status' => 'success','message' => 'Data has been deleted successfully'];
+                        }else{
+                            $output = ['status' => 'error','message' => 'Failed to delete data'];
+                        }
+                    }
+                    DB::commit();
                 } catch (Exception $e) {
                     DB::rollback();
                     $output = ['status' => 'error','message' => $e->getMessage()];
