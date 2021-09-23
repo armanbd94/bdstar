@@ -27,10 +27,15 @@ class WarehouseSummaryController extends BaseController
             $warehouse_id = $request->warehouse_id;
             $start_date = $request->start_date;
             $end_date   = $request->end_date;
+
             
-            $total_stock_value = DB::table('transfers')->where('warehouse_id',$warehouse_id)->sum('grand_total');
-            
-            $product_sale_data= DB::table('sales')
+            $material_purchase_data = DB::table('purchases')
+                                ->select(DB::raw("SUM(grand_total) as material_purchase_grand_value"))
+                                ->whereDate('purchase_date','>=',$start_date)
+                                ->whereDate('purchase_date','<=',$end_date)
+                                ->first();
+
+            $product_sale_data = DB::table('sales')
                                 ->select(DB::raw("SUM(grand_total) as product_sales_grand_value"),
                                 DB::raw("SUM(paid_amount) as sales_collection_received_value"),
                                 DB::raw("SUM(due_amount) as product_sales_due_value"),
@@ -46,36 +51,27 @@ class WarehouseSummaryController extends BaseController
             ->selectRaw('customer_id,due_amount,max(id) as last_due_id')
             ->groupBy('customer_id')
             ->where([['warehouse_id',$warehouse_id],['due_amount','>',0]])
+            ->whereDate('sale_date','>=',$start_date)
+            ->whereDate('sale_date','<=',$end_date)
             ->get();
             
             $total_damage_value = DB::table('sale_returns')
                                 ->where('warehouse_id',$warehouse_id)
+                                ->whereDate('date','>=',$start_date)
+                                ->whereDate('date','<=',$end_date)
                                 ->sum('grand_total');
 
-            $collection_transfer_value = DB::table('daily_closings')
-                                        ->where('warehouse_id',$warehouse_id)
-                                        ->sum('transfer');
-
-            $coupon_data = DB::table('received_coupons as rc')
-                            ->leftJoin('production_coupons as pc','rc.coupon_id','=','pc.id')
-                            ->leftJoin('production_products as pp','pc.production_product_id','=','pp.id')
-                            ->leftJoin('salesmen as s','rc.salesmen_id','=','s.id')
-                            ->select(DB::raw("SUM(pp.coupon_price) as coupon_payment_grand_value"),
-                            DB::raw("COUNT(rc.id) as total_coupon_received"))
-                            ->where([['s.warehouse_id',$warehouse_id],['pc.status',1]])
-                            ->groupBy('s.warehouse_id')
-                            ->first();
 
             $warehouse_expense = DB::table('expenses')
                                 ->where('warehouse_id',$warehouse_id)
+                                ->whereDate('date','>=',$start_date)
+                                ->whereDate('date','<=',$end_date)
                                 ->sum('amount');
 
             $data = [
-                'total_stock_value' => $total_stock_value,
+                'material_purchase_data' => $material_purchase_data,
                 'product_sale_data' => $product_sale_data,
                 'total_damage_value' => $total_damage_value,
-                'collection_transfer_value' => $collection_transfer_value,
-                'coupon_data' => $coupon_data,
                 'warehouse_expense' => $warehouse_expense,
                 'total_due_grand_values' => $total_due_grand_values
             ];

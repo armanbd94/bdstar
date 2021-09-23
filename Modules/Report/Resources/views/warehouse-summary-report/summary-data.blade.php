@@ -1,5 +1,5 @@
 <!-- ## Total Inventory Grand Value -->
-<div class="col-md-12 mb-5">
+{{-- <div class="col-md-12 mb-5">
     <div class="card card-custom card-border">
         <div class="card-header bg-primary">
             <div class="card-title text-center">
@@ -15,8 +15,29 @@
             @endif
         </div>
     </div>
-</div>
+</div> --}}
 
+<!-- ## Product Sales Grand Value -->
+<div class="col-md-12 mb-5">
+    <div class="card card-custom card-border">
+        <div class="card-header bg-primary">
+            <div class="card-title text-center">
+                <h2 class="card-label text-white">Material Purchase Grand Value</h2>
+            </div>
+        </div>
+        <div class="card-body">
+            @if ($material_purchase_data->material_purchase_grand_value)
+                <h5>{{ number_format($material_purchase_data->material_purchase_grand_value,2,'.',',') }}Tk</h5>
+                @if($material_purchase_data->material_purchase_grand_value > 0)
+                <h5>{{ numberTowords($material_purchase_data->material_purchase_grand_value) }} Taka</h5>
+                @endif
+            @else
+            <h5>0.00 Tk</h5>
+            <h5>Zero Taka</h5>
+            @endif
+        </div>
+    </div>
+</div>
 <!-- ## Product Sales Grand Value -->
 <div class="col-md-12 mb-5">
     <div class="card card-custom card-border">
@@ -116,7 +137,7 @@
     <div class="card card-custom card-border">
         <div class="card-header bg-primary">
             <div class="card-title text-center">
-                <h3 class="card-label text-white">Damage Grand Value</h3>
+                <h3 class="card-label text-white">Sales Return Grand Value</h3>
             </div>
         </div>
         <div class="card-body">
@@ -130,65 +151,7 @@
     </div>
 </div>
 
-<!-- ## Collection Transfer Value -->
-<div class="col-md-12 mb-5">
-    <div class="card card-custom card-border">
-        <div class="card-header bg-primary">
-            <div class="card-title text-center">
-                <h3 class="card-label text-white">Collection Transfer Value</h3>
-            </div>
-        </div>
-        <div class="card-body">
-            <h5>{{ number_format($collection_transfer_value,2,'.',',') }}Tk</h5>
-            @if($collection_transfer_value > 0)
-            <h5>{{ numberTowords($collection_transfer_value) }} Taka</h5>
-            @else
-            <h5>Zero Taka</h5>
-            @endif
-        </div>
-    </div>
-</div>
 
-<!-- ## Coupon Received -->
-<div class="col-md-12 mb-5">
-    <div class="card card-custom card-border">
-        <div class="card-header bg-primary">
-            <div class="card-title text-center">
-                <h3 class="card-label text-white">Coupon Received</h3>
-            </div>
-        </div>
-        <div class="card-body">
-            @if($coupon_data)
-            <h5>{{ trans_choice('file.piece', $coupon_data->total_coupon_received, ['value' => $coupon_data->total_coupon_received]) }}</h5>
-            @else
-            <h5>{{ trans_choice('file.piece', 0, ['value' => 0]) }}</h5>
-            @endif
-        </div>
-    </div>
-</div>
-
-<!-- ## Coupon Payment Grand Value -->
-<div class="col-md-12 mb-5">
-    <div class="card card-custom card-border">
-        <div class="card-header bg-primary">
-            <div class="card-title text-center">
-                <h3 class="card-label text-white">Coupon Payment Grand Value</h3>
-            </div>
-        </div>
-        <div class="card-body">
-            @if($coupon_data)
-            <h5>{{ number_format($coupon_data->coupon_payment_grand_value,2,'.',',') }}Tk</h5>
-            @if ($coupon_data->coupon_payment_grand_value > 0)
-            <h5>{{ numberTowords($coupon_data->coupon_payment_grand_value) }} Taka</h5>
-            @endif
-            @else
-            <h5>0.00 Tk</h5>
-            <h5>Zero Taka</h5>
-            @endif
-            
-        </div>
-    </div>
-</div>
 
 <!-- ## Warehouse Expense Value -->
 <div class="col-md-12 mb-5">
