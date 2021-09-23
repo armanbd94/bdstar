@@ -90,6 +90,10 @@ Route::group(['middleware' => ['auth']], function () {
     //Material Alert Report Route
     Route::get('material-stock-alert-report', 'MaterialStockAlertController@index')->name('material.stock.alert.report');
     Route::post('material-stock-alert-report/datatable-data', 'MaterialStockAlertController@get_datatable_data')->name('material.stock.alert.report.datatable.data');
+    
+    //Product Alert Report Route
+    Route::get('product-stock-alert-report', 'ProductStockAlertController@index')->name('product.stock.alert.report');
+    Route::post('product-stock-alert-report/datatable-data', 'ProductStockAlertController@get_datatable_data')->name('product.stock.alert.report.datatable.data');
 
     //Transfer Report Routes
     Route::get('transfer-report', 'TransferReportController@index')->name('transfer.report');

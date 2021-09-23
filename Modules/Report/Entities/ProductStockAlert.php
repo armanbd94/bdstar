@@ -3,6 +3,7 @@
 namespace Modules\Report\Entities;
 
 use App\Models\BaseModel;
+use Illuminate\Support\Facades\DB;
 
 class ProductStockAlert extends BaseModel
 {
@@ -15,6 +16,7 @@ class ProductStockAlert extends BaseModel
      * * * Begin :: Custom Datatable Code * * *
     *******************************************/
     //custom search column property
+
     protected $_name; 
     protected $_category_id; 
 
@@ -36,16 +38,21 @@ class ProductStockAlert extends BaseModel
         $this->column_order = ['id', 'material_name', 'material_code','category_id', 'unit_id', 'qty', 'alert_qty'];
         
         
-        $query = self::with('category:id,name','unit:id,unit_name')
-        ->where('status',1)->whereColumn('alert_qty','>','qty');
+        $query = DB::table('warehouse_product as wp')
+        ->join('products as p','wp.product_id','=','p.id')
+        ->join('categories as c','p.category_id','=','c.id')
+        ->join('units as u','p.base_unit_id','=','u.id')
+        ->selectRaw('wp.*,p.name,p.code,p.alert_quantity,c.name as category_name,u.unit_name')
+        ->groupBy('wp.product_id')
+        ->whereColumn('p.alert_quantity','>','wp.qty');
 
         //search query
         if (!empty($this->_name)) {
-            $query->where('material_name', 'like', '%' . $this->_name . '%');
+            $query->where('p.name', 'like', '%' . $this->_name . '%');
         }
 
         if (!empty($this->_category_id)) {
-            $query->where('category_id', $this->_category_id);
+            $query->where('p.category_id', $this->_category_id);
         }
  
 
@@ -75,7 +82,13 @@ class ProductStockAlert extends BaseModel
 
     public function count_all()
     {
-        return self::toBase()->where('status',1)->whereColumn('alert_qty','>','qty')->get()->count();
+        return DB::table('warehouse_product as wp')
+        ->join('products as p','wp.product_id','=','p.id')
+        ->join('categories as c','p.category_id','=','c.id')
+        ->join('units as u','p.base_unit_id','=','u.id')
+        ->selectRaw('wp.*,p.name,c.name as category_name,u.unit_name')
+        ->groupBy('wp.product_id')
+        ->whereColumn('p.alert_quantity','>','wp.qty')->get()->count();
     }
     /******************************************
      * * * End :: Custom Datatable Code * * *

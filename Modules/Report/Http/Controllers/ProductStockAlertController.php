@@ -49,7 +49,7 @@ class ProductStockAlertController extends BaseController
                     $row[] = $value->category_name;
                     $row[] = $value->unit_name;
                     $row[] = number_format($value->qty,4,'.','') ?? 0;
-                    $row[] = number_format($value->alert_qty,4,'.','') ?? 0;
+                    $row[] = number_format($value->alert_quantity,4,'.','') ?? 0;
                     $data[] = $row;
                 }
                 return $this->datatable_draw($request->input('draw'),$this->model->count_all(),
