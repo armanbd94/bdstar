@@ -46,6 +46,10 @@ Route::group(['middleware' => ['auth']], function () {
     //Salesman Wise Sales Report Route
     Route::get('salesman-wise-sales-report', 'SalesmanWiseSalesReportController@index')->name('salesman.wise.sales.report');
     Route::post('salesman-wise-sales-report/datatable-data', 'SalesmanWiseSalesReportController@get_datatable_data')->name('salesman.wise.sales.report.datatable.data');
+   
+    //SR Commission Report Route
+    Route::get('sr-commission-report', 'SalesmanCommissionReportController@index')->name('sr.commission.report');
+    Route::post('sr-commission-report/datatable-data', 'SalesmanCommissionReportController@get_datatable_data')->name('sr.commission.report.datatable.data');
     
     //Due Report Route
     Route::get('due-report', 'DueReportController@index')->name('due.report');
