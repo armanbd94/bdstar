@@ -42,7 +42,7 @@
                             <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-4" required="required" class="selectpicker">
                                 @if (!$warehouses->isEmpty())
                                 @foreach ($warehouses as $id => $name)
-                                    <option value="{{ $id }}">{{ $name }}</option>
+                                    <option value="{{ $id }}" {{ $id==1 ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                                 @endif
                             </x-form.selectbox>
@@ -60,7 +60,6 @@
                                 <table class="table table-bordered" id="product_table">
                                     <thead class="bg-primary">
                                         <th width="35%">Name</th>
-                                        <th width="10%" class="text-center">Batch No.</th>
                                         <th width="10%" class="text-center">Base Unit</th>
                                         <th width="10%" class="text-center">Qty Base Unit</th>
                                         <th width="10%" class="text-right">Base Unit Price</th>
@@ -71,7 +70,7 @@
                                     <tbody>
                                     </tbody>
                                     <tfoot class="bg-primary">
-                                        <th colspan="3" class="font-weight-bolder">Total</th>
+                                        <th colspan="2" class="font-weight-bolder">Total</th>
                                         <th id="total-qty" class="text-center font-weight-bolder">0</th>
                                         <th></th>
                                         <th id="total-tax" class="text-right font-weight-bolder">0.00</th>
@@ -220,7 +219,6 @@ $(document).ready(function () {
                     var newRow = $('<tr>');
                     var cols = '';
                     cols += `<td>`+data.name+` (`+data.code+`)</td>`;
-                    cols += `<td><input type="text" class="form-control batch_no text-center" name="products[`+count+`][batch_no]" id="products_`+count+`_batch_no" data="${count}"></td>`;
                     cols += `<td class="text-center">${data.base_unit_name}</td>`;
                      cols += `<td><input type="text" class="form-control base_unit_qty text-center" value="1" name="products[`+count+`][base_unit_qty]" id="products_`+count+`_base_unit_qty" data="${count}"></td>`;
                     cols += `<td class="net_unit_price text-right">${data.price}</td>`;
@@ -267,9 +265,9 @@ $(document).ready(function () {
         }
 
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(5)').text(net_unit_price.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(tax.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(5)').text(tax.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-value').val(tax.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text(sub_total.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(sub_total.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.subtotal-value').val(sub_total.toFixed(2));
 
         calculateTotal();

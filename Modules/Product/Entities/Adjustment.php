@@ -18,7 +18,7 @@ class Adjustment extends BaseModel
 
     public function products(){
         return $this->belongsToMany(Product::class,'adjustment_products','adjustment_id','product_id','id','id')
-                    ->withPivot('id','batch_no', 'base_unit_id', 'base_unit_qty','base_unit_price', 'tax_rate', 'tax', 'total')
+                    ->withPivot('id', 'base_unit_id', 'base_unit_qty','base_unit_price', 'tax_rate', 'tax', 'total')
                     ->withTimestamps();
     }
 

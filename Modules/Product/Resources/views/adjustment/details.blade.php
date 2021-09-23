@@ -36,7 +36,6 @@
                             <table class="table table-bordered" id="product_table">
                                 <thead class="bg-primary">
                                     <th width="35%">Name</th>
-                                    <th width="10%" class="text-center">Batch No.</th>
                                     <th width="10%" class="text-center">Base Unit</th>
                                     <th width="10%" class="text-center">Qty Base Unit</th>
                                     <th width="10%" class="text-right">Base Unit Price</th>
@@ -52,7 +51,6 @@
                                             @endphp
                                             <tr>
                                                 <td>{{  $adjustment_product->name.' - ('.$adjustment_product->code.')' }}</td>
-                                                <td class="text-center">{{ $adjustment_product->pivot->batch_no }}</td>
                                                 <td class="text-center">{{ $unit_name }}</td>
                                                 <td class="text-center">{{ $adjustment_product->pivot->base_unit_qty }}</td>
                                                 <td class="text-right">{{ $adjustment_product->pivot->base_unit_price }}</td>
@@ -63,7 +61,7 @@
                                     @endif
                                 </tbody>
                                 <tfoot class="bg-primary">
-                                    <th colspan="3" class="font-weight-bolder">Total</th>
+                                    <th colspan="2" class="font-weight-bolder">Total</th>
                                     <th id="total-qty" class="text-center font-weight-bolder">{{ number_format($adjustment->total_qty,2,'.','') }}</th>
                                     <th></th>
                                     <th id="total-tax" class="text-right font-weight-bolder">{{ number_format($adjustment->total_tax,2,'.','') }}</th>

@@ -90,7 +90,7 @@ class AdjustmentController extends BaseController
                     $row[] = number_format($value->total_qty,2,'.','');
                     $row[] = number_format($value->grand_total,2,'.','');
                     $row[] = $value->created_by;
-                    $row[] = date(config('settings.date_format'),strtotime($value->created_at));
+                    $row[] = date('d-M-Y',strtotime($value->created_at));
                     $row[] = action_button($action);//custom helper function for action button
                     $data[] = $row;
                 }
@@ -143,7 +143,6 @@ class AdjustmentController extends BaseController
                             $products[] = [
                                 'adjustment_id'   => $adjustment->id,
                                 'product_id'      => $value['id'],
-                                'batch_no'        => $value['batch_no'],
                                 'base_unit_id'    => $value['base_unit_id'],
                                 'base_unit_qty'   => $value['base_unit_qty'],
                                 'base_unit_price' => $value['base_unit_price'],
@@ -155,7 +154,6 @@ class AdjustmentController extends BaseController
 
                             $warehouse_product = WarehouseProduct::where([
                                 ['warehouse_id', $request->warehouse_id],
-                                ['batch_no', $value['batch_no']],
                                 ['product_id', $value['id']],
                             ])->first();
                             if ($warehouse_product) {
@@ -163,7 +161,6 @@ class AdjustmentController extends BaseController
                                 $warehouse_product->update();
                             } else {
                                 WarehouseProduct::create([
-                                    'batch_no'     => $value['batch_no'],
                                     'warehouse_id' => $request->warehouse_id,
                                     'product_id'   => $value['id'],
                                     'qty'          => $value['base_unit_qty'],
@@ -243,7 +240,6 @@ class AdjustmentController extends BaseController
                         foreach ($adjustmentData->products as  $adjustment_product) {
                             $warehouse_product = WarehouseProduct::where([
                                 ['warehouse_id', $adjustmentData->warehouse_id],
-                                ['batch_no', $adjustment_product->pivot->batch_no],
                                 ['product_id', $adjustment_product->id],
                             ])->first();
                             if ($warehouse_product) {
@@ -258,7 +254,6 @@ class AdjustmentController extends BaseController
                     {
                         foreach ($request->products as $key => $value) {
                             $products[$value['id']] = [
-                                'batch_no'        => $value['batch_no'],
                                 'base_unit_id'    => $value['base_unit_id'],
                                 'base_unit_qty'   => $value['base_unit_qty'],
                                 'base_unit_price' => $value['base_unit_price'],
@@ -269,7 +264,6 @@ class AdjustmentController extends BaseController
 
                             $warehouse_product = WarehouseProduct::where([
                                 ['warehouse_id', $request->warehouse_id],
-                                ['batch_no', $value['batch_no']],
                                 ['product_id', $value['id']],
                             ])->first();
                             if ($warehouse_product) {
@@ -277,7 +271,6 @@ class AdjustmentController extends BaseController
                                 $warehouse_product->update();
                             } else {
                                 WarehouseProduct::create([
-                                    'batch_no'     => $value['batch_no'],
                                     'warehouse_id' => $request->warehouse_id,
                                     'product_id'   => $value['id'],
                                     'qty'          => $value['base_unit_qty'],
@@ -318,7 +311,6 @@ class AdjustmentController extends BaseController
                         foreach ($adjustmentData->products as  $adjustment_product) {
                             $warehouse_product = WarehouseProduct::where([
                                 ['warehouse_id', $adjustmentData->warehouse_id],
-                                ['batch_no', $adjustment_product->pivot->batch_no],
                                 ['product_id', $adjustment_product->id],
                             ])->first();
                             if ($warehouse_product) {
@@ -358,7 +350,6 @@ class AdjustmentController extends BaseController
                             foreach ($adjustmentData->products as  $adjustment_product) {
                                 $warehouse_product = WarehouseProduct::where([
                                     ['warehouse_id', $adjustmentData->warehouse_id],
-                                    ['batch_no', $adjustment_product->pivot->batch_no],
                                     ['product_id', $adjustment_product->id],
                                 ])->first();
                                 if ($warehouse_product) {

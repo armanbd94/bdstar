@@ -61,7 +61,6 @@
                                 <table class="table table-bordered" id="product_table">
                                     <thead class="bg-primary">
                                         <th width="35%">Name</th>
-                                        <th width="10%" class="text-center">Batch No.</th>
                                         <th width="10%" class="text-center">Base Unit</th>
                                         <th width="10%" class="text-center">Qty Base Unit</th>
                                         <th width="10%" class="text-right">Base Unit Price</th>
@@ -83,9 +82,6 @@
                                                         $unit_name = $base_unit ? $base_unit->unit_name.' ('.$base_unit->unit_code.')' : '';
                                                     @endphp
                                                     <td>{{  $adjustment_product->name.' - ('.$adjustment_product->code.')' }}</td>
-
-                                                    
-                                                    <td><input type="text" class="form-control batch_no text-center" value="{{ $adjustment_product->pivot->batch_no }}" name="products[{{ $key+1 }}][batch_no]" id="products_{{ $key+1 }}_batch_no" data="{{ $key+1 }}"></td>
                                                     <td class="text-center">{{ $unit_name }}</td>
                                                     <td><input type="text" class="form-control base_unit_qty text-center" value="{{ $adjustment_product->pivot->base_unit_qty }}" name="products[{{ $key+1 }}][base_unit_qty]" id="products_{{ $key+1 }}_base_unit_qty" data="{{ $key+1 }}"></td>
                                                     <td class="net_unit_price text-right">{{ $adjustment_product->pivot->base_unit_price }}</td>
@@ -112,7 +108,7 @@
                                         @endif
                                     </tbody>
                                     <tfoot class="bg-primary">
-                                        <th colspan="3" class="font-weight-bolder">Total</th>
+                                        <th colspan="2" class="font-weight-bolder">Total</th>
                                         <th id="total-qty" class="text-center font-weight-bolder">{{ number_format($adjustment->total_qty,2,'.','') }}</th>
                                         <th></th>
                                         <th id="total-tax" class="text-right font-weight-bolder">{{ number_format($adjustment->total_tax,2,'.','') }}</th>
@@ -269,9 +265,8 @@ $(document).ready(function () {
                     var newRow = $('<tr>');
                     var cols = '';
                     cols += `<td>`+data.name+` (`+data.code+`)</td>`;
-                    cols += `<td><input type="text" class="form-control batch_no text-center" name="products[`+count+`][batch_no]" id="products_`+count+`_batch_no" data="${count}"></td>`;
                     cols += `<td class="text-center">${data.base_unit_name}</td>`;
-                     cols += `<td><input type="text" class="form-control base_unit_qty text-center" value="1" name="products[`+count+`][base_unit_qty]" id="products_`+count+`_base_unit_qty" data="${count}"></td>`;
+                    cols += `<td><input type="text" class="form-control base_unit_qty text-center" value="1" name="products[`+count+`][base_unit_qty]" id="products_`+count+`_base_unit_qty" data="${count}"></td>`;
                     cols += `<td class="net_unit_price text-right">${data.price}</td>`;
                     cols += `<td class="tax text-right"></td>`;
                     cols += `<td class="sub-total text-right"></td>`;
@@ -316,9 +311,9 @@ $(document).ready(function () {
         }
 
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(5)').text(net_unit_price.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(tax.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(5)').text(tax.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-value').val(tax.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text(sub_total.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(sub_total.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.subtotal-value').val(sub_total.toFixed(2));
 
         calculateTotal();

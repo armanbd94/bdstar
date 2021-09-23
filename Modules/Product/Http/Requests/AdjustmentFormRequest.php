@@ -26,7 +26,6 @@ class AdjustmentFormRequest extends FormRequest
         if(request()->has('products'))
         {
             foreach (request()->products as $key => $value) {
-                $this->rules   ['products.'.$key.'.batch_no'] = ['required'];
                 $this->rules   ['products.'.$key.'.base_unit_qty']          = ['required','numeric','gt:0'];
                 $this->messages['products.'.$key.'.base_unit_qty.required'] = 'This field is required';
                 $this->messages['products.'.$key.'.base_unit_qty.numeric']  = 'The value must be numeric';
