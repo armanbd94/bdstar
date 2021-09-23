@@ -50,6 +50,11 @@
                             </div>
 
                             <div class="form-group col-md-3 required">
+                                <label>Warehosue</label>
+                                <input type="text" class="form-control" value="{{  $sale->warehouse->name }}" readonly  />
+                                <input type="hidden" class="form-control" value="{{  $sale->warehouse_id }}" id="warehouse_id"  />
+                            </div>
+                            <div class="form-group col-md-3 required">
                                 <label>Order Received By.</label>
                                 <input type="text" class="form-control" value="{{  $sale->salesmen->name }}" readonly  />
                             </div>
@@ -86,7 +91,6 @@
                                     <thead class="bg-primary">
                                         <th>Name</th>
                                         <th class="text-center">Code</th>
-                                        <th class="text-center">Batch No.</th>
                                         <th class="text-center">Sale Unit</th>
                                         <th class="text-center">Available Qty</th>
                                         <th class="text-center">Qty</th>
@@ -111,7 +115,6 @@
                                                                                 ->orWhere('id',$sale_product->pivot->sale_unit_id)
                                                                                 ->get();
                                                     $warehouse_product = DB::table('warehouse_product')->where([
-                                                                            ['batch_no',$sale_product->pivot->batch_no],
                                                                             ['warehouse_id', $sale->warehouse_id],
                                                                             ['product_id',$sale_product->pivot->product_id]
                                                                         ])->first();
@@ -156,7 +159,6 @@
                                                 @endphp
                                                 <td>{{ $sale_product->name }}</td>
                                                 <td class="text-center">{{ $sale_product->code }}</td>
-                                                <td class="text-center">{{ $sale_product->pivot->batch_no }}</td>
                                                 <td class="unit-name text-center"></td>
                                                 <td class="text-center">{{ $stock_qty }}</td>
                                                 <td><input type="text" class="form-control qty text-center" name="products[{{ $key + 1 }}][qty]" id="products_{{ $key + 1 }}_qty" value="{{ number_format($sale_product->pivot->qty,2,'.'.'') }}"></td>
@@ -186,7 +188,7 @@
                                         @endif
                                     </tbody>
                                     <tfoot class="bg-primary">
-                                        <th colspan="5" class="font-weight-bolder">Total</th>
+                                        <th colspan="4" class="font-weight-bolder">Total</th>
                                         <th id="total-qty" class="text-center font-weight-bolder">{{ number_format($sale->total_qty,2,'.','') }}</th>
                                         <th></th>
                                         <th id="total-tax" class="text-right font-weight-bolder">{{ number_format($sale->total_tax,2,'.','') }}</th>
@@ -242,6 +244,7 @@
                                         <th><strong>Shipping Cost</strong><span class="float-right" id="shipping_total_cost">0.00</span></th>
                                         <th><strong>Labor Cost</strong><span class="float-right" id="labor_total_cost">0.00</span></th>
                                         <th><strong>Grand Total</strong><span class="float-right" id="grand_total">0.00</span></th>
+                                        <th><strong>SR Commission</strong><span class="float-right" id="sr_commission">{{ number_format($sale->total_commission,2,'.','') }}</span></th>
                                     </thead>
                                 </table>
                             </div>
@@ -253,6 +256,8 @@
                                 <input type="hidden" name="item" value="{{ $sale->item }}">
                                 <input type="hidden" name="order_tax" value="{{ $sale->order_tax }}">
                                 <input type="hidden" name="grand_total" value="{{ $sale->grand_total }}">
+                                <input type="hidden" name="sr_commission_rate" id="sr_commission_rate" value="{{ $sale->sr_commission_rate }}">
+                                <input type="hidden" name="total_commission" id="total_commission" value="{{ $sale->total_commission }}">
                             </div>
                             <div class="payment col-md-12 @if($sale->payment_status == 3) d-none @endif">
                                 <div class="row">
@@ -410,7 +415,8 @@ $(document).ready(function () {
             dataType: "json",
             data: {
                _token: _token,
-               search: request.term
+               search: request.term,
+               warehouse_id: document.getElementById('warehouse_id').value
             },
             success: function( data ) {
                response( data );
@@ -471,14 +477,13 @@ $(document).ready(function () {
             url: '{{ route("sale.product.search") }}',
             type: 'POST',
             data: {
-                data: data,_token:_token
+                data: data,_token:_token, warehouse_id: document.getElementById('warehouse_id').value
             },
             success: function(data) {
                 var flag = 1;
                 $('.product-code').each(function(i){
                     let row_index = $(this).data('row');
-                    let batch_no = $(`#products_${row_index}_batch_no`).val();
-                    if($(this).val() == data.code && batch_no == data.batch_no){
+                    if($(this).val() == data.code){
                         rowindex = i;
                         var qty = parseFloat($('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
                         $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
@@ -494,7 +499,6 @@ $(document).ready(function () {
                     var cols = '';
                     cols += `<td>${data.name}</td>`;
                     cols += `<td class="text-center">${data.code}</td>`;
-                    cols += `<td class="text-center">${data.batch_no}</td>`;
                     cols += `<td class="unit-name text-center"></td>`;
                     cols += `<td class="text-center">${data.qty}</td>`;
                     cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1"></td>`;
@@ -582,11 +586,11 @@ $(document).ready(function () {
             var sub_total = sub_total_unit * quantity;
         }
 
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text(net_unit_price.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.net-unit-price').val(net_unit_price.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text(tax.toFixed(2));
+        // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(net_unit_price.toFixed(2));
+        // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.net-unit-price').val(net_unit_price.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text(tax.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-value').val(tax.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(9)').text(sub_total.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text(sub_total.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.subtotal-value').val(sub_total.toFixed(2));
 
         calculateTotal();
@@ -647,7 +651,7 @@ $(document).ready(function () {
         var order_discount = parseFloat($('#order_discount').val());
         var shipping_cost  = parseFloat($('#shipping_cost').val());
         var labor_cost     = parseFloat($('#labor_cost').val());
-
+        var sr_commission_rate = $('#sr_commission_rate').val();
         if(!order_discount){
             order_discount = 0.00;
         }
@@ -657,13 +661,15 @@ $(document).ready(function () {
         if(!labor_cost){
             labor_cost = 0.00;
         }
-
+        if(!sr_commission_rate){
+            sr_commission_rate = 0.00;
+        }
         item = ++item + '(' + total_qty + ')';
         order_tax = (subtotal - order_discount) * (order_tax / 100);
         var grand_total = (subtotal + order_tax + shipping_cost + labor_cost) - order_discount;
         var previous_due = parseFloat($('#previous_due').val());
         var net_total = grand_total + previous_due;
-
+        var total_commission = (subtotal - order_discount) * (sr_commission_rate/100);
         $('#item').text(item);
         $('input[name="item"]').val($('#product_table tbody tr:last').index() + 1);
         $('#subtotal').text(subtotal.toFixed(2));
@@ -673,8 +679,10 @@ $(document).ready(function () {
         $('#shipping_total_cost').text(shipping_cost.toFixed(2));
         $('#labor_total_cost').text(labor_cost.toFixed(2));
         $('#grand_total').text(grand_total.toFixed(2));
+        $('#sr_commission').text(total_commission.toFixed(2));
         $('input[name="grand_total"]').val(grand_total.toFixed(2));
         $('input[name="net_total"]').val(net_total.toFixed(2));
+        $('input[name="total_commission"]').val(total_commission.toFixed(2));
         if($('#payment_status option:selected').val() == 1)
         {
             $('#paid_amount').val(net_total.toFixed(2));
@@ -706,6 +714,10 @@ $(document).ready(function () {
         calculateGrandTotal();
     });
 
+    $('#salesmen_id').on('change',function(){
+        alert($('#salesmen_id option:selected').data('cpr'));
+        $('#sr_commission_rate').val($('#salesmen_id option:selected').data('cpr'));
+    });
     $('#payment_status').on('change',function(){
         if($(this).val() != 3){
             $('.payment').removeClass('d-none');

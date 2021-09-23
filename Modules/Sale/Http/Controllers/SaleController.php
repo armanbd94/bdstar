@@ -447,7 +447,7 @@ class SaleController extends BaseController
             $data = [
                 'sale'      => $this->model->with('sale_products','customer','salesmen','route','area')->find($id),
                 'taxes'      => Tax::activeTaxes(),
-                'customer_groups' => CustomerGroup::where('status',1)->get(),
+                'warehouses'   => DB::table('warehouses')->where('status', 1)->pluck('name','id'),
             ];
             return view('sale::edit',$data);
         }else{
@@ -463,7 +463,7 @@ class SaleController extends BaseController
                 // dd($request->all());
                 DB::beginTransaction();
                 try {
-                    $warehouse_id = auth()->user()->warehouse->id;
+                    
                     $sale_data = [
                         'item'           => $request->item,
                         'total_qty'      => $request->total_qty,
@@ -501,7 +501,7 @@ class SaleController extends BaseController
                         $sale_data['document'] = $this->upload_file($request->file('document'),SALE_DOCUMENT_PATH);
                     }
                     $saleData = $this->model->with('sale_products')->find($request->sale_id);
-                    
+                    $warehouse_id = $saleData->warehouse_id;
                     $old_document = $saleData ? $saleData->document : '';
 
                     if(!$saleData->sale_products->isEmpty())
