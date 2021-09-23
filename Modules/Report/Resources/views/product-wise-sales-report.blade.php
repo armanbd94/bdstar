@@ -70,7 +70,6 @@
                                 <thead class="bg-primary">
                                     <tr>
                                         <th>Sl</th>
-                                        <th>Batch No</th>
                                         <th>Product Name</th>
                                         <th>Code</th>
                                         <th>Memo No</th>
@@ -84,7 +83,6 @@
                                 <tbody></tbody>
                                 <tfoot>
                                     <tr class="bg-primary">
-                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -158,11 +156,11 @@
             },
             "columnDefs": [
                 {
-                    "targets": [0,1,3,4,5,6],
+                    "targets": [0,1,3,4,5],
                     "className": "text-center"
                 },
                 {
-                    "targets": [7,8,9],
+                    "targets": [6,7,8],
                     "className": "text-right"
                 },
             ],
@@ -257,17 +255,17 @@
                             i : 0;
                 };
 
-                total = api.column(9).data().reduce( function (a, b) {
+                total = api.column(8).data().reduce( function (a, b) {
                         return intVal(a) + intVal(b);
                     }, 0 );
 
                 // Total over this page
-                pageTotal = api.column(9, { page: 'current'}).data().reduce( function (a, b) {
+                pageTotal = api.column(8, { page: 'current'}).data().reduce( function (a, b) {
                         return intVal(a) + intVal(b);
                     }, 0 );
 
                 // Update footer
-                $(api.column(9).footer()).html('= '+number_format(total));
+                $(api.column(8).footer()).html('= '+number_format(total));
             }
         });
 

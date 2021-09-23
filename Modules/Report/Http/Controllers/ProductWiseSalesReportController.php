@@ -50,7 +50,6 @@ class ProductWiseSalesReportController extends BaseController
                 $no++;
                 $row = [];
                 $row[] = $no;
-                $row[] = $value->batch_no;
                 $row[] = $value->name;
                 $row[] = $value->code;
                 $row[] = $value->memo_no;

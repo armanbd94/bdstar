@@ -40,7 +40,7 @@ class ProductWiseSalesReport extends BaseModel
     {
         //set column sorting index table column name wise (should match with frontend table header)
 
-        $this->column_order = ['sp.id','sp.batch_no','p.name','p.code','s.memo_no','s.sale_date','sp.qty','sp.net_unit_price','sp.tax','sp.total'];
+        $this->column_order = ['sp.id','p.name','p.code','s.memo_no','s.sale_date','sp.qty','sp.net_unit_price','sp.tax','sp.total'];
         
         $warehouse_id = $this->_warehouse_id;
         $query = DB::table('sale_products as sp')
