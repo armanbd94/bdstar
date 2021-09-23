@@ -29,7 +29,7 @@
                         <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" class="selectpicker">
                             @if (!$warehouses->isEmpty())
                             @foreach ($warehouses as $id => $name)
-                                <option value="{{ $id }}" data-name="{{ $name }}">{{ $name }}</option>
+                                <option value="{{ $id }}" {{ $id==1 ? 'selected' : '' }} data-name="{{ $name }}">{{ $name }}</option>
                             @endforeach
                             @endif
                         </x-form.selectbox>
@@ -58,10 +58,9 @@
                                     <tr>
                                         <th>SL</th>
                                         <th>Product Name</th>
-                                        <th>Batch No.</th>
                                         <th>Stock Base Unit</th>
                                         <th>Stock Qty - Base Unit</th>
-                                        <th>TP Price</th>
+                                        <th>Price</th>
                                         <th>Total Value</th>
                                         <th>Status</th>
                                     </tr>
@@ -69,7 +68,6 @@
                                 <tbody></tbody>
                                 <tfoot>
                                     <tr class="bg-primary">
-                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>
@@ -159,17 +157,17 @@ $(document).ready(function(){
             "data": function (data) {
                 data.batch_no     = $("#form-filter #batch_no").val();
                 data.product_id   = $("#form-filter #product_id").val();
-                data.warehouse_id = $("#form-filter #warehouse_id").val();
+                data.warehouse_id = $("#form-filter #warehouse_id option:selected").val();
                 data._token       = _token;
             }
         },
         "columnDefs": [
             {
-                "targets": [0,2,3,4,7],
+                "targets": [0,2,3,6],
                 "className": "text-center"
             },
             {
-                "targets": [5,6],
+                "targets": [4,5],
                 "className": "text-right"
             },
         ],
@@ -262,17 +260,17 @@ $(document).ready(function(){
                         i : 0;
             };
 
-            total = api.column(6).data().reduce( function (a, b) {
+            total = api.column(5).data().reduce( function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0 );
 
             // Total over this page
-            pageTotal = api.column(6, { page: 'current'}).data().reduce( function (a, b) {
+            pageTotal = api.column(5, { page: 'current'}).data().reduce( function (a, b) {
                     return intVal(a) + intVal(b);
                 }, 0 );
 
             // Update footer
-            $( api.column( 6 ).footer() ).html('= '+number_format(pageTotal) +' ('+ number_format(total) +' Total)');
+            $( api.column( 5 ).footer() ).html('= '+number_format(pageTotal) +' ('+ number_format(total) +' Total)');
         }
     });
 

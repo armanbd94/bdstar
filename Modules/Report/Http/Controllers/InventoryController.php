@@ -49,7 +49,6 @@ class InventoryController extends BaseController
                     $row = [];
                     $row[] = $no;
                     $row[] = $value->name;
-                    $row[] = $value->batch_no;
                     $row[] = $value->unit_name;
                     $row[] = number_format($value->qty,2,'.','');
                     $row[] = number_format($value->base_unit_price,2,'.','');

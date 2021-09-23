@@ -57,7 +57,7 @@ class WarehouseProduct extends BaseModel
         ->join('products as p','wp.product_id','=','p.id')
         ->join('units as u','p.base_unit_id','=','u.id')
         ->where('wp.warehouse_id',$this->_warehouse_id)
-        ->groupBy('wp.batch_no','wp.product_id');
+        ->groupBy('wp.product_id');
 
         //search query
 
