@@ -10,7 +10,7 @@ use Modules\Setting\Entities\Warehouse;
 class WarehouseProduct extends BaseModel
 {
     protected $table = 'warehouse_product';
-    protected $fillable = ['batch_no', 'warehouse_id', 'product_id', 'qty'];
+    protected $fillable = ['warehouse_id', 'product_id', 'qty'];
     
     public function warehouse()
     {
@@ -50,7 +50,7 @@ class WarehouseProduct extends BaseModel
     private function get_datatable_query()
     {
 
-        $this->column_order = ['wp.id', 'wp.product_id', 'wp.batch_no','p.base_unit_id', 'p.base_unit_price', null,null];
+        $this->column_order = ['wp.id', 'wp.product_id', 'p.base_unit_id', 'p.base_unit_price', null,null];
         
         $query = DB::table('warehouse_product as wp')
         ->selectRaw('wp.*,p.name,p.base_unit_price,u.unit_name')
@@ -60,9 +60,7 @@ class WarehouseProduct extends BaseModel
         ->groupBy('wp.batch_no','wp.product_id');
 
         //search query
-        if (!empty($this->_batch_no)) {
-            $query->where('wp.batch_no', $this->_batch_no);
-        }
+
         if (!empty($this->_product_id)) {
             $query->where('wp.product_id', $this->_product_id);
         }

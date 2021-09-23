@@ -28,7 +28,7 @@ class Warehouse extends BaseModel
     public function products()
     {
         return $this->belongsToMany(Product::class,'warehouse_product','warehouse_id','product_id','id','id')
-        ->withPivot('id','batch_no','qty')
+        ->withPivot('id','qty')
         ->withTimestamps();
     }
 
