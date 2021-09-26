@@ -18,8 +18,8 @@ class ASMFormRequest extends FormRequest
         $this->rules['username']              = ['required', 'string', 'max:30','unique:asms,username'];
         $this->rules['phone']                 = ['required', 'string', 'max:15', 'unique:asms,phone'];
         $this->rules['email']                 = ['nullable', 'string', 'email', 'unique:asms,email'];
-        $this->rules['password']              = ['required', 'string', 'min:8', 'confirmed'];
-        $this->rules['password_confirmation'] = ['required', 'string', 'min:8'];
+        // $this->rules['password']              = ['required', 'string', 'min:8', 'confirmed'];
+        // $this->rules['password_confirmation'] = ['required', 'string', 'min:8'];
         $this->rules['avatar']                = ['nullable','image', 'mimes:png,jpg,jpeg'];
         $this->rules['address']               = ['nullable', 'string'];
         $this->rules['nid_no']                = ['nullable'];
@@ -29,8 +29,8 @@ class ASMFormRequest extends FormRequest
             $this->rules['username'][3]              = 'unique:asms,username,'.request()->update_id;
             $this->rules['phone'][3]                 = 'unique:asms,phone,'.request()->update_id;
             $this->rules['email'][3]                 = 'unique:asms,email,'.request()->update_id;
-            $this->rules['password'][0]              = 'nullable';
-            $this->rules['password_confirmation'][0] = 'nullable';
+            // $this->rules['password'][0]              = 'nullable';
+            // $this->rules['password_confirmation'][0] = 'nullable';
         }
 
         return $this->rules;

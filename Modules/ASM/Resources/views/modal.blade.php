@@ -25,7 +25,7 @@
                                 <x-form.textbox labelName="Phone No." name="phone" required="required" col="col-md-6" placeholder="Enter phone number"/>
                                 <x-form.textbox labelName="Email" name="email" type="email" col="col-md-6" placeholder="Enter email"/>
 
-                                <div class="col-md-6 form-group">
+                                {{-- <div class="col-md-6 form-group">
                                     <label for="site_title">Password</label>
                                     <div class="input-group">
                                         <input type="password" class="form-control bg-brand" name="password" id="password">
@@ -52,7 +52,7 @@
                                             </span>
                                         </div>
                                     </div>
-                                </div>
+                                </div> --}}
 
                                 <x-form.selectbox labelName="District" name="district_id" col="col-md-6" class="selectpicker">
                                     @if (!$districts->isEmpty())

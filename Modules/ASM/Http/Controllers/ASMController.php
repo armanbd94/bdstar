@@ -113,9 +113,9 @@ class ASMController extends BaseController
                     }  
                 }
                 $collection        = $collection->merge(compact('avatar'));
-                if(!empty($request->password)){
-                    $collection   = $collection->merge(['password'=>$request->password]);
-                }
+                // if(!empty($request->password)){
+                //     $collection   = $collection->merge(['password'=>$request->password]);
+                // }
                 $result       = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
                 $output       = $this->store_message($result, $request->update_id);
        
