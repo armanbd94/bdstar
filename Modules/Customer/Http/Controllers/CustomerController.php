@@ -201,10 +201,11 @@ class CustomerController extends BaseController
     private function previous_balance_add($balance, int $customer_coa_id, string $customer_name) {
         if(!empty($balance) && !empty($customer_coa_id) && !empty($customer_name)){
             $transaction_id = generator(10);
+            $warehouse_id = 1;
             // customer debit for previous balance
             $cosdr = array(
                 'chart_of_account_id' => $customer_coa_id,
-                'warehouse_id'        => auth()->user()->warehouse->id,
+                'warehouse_id'        => $warehouse_id,
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'PR Balance',
                 'voucher_date'        => date("Y-m-d"),
@@ -218,7 +219,7 @@ class CustomerController extends BaseController
             );
             $inventory = array(
                 'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('inventory'))->value('id'),
-                'warehouse_id'        => auth()->user()->warehouse->id,
+                'warehouse_id'        => $warehouse_id,
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'PR Balance',
                 'voucher_date'        => date("Y-m-d"),
