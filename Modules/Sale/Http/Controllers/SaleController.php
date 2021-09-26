@@ -639,10 +639,8 @@ class SaleController extends BaseController
                                 $warehouse_product->qty += $sold_qty;
                                 $warehouse_product->update();
                             }
-                            SaleProduct::where('sale_id',$request->sale_id)->delete();
-                            
                         }
-                        
+                        SaleProduct::where('sale_id',$saleData->id)->delete();
                     }
                     Transaction::where(['voucher_no'=>$saleData->memo_no,'voucher_type'=>'INVOICE'])->delete();
     
@@ -703,10 +701,9 @@ class SaleController extends BaseController
                                     $warehouse_product->qty += $sold_qty;
                                     $warehouse_product->update();
                                 }
-                                SaleProduct::where('sale_id',$request->sale_id)->delete();
                                 
                             }
-                            
+                            SaleProduct::where('sale_id',$saleData->id)->delete();
                         }
                         Transaction::where(['voucher_no'=>$saleData->memo_no,'voucher_type'=>'INVOICE'])->delete();
         
