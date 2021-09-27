@@ -97,6 +97,39 @@
                                         <th class="text-center"><i class="fas fa-trash text-white"></i></th>
                                     </thead>
                                     <tbody>
+                                        <tr>
+                                            <td>                                                
+                                                <select name="products[1][pro-id]" id="product_list_1" onchange="product_select(this,1)" class="selectpicker col-md-12 products-alls form-control"  data-live-search="true" data-row="1">
+                                                
+                                                @if (!$products->isEmpty())
+                                                <option value="0">Please Select</option>
+                                                @foreach ($products as $product)
+                                                    <option value="{{ $product->id }}" data-pro-id="{{ $product->id}}" data-pro-code="{{ $product->code}}" data-pro-avl-qty="{{ $product->qty}}" data-pro-net-price="{{ $product->price}}" data-pro-net-tax_rate="{{ $product->tax_rate}}" data-pro-unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+                                                @endforeach
+                                                @endif
+                                                </select>
+                                            </td>
+                                            <td class="unit-name text-center" data-row="1"></td>
+                                            <td class="unit-name text-center" data-row="1"></td>
+                                            <td class="text-center" data-row="1"></td>
+                                            <td><input type="text" class="form-control qty text-center" name="products[1][qty]" id="products_1_qty" value="1" data-row="1"></td>
+                                            <td><input type="text" class="form-control free_qty text-center" name="products[1][free_qty]" id="products_1_free_qty" value="0" data-row="1"></td>
+                                            <td class="text-right" data-row="1"></td>
+                                            <td class="tax text-right" data-row="1"></td>
+                                            <td class="sub-total text-right" data-row="1"></td>
+                                            <td class="text-center"></td>
+                                            <input type="hidden" class="product-id" name="products[1][id]"  data-row="1">
+                                            <input type="hidden" class="product-code" name="products[1][code]"  data-row="1">
+                                            <input type="hidden" class="batch-no" name="products[1][batch_no]" id="products_1_batch_no" data-row="1">
+                                            <input type="hidden" class="product-unit" name="products[1][unit]" data-row="1">
+                                            <input type="hidden" class="stock-qty" name="products[1][stock_qty]" id="products_1_stock_qty"  data-row="1">
+                                            <input type="hidden" class="free-stock-qty" name="products[1][free_stock_qty]" id="products_1_free_stock_qty"  data-row="1">
+                                            <input type="hidden" class="net-unit-price" name="products[1][net_unit_price]" id="products_1_net_unit_price" data-row="1">
+                                            <input type="hidden" class="tax-rate" name="products[1][tax_rate]" data-row="1">
+                                            <input type="hidden" class="tax-value" name="products[1][tax]" data-row="1">
+                                            <input type="hidden" class="subtotal-value" name="products[1][subtotal]" data-row="1">
+
+                                        </tr>
                                     </tbody>
                                     <tfoot class="bg-primary">
                                         <th colspan="4" class="font-weight-bolder">Total</th>
@@ -105,7 +138,7 @@
                                         <th></th>
                                         <th id="total-tax" class="text-right font-weight-bolder">0.00</th>
                                         <th id="total" class="text-right font-weight-bolder">0.00</th>
-                                        <th></th>
+                                        <th class="text-center"><button type="button" class="btn btn-success btn-md add-product"><i class="fas fa-plus"></i></button></th>
                                     </tfoot>
                                 </table>
                             </div>
@@ -225,8 +258,8 @@
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
 
-$(document).ready(function () {
 
+$(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
 
     $('#product_code_name').on('input',function(){
@@ -351,75 +384,118 @@ $(document).ready(function () {
         calculateTotal();
     });
 
-    //Add  Product to cart table
+    //Remove product from cart table
     var count = 1;
-    function product_search(data) {
-        $.ajax({
-            url: '{{ route("sale.product.search") }}',
-            type: 'POST',
-            data: {
-                data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
-            },
-            success: function(data) {
-                var flag = 1;
-                $('.product-code').each(function(i){
-                    let row_index = $(this).data('row');
-                    if($(this).val() == data.code){
-                        rowindex = i;
-                        var qty = parseFloat($('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
-                        $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
-                        checkQuantity(String(qty),true,0);
-                        flag = 0;
-                    }
-                });
-                $('#product_code_name').val('');
-                if(flag)
-                {
-                    temp_unit_name = data.unit_name.split(',');
-                    var newRow = $('<tr>');
-                    var cols = '';
-                    cols += `<td>${data.name}</td>`;
-                    cols += `<td class="text-center">${data.code}</td>`
-                    cols += `<td class="unit-name text-center"></td>`;
-                    cols += `<td class="text-center">${data.qty}</td>`;
-                    cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1"></td>`;
-                    cols += `<td><input type="text" class="form-control free_qty text-center" name="products[${count}][free_qty]" id="products_${count}_free_qty" value="0"></td>`;
-                    cols += `<td class="text-right">${data.price}</td>`;
-                    cols += `<td class="tax text-right"></td>`;
-                    cols += `<td class="sub-total text-right"></td>`;
-                    cols += `<td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
-                    cols += `<input type="hidden" class="product-id" name="products[${count}][id]"  value="${data.id}">`;
-                    cols += `<input type="hidden" class="product-code" name="products[${count}][code]" value="${data.code}" data-row="${count}">`;
-                    cols += `<input type="hidden" class="batch-no" name="products[${count}][batch_no]" id="products_${count}_batch_no" value="${data.batch_no}">`;
-                    cols += `<input type="hidden" class="product-unit" name="products[${count}][unit]" value="`+temp_unit_name[0]+`">`;
-                    cols += `<input type="hidden" class="stock-qty" name="products[${count}][stock_qty]" id="products_${count}_stock_qty"  value="${data.qty}">`;
-                    cols += `<input type="hidden" class="free-stock-qty" name="products[${count}][free_stock_qty]" id="products_${count}_free_stock_qty"  value="${data.free_qty}">`;
-                    cols += `<input type="hidden" class="net-unit-price" name="products[${count}][net_unit_price]" id="products_${count}_net_unit_price" value="${data.price}">`;
-                    cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" value="${data.tax_rate}">`;
-                    cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]">`;
-                    cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]">`;
+    $('#product_table').on('click','.add-product',function(){
+        count++;
+        product_row_add(count);
+    });    
+    function product_row_add(count){
+        var newRow = $('<tr>');
+        var cols = '';
+        cols += `<td><select name="products[${count}][pro-id]" id="product_list_${count}" onchange="product_select(this,${count})" class="selectpicker col-md-12 products-alls form-control" data-live-search="true" data-row="1">
+            @if (!$products->isEmpty())
+            <option value="0">Please Select</option>
+            @foreach ($products as $product)
+                <option value="{{ $product->id }}" data-pro-id="{{ $product->id}}" data-pro-code="{{ $product->code}}" data-pro-avl-qty="{{ $product->qty}}" data-pro-net-price="{{ $product->price}}" data-pro-net-tax_rate="{{ $product->tax_rate}}" data-pro-unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+            @endforeach
+            @endif
+        </select></td>`;
+        cols += `<td class="text-center" data-row="${count}"></td>`
+        cols += `<td class="unit-name text-center" data-row="${count}"></td>`;
+        cols += `<td class="text-center" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="form-control free_qty text-center" name="products[${count}][free_qty]" id="products_${count}_free_qty" value="0" data-row="${count}"></td>`;
+        cols += `<td class="text-right" data-row="${count}"></td>`;
+        cols += `<td class="tax text-right" data-row="${count}"></td>`;
+        cols += `<td class="sub-total text-right" data-row="${count}"></td>`;
+        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
+        cols += `<input type="hidden" class="product-id" name="products[${count}][id]"  data-row="${count}">`;
+        cols += `<input type="hidden" class="product-code" name="products[${count}][code]" data-row="${count}">`;
+        cols += `<input type="hidden" class="batch-no" name="products[${count}][batch_no]" id="products_${count}_batch_no"  data-row="${count}">`;
+        cols += `<input type="hidden" class="product-unit" name="products[${count}][unit]" >`;
+        cols += `<input type="hidden" class="stock-qty" name="products[${count}][stock_qty]" id="products_${count}_stock_qty"  data-row="${count}">`;
+        cols += `<input type="hidden" class="free-stock-qty" name="products[${count}][free_stock_qty]" id="products_${count}_free_stock_qty" data-row="${count}">`;
+        cols += `<input type="hidden" class="net-unit-price" name="products[${count}][net_unit_price]" id="products_${count}_net_unit_price" data-row="${count}">`;
+        cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" data-row="${count}">`;
+        cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]" data-row="${count}">`;
+        cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]" data-row="${count}">`;
 
-                    newRow.append(cols);
-                    $('#product_table tbody').append(newRow);
+        newRow.append(cols);
+        $('#product_table tbody').append(newRow);
+        $('#product_table .selectpicker').selectpicker();
 
-                    console.log(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
-
-                    product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
-                    product_qty.push(data.qty);
-                    product_free_qty.push(data.free_qty);
-                    tax_rate.push(parseFloat(data.tax_rate));
-                    tax_name.push(data.tax_name);
-                    tax_method.push(data.tax_method);
-                    unit_name.push(data.unit_name);
-                    unit_operator.push(data.unit_operator);
-                    unit_operation_value.push(data.unit_operation_value);
-                    rowindex = newRow.index();
-                    checkQuantity(1,true,0);
-                    count++;
-                }
-            }
-        });
     }
+
+    //Add  Product to cart table
+    // var count = 1;
+    // function product_search(data) {
+    //     $.ajax({
+    //         url: '{{ route("sale.product.search") }}',
+    //         type: 'POST',
+    //         data: {
+    //             data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
+    //         },
+    //         success: function(data) {
+    //             var flag = 1;
+    //             $('.product-code').each(function(i){
+    //                 let row_index = $(this).data('row');
+    //                 if($(this).val() == data.code){
+    //                     rowindex = i;
+    //                     var qty = parseFloat($('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
+    //                     $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
+    //                     checkQuantity(String(qty),true,0);
+    //                     flag = 0;
+    //                 }
+    //             });
+    //             $('#product_code_name').val('');
+    //             if(flag)
+    //             {
+    //                 temp_unit_name = data.unit_name.split(',');
+    //                 var newRow = $('<tr>');
+    //                 var cols = '';
+    //                 cols += `<td>${data.name}</td>`;
+    //                 cols += `<td class="text-center">${data.code}</td>`
+    //                 cols += `<td class="unit-name text-center"></td>`;
+    //                 cols += `<td class="text-center">${data.qty}</td>`;
+    //                 cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1"></td>`;
+    //                 cols += `<td><input type="text" class="form-control free_qty text-center" name="products[${count}][free_qty]" id="products_${count}_free_qty" value="0"></td>`;
+    //                 cols += `<td class="text-right">${data.price}</td>`;
+    //                 cols += `<td class="tax text-right"></td>`;
+    //                 cols += `<td class="sub-total text-right"></td>`;
+    //                 cols += `<td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
+    //                 cols += `<input type="hidden" class="product-id" name="products[${count}][id]"  value="${data.id}">`;
+    //                 cols += `<input type="hidden" class="product-code" name="products[${count}][code]" value="${data.code}" data-row="${count}">`;
+    //                 cols += `<input type="hidden" class="batch-no" name="products[${count}][batch_no]" id="products_${count}_batch_no" value="${data.batch_no}">`;
+    //                 cols += `<input type="hidden" class="product-unit" name="products[${count}][unit]" value="`+temp_unit_name[0]+`">`;
+    //                 cols += `<input type="hidden" class="stock-qty" name="products[${count}][stock_qty]" id="products_${count}_stock_qty"  value="${data.qty}">`;
+    //                 cols += `<input type="hidden" class="free-stock-qty" name="products[${count}][free_stock_qty]" id="products_${count}_free_stock_qty"  value="${data.free_qty}">`;
+    //                 cols += `<input type="hidden" class="net-unit-price" name="products[${count}][net_unit_price]" id="products_${count}_net_unit_price" value="${data.price}">`;
+    //                 cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" value="${data.tax_rate}">`;
+    //                 cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]">`;
+    //                 cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]">`;
+
+    //                 newRow.append(cols);
+    //                 $('#product_table tbody').append(newRow);
+
+    //                 console.log(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+
+    //                 product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+    //                 product_qty.push(data.qty);
+    //                 product_free_qty.push(data.free_qty);
+    //                 tax_rate.push(parseFloat(data.tax_rate));
+    //                 tax_name.push(data.tax_name);
+    //                 tax_method.push(data.tax_method);
+    //                 unit_name.push(data.unit_name);
+    //                 unit_operator.push(data.unit_operator);
+    //                 unit_operation_value.push(data.unit_operation_value);
+    //                 rowindex = newRow.index();
+    //                 checkQuantity(1,true,0);
+    //                 count++;
+    //             }
+    //         }
+    //     });
+    // }
 
     function checkQuantity(sale_qtyadd,flag,free_qty=0)
     {
@@ -657,6 +733,34 @@ $(document).ready(function () {
         
     });
 });
+    
+function product_select(value,rowindex){
+    let id = $(value).val();
+    //alert(id+' '+rowindex);
+    
+}
+//loadProduct(null,1);
+function loadProduct(warehouse_id=null,rowcount){
+
+    $.ajax({
+        url:"{{url('sale/product-select-search')}}",
+        type: 'post',
+        data: { _token: _token,warehouse_id:warehouse_id},
+        success: function( data ) {
+            var html = `<option value="">Select Please</option>`;
+            $.each(data, function(key, value) {
+                html += '<option value="'+ value.id +'">'+ value.label +'</option>';
+            });
+
+            $('#product_table #product_list_'+rowcount).empty().html(html);
+            // $('#product_table .products-alls').selectpicker();
+            $('#product_table #product_list_'+rowcount+'.selectpicker').selectpicker('refresh');
+        },
+        error: function (xhr, ajaxOption, thrownError) {
+            console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+        }
+    });
+}
 
 
 function getRouteList(salesmen_id){

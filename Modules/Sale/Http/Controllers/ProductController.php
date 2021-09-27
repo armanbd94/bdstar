@@ -100,5 +100,47 @@ class ProductController extends Controller
                 return $output;
             }
         }
+    }    
+    public function product_select_search(Request $request)
+    {
+        $warehouse_id=0;
+        if(!empty($request->warehouse_id)){
+            $warehouse_id = $request->warehouse_id;
+        }else{
+            $warehouse_id = 1;
+        }
+            $output=[];
+            $products = DB::table('warehouse_product as wp')
+            ->join('products as p','wp.product_id','=','p.id')
+            ->leftjoin('taxes as t','p.tax_id','=','t.id')
+            ->leftjoin('units as u','p.base_unit_id','=','u.id')
+            ->selectRaw('wp.*,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
+            ->where([['wp.warehouse_id',$warehouse_id],['wp.qty','>',0]])
+            ->orderBy('p.name','asc')
+            ->get();
+            
+            if(!$products->isEmpty())
+            {
+                foreach($products as $row)
+                {
+                    $temp_array       = array();
+                    $temp_array['id']             = $row->id;
+                    $temp_array['name']           = $row->name;
+                    $temp_array['code']           = $row->code;
+                    $temp_array['base_unit_id']   = $row->base_unit_id;
+                    $temp_array['base_unit_name'] = $row->unit_name;
+                    $temp_array['net_unit_price'] = number_format($row->price,'2','.','');
+                    $temp_array['stock_qty']      = $row->qty;
+                    $temp_array['tax_name']       = $row->tax_name ? $row->tax_name : 'No Tax';
+                    $temp_array['tax_rate']       = $row->tax_rate ? number_format($row->tax_rate,2,'.','') : number_format(0,2,'.','');
+                    $temp_array['tax_method']     = $row->tax_method;
+                    $temp_array['image']          = $row->image ? asset('storage/'.PRODUCT_IMAGE_PATH.$row->image) : asset('images/product.svg');
+                    $temp_array['label']          = $row->name.' ('.$row->code.') - [Stock Avl. Qty: '.$row->qty.']';
+                    $output[] = $temp_array;
+                }
+            }else{
+                $temp_array['label']  = 'No data found!';
+            }
+            return $output;
     }
 }

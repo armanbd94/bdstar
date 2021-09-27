@@ -30,6 +30,7 @@ Route::group(['middleware' => ['auth']], function () {
            //Sale Product Search Routes
             Route::post('product-autocomplete-search', 'ProductController@product_autocomplete_search');
             Route::post('product-search', 'ProductController@product_search')->name('product.search');
+            Route::post('product-select-search', 'ProductController@product_select_search');
        });
        
 });

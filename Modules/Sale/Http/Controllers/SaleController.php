@@ -9,6 +9,7 @@ use App\Traits\UploadAble;
 use Illuminate\Http\Request;
 use Modules\Sale\Entities\Sale;
 use Illuminate\Support\Facades\DB;
+use Modules\Product\Entities\Product;
 use Modules\Sale\Entities\SaleProduct;
 use Modules\Customer\Entities\Customer;
 use App\Http\Controllers\BaseController;
@@ -146,7 +147,18 @@ class SaleController extends BaseController
     {
         if(permission('sale-add')){
             $this->setPageData('Add Sale','Add Sale','fas fa-shopping-cart',[['name' => 'Add Sale']]);
+
+            $products = DB::table('warehouse_product as wp')
+                ->join('products as p','wp.product_id','=','p.id')
+                ->leftjoin('taxes as t','p.tax_id','=','t.id')
+                ->leftjoin('units as u','p.base_unit_id','=','u.id')
+                ->selectRaw('wp.*,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
+                ->where([['wp.warehouse_id',1],['wp.qty','>',0]])
+                ->orderBy('p.name','asc')
+                ->get();
+
             $data = [
+                'products'       => $products,
                 'taxes'       => Tax::activeTaxes(),
                 'salesmen'    => DB::table('salesmen')->where([['status',1]])->select('name','id','phone','cpr')->get(),
                 'locations'   => DB::table('locations')->where('status', 1)->get(),
