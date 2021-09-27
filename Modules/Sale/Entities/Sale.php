@@ -17,7 +17,7 @@ use Modules\Setting\Entities\Warehouse;
 class Sale extends BaseModel
 {
     protected $fillable = ['memo_no', 'warehouse_id', 'district_id', 'upazila_id', 'route_id', 'area_id', 'salesmen_id', 
-    'customer_id', 'item', 'total_qty', 'total_discount', 'total_tax', 'total_price', 'order_tax_rate', 'order_tax', 
+    'customer_id', 'item', 'total_qty', 'total_free_qty', 'total_discount', 'total_tax', 'total_price', 'order_tax_rate', 'order_tax', 
     'order_discount', 'shipping_cost', 'labor_cost', 'grand_total', 'previous_due', 'net_total', 'paid_amount', 
     'due_amount','sr_commission_rate','total_commission', 'payment_status', 'payment_method', 'account_id', 'reference_no', 'document', 'note', 'sale_date', 
     'delivery_status', 'delivery_date', 'created_by', 'modified_by' ];
@@ -55,7 +55,7 @@ class Sale extends BaseModel
     public function sale_products()
     {
         return $this->belongsToMany(Product::class,'sale_products','sale_id','product_id','id','id')
-        ->withPivot('id', 'qty', 'sale_unit_id', 'net_unit_price', 'discount', 'tax_rate', 'tax', 'total')
+        ->withPivot('id', 'qty','free_qty', 'sale_unit_id', 'net_unit_price', 'discount', 'tax_rate', 'tax', 'total')
         ->withTimestamps(); 
     }
 
