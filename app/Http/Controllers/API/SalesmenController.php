@@ -10,52 +10,47 @@ use Modules\SalesMen\Entities\SalesMenDailyRoute;
 
 class SalesmenController extends APIController
 {
-    public function daily_route_list(int $salesmen_id)
-    {
-        $errors = [];
-        $data    = [];
-        $message = "";
-        $status  = true;
-        try {
-            if(auth()->user()->id == $salesmen_id){
-                $routes = SalesMenDailyRoute::with('route')->where('salesmen_id',$salesmen_id)->get();
-                if($routes){
-                    foreach ($routes as $value) {
-                        $data[] = [
-                            'id' => $value->id,
-                            'route_name' => DAYS[$value->day].' - '.$value->route->name
-                        ];
-                    }
-                    $message = "Data found Successfully";
-                }
-            }else{
-                $status = false;
-                $message = 'Invalid User';
-            }
-        } catch (Exception $e) {
-            $status  = false;
-            $message = $e->getMessage();
-        }
-        
-        return $this->sendResult($message,$data,$errors,$status);
-    }
 
-    public function route_area_list(int $route_id)
+    public function customer_list(Request $request)
     {
         $errors    = [];
         $data    = [];
         $message = "";
         $status  = true;
         try {
-            $route = DB::table('sales_men_daily_routes')->where(['id' => $route_id, 'salesmen_id' => auth()->user()->id])->first();
-            if($route)
+            
+            $search_text = $request->customer;
+            $salesman_routes = DB::table('sales_men_daily_routes')->where('salesmen_id',auth()->user()->id)->select('route_id')->get();
+            $routes = [];
+            if(!$salesman_routes->isEmpty())
             {
-                $customers = DB::table('locations')->where(['parent_id'=>$route->route_id,'status'=>1])->pluck('name','id');
+                foreach ($salesman_routes as $value) {
+                    array_push($routes,$value->route_id);
+                }
+                $customers = DB::table('customers as c')
+                ->leftJoin('customer_groups as cg','c.customer_group_id','=','cg.id')
+                ->select('c.id','c.name','c.shop_name','cg.percentage')
+                ->where('c.status',1)
+                ->whereIn('c.route_id',$routes)
+                ->when($search_text,function($q) use ($search_text){
+                    $q->where('c.name','like','%'.$search_text.'%')
+                    ->orWhere('c.shop_name','like','%'.$search_text.'%');
+                })
+                ->get();
                 if($customers){
-                    foreach ($customers as $id => $name) {
+                    foreach ($customers as $value) {
+                        $customer_previous_balance = DB::table('transactions as t')
+                        ->leftjoin('chart_of_accounts as coa','t.chart_of_account_id','=','coa.id')
+                        ->select(DB::raw("SUM(t.debit) - SUM(t.credit) as balance"),'coa.id','coa.code')
+                        ->groupBy('t.chart_of_account_id')
+                        ->where('coa.customer_id',$value->id)
+                        ->where('t.approve',1)
+                        ->first();
                         $data[] = [
-                            'id'   => $id,
-                            'name' => $name
+                            'id'           => $value->id,
+                            'name'         => $value->shop_name.' ('.$value->name.')',
+                            'percentage'   => $value->percentage ? number_format($value->percentage,2,'.','') : number_format(0,2,'.',''),
+                            'previous_due' => $customer_previous_balance ? number_format($customer_previous_balance->balance,2,'.','') : number_format(0,2,'.','')
                         ];
                     }
                     $message = "Data found Successfully";
@@ -65,36 +60,9 @@ class SalesmenController extends APIController
                 }
             }else{
                 $status  = false;
-                $message = "Invalid route";
-            }
-            
-        } catch (Exception $e) {
-            $status  = false;
-            $message = $e->getMessage();
-        }
-        return $this->sendResult($message,$data,$errors,$status);
-    }
-
-    public function area_customer_list(int $area_id)
-    {
-        $errors    = [];
-        $data    = [];
-        $message = "";
-        $status  = true;
-        try {
-            $customers = DB::table('customers')->where(['area_id'=>$area_id,'status'=>1])->get();
-            if($customers){
-                foreach ($customers as $value) {
-                    $data[] = [
-                        'id' => $value->id,
-                        'name' => $value->shop_name.' ('.$value->name.')'
-                    ];
-                }
-                $message = "Data found Successfully";
-            }else{
-                $status  = false;
                 $message = "No Records Found";
             }
+            
         } catch (Exception $e) {
             $status  = false;
             $message = $e->getMessage();
