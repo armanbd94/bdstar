@@ -14,7 +14,6 @@ class ProductSearchController extends APIController
         $data    = [];
         $message = "";
         $status  = true;
-
             $products = DB::table('warehouse_product as wp')
             ->join('products as p','wp.product_id','=','p.id')
             ->leftjoin('taxes as t','p.tax_id','=','t.id')
