@@ -31,7 +31,7 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     //Purchase Return Routes
-    Route::get('purchase-return', 'PurchaseReturnController@index')->name('purchase.return.list');
+    Route::get('purchase-return', 'PurchaseReturnController@index')->name('purchase.return');
     Route::group(['prefix' => 'purchase-return', 'as'=>'purchase.return.'], function () {
         Route::post('datatable-data', 'PurchaseReturnController@get_datatable_data')->name('datatable.data');
         Route::post('store', 'PurchaseReturnController@store')->name('store');

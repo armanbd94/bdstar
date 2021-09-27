@@ -19,5 +19,7 @@
     "HRM": true,
     "Loan": true,
     "Report": true,
-    "Sale": true
+    "Sale": true,
+    "ProductDamage": true,
+    "DamageProduct": true
 }
