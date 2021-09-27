@@ -36,41 +36,37 @@
             <div class="card-body">
                 <!--begin: Datatable-->
                 <div id="kt_datatable_wrapper" class="dataTables_wrapper dt-bootstrap4 no-footer">
-                    <form action="" id="sale_update_form" method="post" enctype="multipart/form-data">
+                    <form action="" id="sale_store_form" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="row">
-                            <input type="hidden" name="sale_id" id="sale_id" value="{{ $sale->id }}">
+                            <input type="hidden" name="sale_id" id="sale_id" >
                             <div class="form-group col-md-3 required">
                                 <label for="memo_no">Memo No.</label>
-                                <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{  $sale->memo_no }}"  />
+                                <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{  $memo_no }}"  />
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label for="sale_date">Sale Date</label>
-                                <input type="text" class="form-control date" name="sale_date" id="sale_date" value="{{ $sale->sale_date }}" readonly />
+                                <input type="text" class="form-control date" name="sale_date" id="sale_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
-
-                            <div class="form-group col-md-3 required">
-                                <label>Warehosue</label>
-                                <input type="text" class="form-control" value="{{  $sale->warehouse->name }}" readonly  />
-                                <input type="hidden" class="form-control" value="{{  $sale->warehouse_id }}" id="warehouse_id"  />
-                            </div>
-                            <div class="form-group col-md-3 required">
-                                <label>Order Received By.</label>
-                                <input type="text" class="form-control" value="{{  $sale->salesmen->name }}" readonly  />
-                            </div>
-                            <div class="form-group col-md-3 required">
-                                <label>Route</label>
-                                <input type="text" class="form-control" value="{{  $sale->route->name }}" readonly  />
-                            </div>
-                            <div class="form-group col-md-3 required">
-                                <label>Area</label>
-                                <input type="text" class="form-control" value="{{  $sale->area->name }}" readonly  />
-                            </div>
-                            <div class="form-group col-md-3 required">
-                                <label>Customer</label>
-                                <input type="text" class="form-control" value="{{  $sale->customer->name.' - '.$sale->customer->shop_name }}" readonly  />
-                                <input type="hidden" name="customer_id_hidden" id="customer_id_hidden" value="{{ $sale->customer_id }}">
-                            </div>
+                            <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" class="selectpicker">
+                                @if (!$warehouses->isEmpty())
+                                @foreach ($warehouses as $id => $name)
+                                    <option value="{{ $id }}" {{ $id == 1 ? 'selected' : '' }}>{{ $name }}</option>
+                                @endforeach
+                                @endif
+                            </x-form.selectbox>
+                            <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="selectpicker" onchange="getRouteList(this.value)">
+                                @if (!$salesmen->isEmpty())
+                                @foreach ($salesmen as $value)
+                                <option value="{{ $value->id }}" data-cpr="{{ $value->cpr }}">{{ $value->name.' - '.$value->phone }}</option>
+                            @endforeach
+                                @endif
+                            </x-form.selectbox>
+    
+                            <x-form.selectbox labelName="Route" name="route_id" col="col-md-3" class="selectpicker" onchange="getAreaList(this.value);"/>
+    
+                            <x-form.selectbox labelName="Area" name="area_id" col="col-md-3" class="selectpicker" onchange="customer_list(this.value)"/>
+                            <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="selectpicker"/>
                             
                             <div class="form-group col-md-3">
                                 <label for="document">Attach Document</label>
@@ -94,109 +90,19 @@
                                         <th class="text-center">Sale Unit</th>
                                         <th class="text-center">Available Qty</th>
                                         <th class="text-center">Qty</th>
-                                        <th class="text-center">Free Qty</th>
                                         <th class="text-right">Net Sale Unit Price</th>
                                         <th class="text-right">Tax</th>
                                         <th class="text-right">Subtotal</th>
                                         <th class="text-center"><i class="fas fa-trash text-white"></i></th>
                                     </thead>
                                     <tbody>
-                                        @php
-                                            $temp_unit_name = [];
-                                            $temp_unit_operator = [];
-                                            $temp_unit_operation_value = [];
-                                        @endphp
-                                        @if (!$sale->sale_products->isEmpty())
-                                            @foreach ($sale->sale_products as $key => $sale_product)
-                                            <tr>
-                                                @php
-                                                    $tax = DB::table('taxes')->where('rate',$sale_product->pivot->tax_rate)->first();
-
-                                                    $units = DB::table('units')->where('base_unit',$sale_product->pivot->sale_unit_id)
-                                                                                ->orWhere('id',$sale_product->pivot->sale_unit_id)
-                                                                                ->get();
-                                                    $warehouse_product = DB::table('warehouse_product')->where([
-                                                                            ['warehouse_id', $sale->warehouse_id],
-                                                                            ['product_id',$sale_product->pivot->product_id]
-                                                                        ])->first();
-                                                    $stock_qty = $sale_product->pivot->qty + ($warehouse_product ? $warehouse_product->qty : 0);
-                                                    
-                                                    $unit_name            = [];
-                                                    $unit_operator        = [];
-                                                    $unit_operation_value = [];
-
-                                                    if($units){
-                                                        foreach ($units as $unit) {
-                                                            if($sale_product->pivot->sale_unit_id == $unit->id)
-                                                            {
-                                                                array_unshift($unit_name,$unit->unit_name);
-                                                                array_unshift($unit_operator,$unit->operator);
-                                                                array_unshift($unit_operation_value,$unit->operation_value);
-                                                            }else{
-                                                                $unit_name           [] = $unit->unit_name;
-                                                                $unit_operator       [] = $unit->operator;
-                                                                $unit_operation_value[] = $unit->operation_value;
-                                                            }
-                                                        }
-
-                                                        if($sale_product->tax_method == 1){
-                                                            $product_price = $sale_product->pivot->net_unit_price;
-                                                        }else{
-                                                            $product_price = $sale_product->pivot->total / $sale_product->pivot->qty;
-                                                        }
-
-                                                        if($unit_operator[0] == '*')
-                                                        {
-                                                            $product_price = $product_price * $unit_operation_value[0];
-                                                        }else if($unit_operator[0] == '/')
-                                                        {
-                                                            $product_price = $product_price / $unit_operation_value[0];
-                                                        }
-                                                        
-                                                        $temp_unit_name = $unit_name = implode(",",$unit_name).',';
-                                                        $temp_unit_operator = $unit_operator = implode(",",$unit_operator).',';
-                                                        $temp_unit_operation_value = $unit_operation_value = implode(",",$unit_operation_value).',';
-                                                    }
-                                                @endphp
-                                                <td>{{ $sale_product->name }}</td>
-                                                <td class="text-center">{{ $sale_product->code }}</td>
-                                                <td class="unit-name text-center"></td>
-                                                <td class="text-center">{{ $stock_qty }}</td>
-                                                <td><input type="text" class="form-control qty text-center" name="products[{{ $key + 1 }}][qty]" id="products_{{ $key + 1 }}_qty" value="{{ number_format($sale_product->pivot->qty,2,'.','') }}"></td>
-                                                <td><input type="text" class="form-control free_qty text-center" name="products[{{ $key + 1 }}][free_qty]" id="products_{{ $key + 1 }}_free_qty" value="{{ number_format($sale_product->pivot->free_qty,2,'.','') }}"></td>
-                                                <td class="text-right">{{ $product_price }}</td>
-                                                <td class="tax text-right">{{ number_format((float)$sale_product->pivot->tax, 2, '.','') }}</td>
-                                                <td class="sub-total text-right">{{ number_format((float)$sale_product->pivot->total, 2, '.','') }}</td>
-                                                <td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>
-                                                <input type="hidden" class="product-id" name="products[{{ $key + 1 }}][id]"  value="{{ $sale_product->pivot->product_id }}">
-                                                <input type="hidden" class="product-code" name="products[{{ $key + 1 }}][code]" value="{{ $sale_product->code }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="batch-no" name="products[{{ $key + 1 }}][batch_no]" id="products_{{ $key + 1 }}_batch_no" value="{{ $sale_product->pivot->batch_no }}">
-                                                <input type="hidden"   class="stock-qty form-control text-center" name="products[{{ $key+1 }}][stock_qty]"  value="{{ $stock_qty }}">
-                                                <input type="hidden"   class="free-stock-qty form-control text-center" name="products[{{ $key+1 }}][free_stock_qty]"  value="{{ $sale_product->pivot->free_qty }}">
-                                                <input type="hidden" class="product-price" name="products[{{ $key+1 }}][net_unit_price]" value="{{ $product_price }}">
-                                                <input type="hidden" class="sale-unit" name="products[{{ $key+1 }}][unit]" value="{{ $unit_name }}">
-                                                <input type="hidden" class="sale-unit-operator"  value="{{ $unit_operator }}">
-                                                <input type="hidden" class="sale-unit-operation-value"  value="{{ $unit_operation_value }}">
-                                                <input type="hidden" class="tax-rate" name="products[{{ $key+1 }}][tax_rate]" value="{{ $sale_product->pivot->tax_rate }}">
-                                                @if ($tax)
-                                                <input type="hidden" class="tax-name" value="{{ $tax->name }}">
-                                                @else
-                                                <input type="hidden" class="tax-name" value="No Tax">
-                                                @endif
-                                                <input type="hidden" class="tax-method" value="{{ $sale_product->tax_method }}">
-                                                <input type="hidden" class="tax-value" name="products[{{ $key+1 }}][tax]" value="{{ $sale_product->pivot->tax }}">
-                                                <input type="hidden" class="subtotal-value" name="products[{{ $key+1 }}][subtotal]" value="{{ $sale_product->pivot->total }}">
-                                            </tr>
-                                            @endforeach
-                                        @endif
                                     </tbody>
                                     <tfoot class="bg-primary">
                                         <th colspan="4" class="font-weight-bolder">Total</th>
-                                        <th id="total-qty" class="text-center font-weight-bolder">{{ number_format($sale->total_qty,2,'.','') }}</th>
-                                        <th id="total-free-qty" class="text-center font-weight-bolder">{{ number_format($sale->total_free_qty,2,'.','') }}</th>
+                                        <th id="total-qty" class="text-center font-weight-bolder">0.00</th>
                                         <th></th>
-                                        <th id="total-tax" class="text-right font-weight-bolder">{{ number_format($sale->total_tax,2,'.','') }}</th>
-                                        <th id="total" class="text-right font-weight-bolder">{{ number_format($sale->total_price,2,'.','') }}</th>
+                                        <th id="total-tax" class="text-right font-weight-bolder">0.00</th>
+                                        <th id="total" class="text-right font-weight-bolder">0.00</th>
                                         <th></th>
                                     </tfoot>
                                 </table>
@@ -207,27 +113,27 @@
                                         <option value="0" selected>No Tax</option>
                                         @if (!$taxes->isEmpty())
                                             @foreach ($taxes as $tax)
-                                                <option value="{{ $tax->rate }}" {{ $sale->order_tax_rate == $tax->rate ? 'selected' : '' }}>{{ $tax->name }}</option>
+                                                <option value="{{ $tax->rate }}">{{ $tax->name }}</option>
                                             @endforeach
                                         @endif
                                     </x-form.selectbox>
 
                                     <div class="form-group col-md-2">
                                         <label for="order_discount">Order Discount</label>
-                                        <input type="text" class="form-control" name="order_discount" id="order_discount" value="{{ number_format($sale->order_discount,2,'.','') }}">
+                                        <input type="text" class="form-control" name="order_discount" id="order_discount">
                                     </div>
                                     <div class="form-group col-md-2">
                                         <label for="shipping_cost">Shipping Cost</label>
-                                        <input type="text" class="form-control" name="shipping_cost" id="shipping_cost"  value="{{ number_format($sale->shipping_cost,2,'.','') }}" />
+                                        <input type="text" class="form-control" name="shipping_cost" id="shipping_cost"/>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <label for="labor_cost">Labor Cost</label>
-                                        <input type="text" class="form-control" name="labor_cost" id="labor_cost"  value="{{ number_format($sale->labor_cost,2,'.','') }}" />
+                                        <input type="text" class="form-control" name="labor_cost" id="labor_cost"/>
                                     </div>
 
                                     <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2" class="selectpicker">
                                         @foreach (PAYMENT_STATUS as $key => $value)
-                                        <option value="{{ $key }}" {{ $sale->payment_status == $key ? 'selected' : '' }}>{{ $value }}</option>
+                                        <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </x-form.selectbox>
                                 </div>
@@ -235,8 +141,8 @@
                             
                             
                             <div class="form-group col-md-12">
-                                <label for="note">Note</label>
-                                <textarea  class="form-control" name="note" id="note" cols="30" rows="3">{{ $sale->note }}</textarea>
+                                <label for="shipping_cost">Note</label>
+                                <textarea  class="form-control" name="note" id="note" cols="30" rows="3"></textarea>
                             </div>
                             <div class="col-md-12">
                                 <table class="table table-bordered">
@@ -248,56 +154,55 @@
                                         <th><strong>Shipping Cost</strong><span class="float-right" id="shipping_total_cost">0.00</span></th>
                                         <th><strong>Labor Cost</strong><span class="float-right" id="labor_total_cost">0.00</span></th>
                                         <th><strong>Grand Total</strong><span class="float-right" id="grand_total">0.00</span></th>
-                                        <th><strong>SR Commission</strong><span class="float-right" id="sr_commission">{{ number_format($sale->total_commission,2,'.','') }}</span></th>
+                                        <th><strong>SR Commission</strong><span class="float-right" id="sr_commission">0.00</span></th>
                                     </thead>
                                 </table>
                             </div>
                             <div class="col-md-12">
-                                <input type="hidden" name="total_qty" value="{{ $sale->total_qty }}">
-                                <input type="hidden" name="total_free_qty" value="{{ $sale->total_free_qty }}">
-                                <input type="hidden" name="total_discount" value="{{ $sale->total_discount }}">
-                                <input type="hidden" name="total_tax" value="{{ $sale->total_tax }}">
-                                <input type="hidden" name="total_price" value="{{ $sale->total_price }}">
-                                <input type="hidden" name="item" value="{{ $sale->item }}">
-                                <input type="hidden" name="order_tax" value="{{ $sale->order_tax }}">
-                                <input type="hidden" name="grand_total" value="{{ $sale->grand_total }}">
-                                <input type="hidden" name="sr_commission_rate" id="sr_commission_rate" value="{{ $sale->sr_commission_rate }}">
-                                <input type="hidden" name="total_commission" id="total_commission" value="{{ $sale->total_commission }}">
+                                <input type="hidden" name="total_qty">
+                                <input type="hidden" name="total_discount">
+                                <input type="hidden" name="total_tax">
+                                <input type="hidden" name="total_price">
+                                <input type="hidden" name="item">
+                                <input type="hidden" name="order_tax">
+                                <input type="hidden" name="grand_total">
+                                <input type="hidden" name="sr_commission_rate" id="sr_commission_rate">
+                                <input type="hidden" name="total_commission" id="total_commission">
                             </div>
-                            <div class="payment col-md-12 @if($sale->payment_status == 3) d-none @endif">
+                            <div class="payment col-md-12 d-none">
                                 <div class="row">
                                     <div class="form-group col-md-4 required">
                                         <label for="previous_due">Previous Due</label>
-                                        <input type="text" class="form-control" name="previous_due" id="previous_due" value="{{ $sale->previous_due }}" readonly>
+                                        <input type="text" class="form-control" name="previous_due" id="previous_due" readonly>
                                     </div>
                                     <div class="form-group col-md-4 required">
                                         <label for="net_total">Net Total</label>
-                                        <input type="text" class="form-control" name="net_total" id="net_total" value="{{ ($sale->grand_total + $sale->previous_due) }}" readonly>
+                                        <input type="text" class="form-control" name="net_total" id="net_total" readonly>
                                     </div>
                                     <div class="form-group col-md-4 required">
                                         <label for="paid_amount">Paid Amount</label>
-                                        <input type="text" class="form-control" name="paid_amount" id="paid_amount" value="{{$sale->paid_amount }}">
+                                        <input type="text" class="form-control" name="paid_amount" id="paid_amount">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="due_amount">Due Amount</label>
-                                        <input type="text" class="form-control" name="due_amount" id="due_amount" value="{{$sale->due_amount }}" readonly>
+                                        <input type="text" class="form-control" name="due_amount" id="due_amount" readonly>
                                     </div>
                                     <x-form.selectbox labelName="Payment Method" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-4" class="selectpicker">
                                         @foreach (SALE_PAYMENT_METHOD as $key => $value)
-                                        <option value="{{ $key }}" @if($sale->payment_method) {{ $sale->payment_method == $key ? 'selected' : '' }} @endif>{{ $value }}</option>
+                                        <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </x-form.selectbox>
                                     <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4" class="selectpicker"/>
-                                    <div class="form-group required col-md-4 @if($sale->payment_method) {{ $sale->payment_method != 1  ? '' : 'd-none' }} @endif reference_no">
+                                    <div class="form-group required col-md-4 d-none reference_no">
                                         <label for="reference_no">Reference No</label>
-                                        <input type="text" class="form-control" name="reference_no" id="reference_no" value="{{ $sale->reference_no }}">
+                                        <input type="text" class="form-control" name="reference_no" id="reference_no">
                                     </div>
                                 </div>
                             </div>
 
                             <div class="form-grou col-md-12 text-center pt-5">
-                                <a href="{{ url('sale') }}" class="btn btn-danger btn-sm mr-3"><i class="far fa-window-close"></i> Cancel</a>
-                                <button type="button" class="btn btn-primary btn-sm mr-3" id="save-btn" onclick="update_data()"><i class="fas fa-save"></i> Update</button>
+                                <button type="button" class="btn btn-danger btn-sm mr-3" onclick="window.location.replace('{{ route("sale.add") }}');"><i class="fas fa-sync-alt"></i> Reset</button>
+                                <button type="button" class="btn btn-primary btn-sm mr-3" id="save-btn" onclick="store_data()"><i class="fas fa-save"></i> Save</button>
                             </div>
                         </div>
                     </form>
@@ -322,7 +227,7 @@ $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
 
     $('#product_code_name').on('input',function(){
-        var customer_id  = $('#customer_id_hidden').val();
+        var customer_id  = $('#customer_id option:selected').val();
         var temp_data = $('#product_code_name').val();
         if(!customer_id){
             $('#product_code_name').val(temp_data.substring(0,temp_data.length - 1));
@@ -334,7 +239,6 @@ $(document).ready(function () {
     var product_code  = [];
     var product_name  = [];
     var product_qty   = [];
-    var product_free_qty   = [];
 
     // array data with selection
     var product_price        = [];
@@ -353,54 +257,6 @@ $(document).ready(function () {
     var rowindex;
     var customer_group_rate;
     var row_product_price;
-
-    var rownumber = $('#product_table tbody tr:last').index();
-
-    for (rowindex = 0; rowindex <= rownumber; rowindex++) {
-        
-        product_price.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.product-price').val()));
-        var quantity = parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.qty').val());
-        var free_quantity = parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.free_qty').val());
-        product_qty.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.stock-qty').val()));
-        tax_rate.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.tax-rate').val()));
-        tax_name.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.tax-name').val());
-        tax_method.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.tax-method').val());
-        temp_unit_name = $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit').val().split(',');
-        unit_name.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit').val());
-        unit_operator.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operator').val());
-        unit_operation_value.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operation-value').val());
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit').val(temp_unit_name[0]);
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name').text(temp_unit_name[0]);
-    }
-
-    //assigning value
-
-    $('#item').text($('input[name="item"]').val() + '('+$('input[name="total_qty"]').val()+')');
-    $('#subtotal').text(parseFloat($('input[name="total_price"]').val()).toFixed(2));
-    $('#order_tax').text(parseFloat($('input[name="order_tax"]').val()).toFixed(2));
-
-    if(!$('input[name="order_discount"]').val())
-    {
-        $('input[name="order_discount"]').val('0.00');
-    }
-    $('#order_total_discount').text(parseFloat($('input[name="order_discount"]').val()).toFixed(2));
-    if(!$('input[name="shipping_cost"]').val())
-    {
-        $('input[name="shipping_cost"]').val('0.00');
-    }
-    $('#shipping_total_cost').text(parseFloat($('input[name="shipping_cost"]').val()).toFixed(2));
-    if(!$('input[name="labor_cost"]').val())
-    {
-        $('input[name="labor_cost"]').val('0.00');
-    }
-    $('#labor_total_cost').text(parseFloat($('input[name="labor_cost"]').val()).toFixed(2));
-    $('#grand_total').text(parseFloat($('input[name="grand_total"]').val()).toFixed(2));
-
-
-    var cid = $('input[name="customer_id_hidden"]').val();
-    $.get('{{ url("customer/group-data") }}/'+cid,function(data){
-        customer_group_rate = (data/100);
-    });
 
     //Get customer group rate for special price
     $('#customer_id').on('change',function(){
@@ -452,29 +308,11 @@ $(document).ready(function () {
     //Update product qty
     $('#product_table').on('keyup','.qty',function(){
         rowindex = $(this).closest('tr').index();
-        let free_qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val();
-        if(parseFloat($(this).val()) == ''){
-            free_qty = 0;
-        }
-        if(parseFloat($(this).val()) < 1 && parseFloat($(this).val()) != ''){
+        if($(this).val() < 1 && $(this).val() != ''){
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(1);
             notification('error','Qunatity can\'t be less than 1');
         }
-        checkQuantity($(this).val(),true,free_qty);
-    });
-
-    //Update product free qty
-    $('#product_table').on('keyup','.free_qty',function(){
-        rowindex = $(this).closest('tr').index();
-        let qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val();
-        if(parseFloat(qty) == ''){
-            qty = 0;
-        }
-        if(parseFloat($(this).val()) > parseFloat(qty)){
-            console.log(qty);
-            $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val(0);
-        }
-        checkQuantity(qty,true,$(this).val());
+        checkQuantity($(this).val(),true);
     });
 
     //Remove product from cart table
@@ -492,17 +330,13 @@ $(document).ready(function () {
     });
 
     //Add  Product to cart table
-    @if (!$sale->sale_products->isEmpty())
-    var count = "{{ count($sale->sale_products) + 1 }}" ;
-    @else 
     var count = 1;
-    @endif
     function product_search(data) {
         $.ajax({
             url: '{{ route("sale.product.search") }}',
             type: 'POST',
             data: {
-                data: data,_token:_token, warehouse_id: document.getElementById('warehouse_id').value
+                data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
             },
             success: function(data) {
                 var flag = 1;
@@ -512,7 +346,7 @@ $(document).ready(function () {
                         rowindex = i;
                         var qty = parseFloat($('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
                         $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
-                        checkQuantity(String(qty),true,0);
+                        checkQuantity(String(qty),true);
                         flag = 0;
                     }
                 });
@@ -523,7 +357,7 @@ $(document).ready(function () {
                     var newRow = $('<tr>');
                     var cols = '';
                     cols += `<td>${data.name}</td>`;
-                    cols += `<td class="text-center">${data.code}</td>`;
+                    cols += `<td class="text-center">${data.code}</td>`
                     cols += `<td class="unit-name text-center"></td>`;
                     cols += `<td class="text-center">${data.qty}</td>`;
                     cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1"></td>`;
@@ -553,21 +387,15 @@ $(document).ready(function () {
                     unit_operator.push(data.unit_operator);
                     unit_operation_value.push(data.unit_operation_value);
                     rowindex = newRow.index();
-                    checkQuantity(1,true,0);
+                    checkQuantity(1,true);
                     count++;
                 }
             }
         });
     }
 
-    function checkQuantity(sale_qtyadd,flag,free_qty=0)
+    function checkQuantity(sale_qty,flag)
     {
-        var sale_qty=0;
-        if(free_qty != 0){
-            sale_qty = (sale_qtyadd - free_qty);            
-        }else{
-            sale_qty = sale_qtyadd;   
-        }
 
         var operator = unit_operator[rowindex].split(',');
         var operation_value = unit_operation_value[rowindex].split(',');
@@ -619,9 +447,9 @@ $(document).ready(function () {
 
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(net_unit_price.toFixed(2));
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.net-unit-price').val(net_unit_price.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text(tax.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text(tax.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-value').val(tax.toFixed(2));
-        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(9)').text(sub_total.toFixed(2));
+        $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text(sub_total.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.subtotal-value').val(sub_total.toFixed(2));
 
         calculateTotal();
@@ -644,7 +472,6 @@ $(document).ready(function () {
     {
         //sum of qty
         var total_qty = 0;
-        var total_free_qty = 0;
         $('.qty').each(function() {
             if($(this).val() == ''){
                 total_qty += 0;
@@ -654,17 +481,6 @@ $(document).ready(function () {
         });
         $('#total-qty').text(total_qty);
         $('input[name="total_qty"]').val(total_qty);
-
-        //sum of free qty
-        $('.free_qty').each(function() {
-            if($(this).val() == ''){
-                total_free_qty += 0;
-            }else{
-                total_free_qty += parseFloat($(this).val());
-            }
-        });
-        $('#total-free-qty').text(total_free_qty);
-        $('input[name="total_free_qty"]').val(total_free_qty);
 
         //sum of tax
         var total_tax = 0;
@@ -707,6 +523,8 @@ $(document).ready(function () {
         if(!sr_commission_rate){
             sr_commission_rate = 0.00;
         }
+
+
         item = ++item + '(' + total_qty + ')';
         order_tax = (subtotal - order_discount) * (order_tax / 100);
         var grand_total = (subtotal + order_tax + shipping_cost + labor_cost) - order_discount;
@@ -724,6 +542,7 @@ $(document).ready(function () {
         $('#grand_total').text(grand_total.toFixed(2));
         $('#sr_commission').text(total_commission.toFixed(2));
         $('input[name="grand_total"]').val(grand_total.toFixed(2));
+        $('input[name="net_total"]').val(net_total.toFixed(2));
         $('input[name="net_total"]').val(net_total.toFixed(2));
         $('input[name="total_commission"]').val(total_commission.toFixed(2));
         if($('#payment_status option:selected').val() == 1)
@@ -793,22 +612,65 @@ $(document).ready(function () {
     });
 });
 
-account_list("{{ $sale->payment_method }}","{{ $sale->account_id }}");
-function account_list(payment_method,account_id='')
+
+function getRouteList(salesmen_id){
+    $.ajax({
+        url:"{{route('sales.representative.daily.route.list')}}",
+        type: 'post',
+        data: { _token: _token,id:salesmen_id},
+        success: function( data ) {
+            $('#route_id').empty().html(data);
+            $('#route_id.selectpicker').selectpicker('refresh');
+        },
+        error: function (xhr, ajaxOption, thrownError) {
+            console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
+        }
+    });
+}
+function getAreaList(route_id){
+    $.ajax({
+        url:"{{ url('route-id-wise-area-list') }}/"+route_id,
+        type:"GET",
+        dataType:"JSON",
+        success:function(data){
+            html = `<option value="">Select Please</option>`;
+            $.each(data, function(key, value) {
+                html += '<option value="'+ key +'">'+ value +'</option>';
+            });
+
+            $('#area_id').empty().append(html);
+            $('#area_id.selectpicker').selectpicker('refresh');
+        },
+    });
+}
+function customer_list(area_id)
+{
+    $.ajax({
+        url:"{{ url('customer-list') }}",
+        type:"POST",
+        data:{area_id:area_id,_token:_token},
+        dataType:"JSON",
+        success:function(data){
+            html = `<option value="">Select Please</option>`;
+            $.each(data, function(key, value) {
+                html += `<option value="${value.id}">${value.name} - ${value.mobile} (${value.shop_name})</option>`;
+            });
+            $('#customer_id').empty().append(html);
+            $('#customer_id.selectpicker').selectpicker('refresh');
+      
+        },
+    });
+
+}
+function account_list(payment_method)
 {
     $.ajax({
         url: "{{route('account.list')}}",
         type: "POST",
         data: { payment_method: payment_method,_token: _token},
         success: function (data) {
-            $('#sale_update_form #account_id').html('');
-            $('#sale_update_form #account_id').html(data);
-            $('#sale_update_form #account_id.selectpicker').selectpicker('refresh');
-            if(account_id)
-            {
-                $('#sale_update_form #account_id').val(account_id);
-                $('#sale_update_form #account_id.selectpicker').selectpicker('refresh');
-            }
+            $('#sale_store_form #account_id').empty().html(data);
+            $('#sale_store_form #account_id.selectpicker').selectpicker('refresh');
         },
         error: function (xhr, ajaxOption, thrownError) {
             console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
@@ -817,15 +679,14 @@ function account_list(payment_method,account_id='')
 }
 
 
-
-function update_data(){
+function store_data(){
     var rownumber = $('table#product_table tbody tr:last').index();
     if (rownumber < 0) {
         notification("error","Please insert product to order table!")
     }else{
-        let form = document.getElementById('sale_update_form');
+        let form = document.getElementById('sale_store_form');
         let formData = new FormData(form);
-        let url = "{{route('sale.update')}}";
+        let url = "{{route('sale.store')}}";
         $.ajax({
             url: url,
             type: "POST",
@@ -841,24 +702,24 @@ function update_data(){
                 $('#save-btn').removeClass('spinner spinner-white spinner-right');
             },
             success: function (data) {
-                $('#sale_update_form').find('.is-invalid').removeClass('is-invalid');
-                $('#sale_update_form').find('.error').remove();
+                $('#sale_store_form').find('.is-invalid').removeClass('is-invalid');
+                $('#sale_store_form').find('.error').remove();
                 if (data.status == false) {
                     $.each(data.errors, function (key, value) {
                         var key = key.split('.').join('_');
-                        $('#sale_update_form input#' + key).addClass('is-invalid');
-                        $('#sale_update_form textarea#' + key).addClass('is-invalid');
-                        $('#sale_update_form select#' + key).parent().addClass('is-invalid');
-                        $('#sale_update_form #' + key).parent().append(
+                        $('#sale_store_form input#' + key).addClass('is-invalid');
+                        $('#sale_store_form textarea#' + key).addClass('is-invalid');
+                        $('#sale_store_form select#' + key).parent().addClass('is-invalid');
+                        $('#sale_store_form #' + key).parent().append(
                             '<small class="error text-danger">' + value + '</small>');
                     });
                 } else {
                     notification(data.status, data.message);
                     if (data.status == 'success') {
                         window.location.replace("{{ route('sale') }}");
-                        
                     }
                 }
+
             },
             error: function (xhr, ajaxOption, thrownError) {
                 console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
