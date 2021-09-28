@@ -42,20 +42,20 @@
                             <input type="hidden" name="sale_id" id="sale_id" >
                             <div class="form-group col-md-3 required">
                                 <label for="memo_no">Memo No.</label>
-                                <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{  $memo_no }}"  />
+                                <input type="text" class="fcs form-control" name="memo_no" id="memo_no" value="{{  $memo_no }}"  />
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label for="sale_date">Sale Date</label>
-                                <input type="text" class="form-control date" name="sale_date" id="sale_date" value="{{ date('Y-m-d') }}" readonly />
+                                <input type="text" class="fcs form-control date" name="sale_date" id="sale_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
-                            <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" class="selectpicker">
+                            <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" class="fcs">
                                 @if (!$warehouses->isEmpty())
                                 @foreach ($warehouses as $id => $name)
                                     <option value="{{ $id }}" {{ $id == 1 ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                                 @endif
                             </x-form.selectbox>
-                            <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="selectpicker" onchange="getRouteList(this.value)">
+                            <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="fcs selectpicker" onchange="getRouteList(this.value)">
                                 @if (!$salesmen->isEmpty())
                                 @foreach ($salesmen as $value)
                                 <option value="{{ $value->id }}" data-cpr="{{ $value->cpr }}">{{ $value->name.' - '.$value->phone }}</option>
@@ -63,17 +63,17 @@
                                 @endif
                             </x-form.selectbox>
     
-                            <x-form.selectbox labelName="Route" name="route_id" col="col-md-3" class="selectpicker" onchange="getAreaList(this.value);"/>
+                            <x-form.selectbox labelName="Route" name="route_id" col="col-md-3" class="fcs selectpicker" onchange="getAreaList(this.value);"/>
     
-                            <x-form.selectbox labelName="Area" name="area_id" col="col-md-3" class="selectpicker" onchange="customer_list(this.value)"/>
-                            <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="selectpicker"/>
+                            <x-form.selectbox labelName="Area" name="area_id" col="col-md-3" class="fcs selectpicker" onchange="customer_list(this.value)"/>
+                            <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="fcs selectpicker"/>
                             
                             <div class="form-group col-md-3">
                                 <label for="document">Attach Document</label>
-                                <input type="file" class="form-control" name="document" id="document">
+                                <input type="file" class="form-control fcs" name="document" id="document">
                             </div>
 
-                            <div class="form-group col-md-12">
+                            <!-- <div class="form-group col-md-12">
                                 <label for="product_code_name">Select Product</label>
                                 <div class="input-group mb-3">
                                     <div class="input-group-prepend">
@@ -81,7 +81,7 @@
                                     </div>
                                     <input type="text" class="form-control" name="product_code_name" id="product_code_name" placeholder="Please type product code and select...">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-md-12">
                                 <table class="table table-bordered" id="product_table">
                                     <thead class="bg-primary">
@@ -98,36 +98,35 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>                                                
-                                                <select name="products[1][pro-id]" id="product_list_1" onchange="product_select(this,1)" class="selectpicker col-md-12 products-alls form-control"  data-live-search="true" data-row="1">
+                                            <td class="col-md-3">                                                
+                                                <select name="products[1][pro_id]" id="product_list_1" class="fcs selectpicker col-md-12 product_name form-control" onchange="getProductDetails(this,1)"  data-live-search="true" data-row="1">
                                                 
                                                 @if (!$products->isEmpty())
                                                 <option value="0">Please Select</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}" data-pro-id="{{ $product->id}}" data-pro-code="{{ $product->code}}" data-pro-avl-qty="{{ $product->qty}}" data-pro-net-price="{{ $product->price}}" data-pro-net-tax_rate="{{ $product->tax_rate}}" data-pro-unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+                                                    <option value="{{ $product->id }}" data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
                                                 @endforeach
                                                 @endif
                                                 </select>
                                             </td>
-                                            <td class="unit-name text-center" data-row="1"></td>
-                                            <td class="unit-name text-center" data-row="1"></td>
-                                            <td class="text-center" data-row="1"></td>
-                                            <td><input type="text" class="form-control qty text-center" name="products[1][qty]" id="products_1_qty" value="1" data-row="1"></td>
-                                            <td><input type="text" class="form-control free_qty text-center" name="products[1][free_qty]" id="products_1_free_qty" value="0" data-row="1"></td>
-                                            <td class="text-right" data-row="1"></td>
-                                            <td class="tax text-right" data-row="1"></td>
-                                            <td class="sub-total text-right" data-row="1"></td>
+                                            <td class="product-code_tx_1 text-center" id="products_code_1" data-row="1"></td>
+                                            <td class="unit-name_tx_1 text-center" id="products_unit_1" data-row="1"></td>
+                                            <td class="available-qty_tx_1 text-center" id="products_available_qty_1" data-row="1"></td>
+                                            <td><input type="text" class="fcs form-control qty text-center" name="products[1][qty]" id="products_qty_1" value="1" data-row="1"></td>
+                                            <td><input type="text" class="fcs form-control free_qty text-center" name="products[1][free_qty]" id="products_free_qty_1" value="0" data-row="1"></td>
+                                            <td><input type="text" class="fcs text-right form-control net_unit_price" name="products[1][net_unit_price]" id="products_net_unit_price_1" data-row="1"></td>
+                                            <td class="tax text-right" id="tax_tx_1" data-row="1"></td>
+                                            <td class="sub-total text-right" id="sub_total_tx_1" data-row="1"></td>
                                             <td class="text-center"></td>
-                                            <input type="hidden" class="product-id" name="products[1][id]"  data-row="1">
-                                            <input type="hidden" class="product-code" name="products[1][code]"  data-row="1">
-                                            <input type="hidden" class="batch-no" name="products[1][batch_no]" id="products_1_batch_no" data-row="1">
-                                            <input type="hidden" class="product-unit" name="products[1][unit]" data-row="1">
-                                            <input type="hidden" class="stock-qty" name="products[1][stock_qty]" id="products_1_stock_qty"  data-row="1">
-                                            <input type="hidden" class="free-stock-qty" name="products[1][free_stock_qty]" id="products_1_free_stock_qty"  data-row="1">
-                                            <input type="hidden" class="net-unit-price" name="products[1][net_unit_price]" id="products_1_net_unit_price" data-row="1">
-                                            <input type="hidden" class="tax-rate" name="products[1][tax_rate]" data-row="1">
-                                            <input type="hidden" class="tax-value" name="products[1][tax]" data-row="1">
-                                            <input type="hidden" class="subtotal-value" name="products[1][subtotal]" data-row="1">
+                                            <input type="hidden" class="product-id_vl_1" name="products[1][id]" id="products_id_vl_1"  data-row="1">
+                                            <input type="hidden" class="product-code_vl_1" name="products[1][code]" id="products_code_vl_1" data-row="1">
+                                            <input type="hidden" class="batch-no_vl_1" name="products[1][batch_no]" id="products_batch_no_1" data-row="1">
+                                            <input type="hidden" class="product-unit_vl_1" name="products[1][unit]"  id="products_unit_vl_1" data-row="1">
+                                            <input type="hidden" class="stock-qty_vl_1" name="products[1][stock_qty]" id="products_stock_qty_1"  data-row="1">
+                                            <input type="hidden" class="free-stock-qty_vl_1" name="products[1][free_stock_qty]" id="products_free_stock_qty_1"  data-row="1">
+                                            <input type="hidden" class="tax-rate" name="products[1][tax_rate]" id="tax_rate_vl_1" data-row="1">
+                                            <input type="hidden" class="tax-value" name="products[1][tax]" id="tax_value_vl_1" data-row="1">
+                                            <input type="hidden" class="subtotal-value" name="products[1][subtotal]" id="subtotal_value_vl_1" data-row="1">
 
                                         </tr>
                                     </tbody>
@@ -144,7 +143,7 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="row justify-content-between">
-                                    <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-2" class="selectpicker">
+                                    <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-2" class="fcs selectpicker">
                                         <option value="0" selected>No Tax</option>
                                         @if (!$taxes->isEmpty())
                                             @foreach ($taxes as $tax)
@@ -155,18 +154,18 @@
 
                                     <div class="form-group col-md-2">
                                         <label for="order_discount">Order Discount</label>
-                                        <input type="text" class="form-control" name="order_discount" id="order_discount">
+                                        <input type="text" class="fcs form-control" name="order_discount" id="order_discount">
                                     </div>
                                     <div class="form-group col-md-2">
                                         <label for="shipping_cost">Shipping Cost</label>
-                                        <input type="text" class="form-control" name="shipping_cost" id="shipping_cost"/>
+                                        <input type="text" class="fcs form-control" name="shipping_cost" id="shipping_cost"/>
                                     </div>
                                     <div class="form-group col-md-2">
                                         <label for="labor_cost">Labor Cost</label>
-                                        <input type="text" class="form-control" name="labor_cost" id="labor_cost"/>
+                                        <input type="text" class="fcs form-control" name="labor_cost" id="labor_cost"/>
                                     </div>
 
-                                    <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2" class="selectpicker">
+                                    <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2" class="fcs selectpicker">
                                         @foreach (PAYMENT_STATUS as $key => $value)
                                         <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
@@ -177,7 +176,7 @@
                             
                             <div class="form-group col-md-12">
                                 <label for="shipping_cost">Note</label>
-                                <textarea  class="form-control" name="note" id="note" cols="30" rows="3"></textarea>
+                                <textarea  class="fcs form-control" name="note" id="note" cols="30" rows="3"></textarea>
                             </div>
                             <div class="col-md-12">
                                 <table class="table table-bordered">
@@ -209,29 +208,29 @@
                                 <div class="row">
                                     <div class="form-group col-md-4 required">
                                         <label for="previous_due">Previous Due</label>
-                                        <input type="text" class="form-control" name="previous_due" id="previous_due" readonly>
+                                        <input type="text" class="fcs form-control" name="previous_due" id="previous_due" readonly>
                                     </div>
                                     <div class="form-group col-md-4 required">
                                         <label for="net_total">Net Total</label>
-                                        <input type="text" class="form-control" name="net_total" id="net_total" readonly>
+                                        <input type="text" class="fcs form-control" name="net_total" id="net_total" readonly>
                                     </div>
                                     <div class="form-group col-md-4 required">
                                         <label for="paid_amount">Paid Amount</label>
-                                        <input type="text" class="form-control" name="paid_amount" id="paid_amount">
+                                        <input type="text" class="fcs form-control" name="paid_amount" id="paid_amount">
                                     </div>
                                     <div class="form-group col-md-4">
                                         <label for="due_amount">Due Amount</label>
-                                        <input type="text" class="form-control" name="due_amount" id="due_amount" readonly>
+                                        <input type="text" class="fcs form-control" name="due_amount" id="due_amount" readonly>
                                     </div>
                                     <x-form.selectbox labelName="Payment Method" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-4" class="selectpicker">
                                         @foreach (SALE_PAYMENT_METHOD as $key => $value)
                                         <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </x-form.selectbox>
-                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4" class="selectpicker"/>
+                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4" class="fcs selectpicker"/>
                                     <div class="form-group required col-md-4 d-none reference_no">
                                         <label for="reference_no">Reference No</label>
-                                        <input type="text" class="form-control" name="reference_no" id="reference_no">
+                                        <input type="text" class="fcs form-control" name="reference_no" id="reference_no">
                                     </div>
                                 </div>
                             </div>
@@ -256,20 +255,22 @@
 <script src="js/jquery-ui.js"></script>
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
+<script src="js/jquery.fcs.js"></script>
 <script>
-
-
-$(document).ready(function () {
-    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
-
-    $('#product_code_name').on('input',function(){
-        var customer_id  = $('#customer_id option:selected').val();
-        var temp_data = $('#product_code_name').val();
-        if(!customer_id){
-            $('#product_code_name').val(temp_data.substring(0,temp_data.length - 1));
-            notification('error','Please select customer');
+    $('body').on('keydown', 'input, select, selectpicker', function(e) {
+        if (e.key === "Enter") {
+            var self = $(this), form = self.parents('form:eq(0)'), focusable, next;
+            focusable = form.find('input,a,select,button,textarea,selectpicker').filter(':visible');
+            next = focusable.eq(focusable.index(this)+1);
+            if (next.length) {
+                next.focus();
+            } else {
+                form.submit();
+            }
+            return false;
         }
     });
+    //$(document).fcs(".fcs");
     //array data depend on warehouse
     var product_array = [];
     var product_code  = [];
@@ -295,6 +296,9 @@ $(document).ready(function () {
     var customer_group_rate;
     var row_product_price;
 
+$(document).ready(function () {
+    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
+
     //Get customer group rate for special price
     $('#customer_id').on('change',function(){
         var id = $(this).val();
@@ -305,43 +309,6 @@ $(document).ready(function () {
             $('#previous_due').val(parseFloat(data).toFixed(2));
         });
     });
-    
-    //Search product by name or barcode
-    $('#product_code_name').autocomplete({
-        source: function( request, response ) {
-          $.ajax({
-            url:"{{url('sale/product-autocomplete-search')}}",
-            type: 'post',
-            dataType: "json",
-            data: {
-               _token: _token,
-               search: request.term,
-               warehouse_id: document.getElementById('warehouse_id').value
-            },
-            success: function( data ) {
-               response( data );
-            }
-          });
-        },
-        minLength: 3,
-        response: function(event, ui) {
-            if (ui.content.length == 1) {
-                var data = ui.content[0];
-                $(this).autocomplete( "close" );
-                product_search(data);
-            };
-        },
-        select: function (event, ui) {
-            var data = ui.item;
-            product_search(data);
-        },
-    }).data('ui-autocomplete')._renderItem = function (ul, item) {
-        return $("<li class='ui-autocomplete-row'></li>")
-            .data("item.autocomplete", item)
-            .append(item.label)
-            .appendTo(ul);
-    };
-
     //Update product qty
     $('#product_table').on('keyup','.qty',function(){
         rowindex = $(this).closest('tr').index();
@@ -353,7 +320,7 @@ $(document).ready(function () {
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(1);
             notification('error','Qunatity can\'t be less than 1');
         }
-        checkQuantity($(this).val(),true,free_qty);
+        checkQuantity($(this).val(),true,free_qty,rowindex,input=2);
     });
 
     //Update product free qty
@@ -367,7 +334,22 @@ $(document).ready(function () {
             console.log(qty);
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val(0);
         }
-        checkQuantity(qty,true,$(this).val());
+        checkQuantity(qty,true,$(this).val(),rowindex,input=2);
+    });
+
+    $('#product_table').on('keyup','.net_unit_price',function(){
+        rowindex = $(this).closest('tr').index();
+        if($(this).val() < 1 && $(this).val() != ''){
+            $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .net_unit_price').val(1);
+            notification('error','Net unit price can\'t be less than 1');
+        }else{
+            product_price[rowindex] = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .net_unit_price').val();
+        }
+        var qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val();
+        if(qty > 0){
+            checkQuantity(qty,true,0,rowindex,input=1);
+        }
+        
     });
 
     //Remove product from cart table
@@ -393,158 +375,132 @@ $(document).ready(function () {
     function product_row_add(count){
         var newRow = $('<tr>');
         var cols = '';
-        cols += `<td><select name="products[${count}][pro-id]" id="product_list_${count}" onchange="product_select(this,${count})" class="selectpicker col-md-12 products-alls form-control" data-live-search="true" data-row="1">
+        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs selectpicker col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count})" data-live-search="true" data-row="${count}">
             @if (!$products->isEmpty())
             <option value="0">Please Select</option>
             @foreach ($products as $product)
-                <option value="{{ $product->id }}" data-pro-id="{{ $product->id}}" data-pro-code="{{ $product->code}}" data-pro-avl-qty="{{ $product->qty}}" data-pro-net-price="{{ $product->price}}" data-pro-net-tax_rate="{{ $product->tax_rate}}" data-pro-unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
             @endforeach
             @endif
         </select></td>`;
-        cols += `<td class="text-center" data-row="${count}"></td>`
-        cols += `<td class="unit-name text-center" data-row="${count}"></td>`;
-        cols += `<td class="text-center" data-row="${count}"></td>`;
-        cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1" data-row="${count}"></td>`;
-        cols += `<td><input type="text" class="form-control free_qty text-center" name="products[${count}][free_qty]" id="products_${count}_free_qty" value="0" data-row="${count}"></td>`;
-        cols += `<td class="text-right" data-row="${count}"></td>`;
-        cols += `<td class="tax text-right" data-row="${count}"></td>`;
-        cols += `<td class="sub-total text-right" data-row="${count}"></td>`;
+        cols += `<td class="product-code_tx_${count} text-center" id="products_code_${count}" data-row="${count}"></td>`
+        cols += `<td class="unit-name_tx_${count} text-center" id="products_unit_${count}" data-row="${count}"></td>`;
+        cols += `<td class="available-qty_tx_${count} text-center" id="products_available_qty_${count}" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs form-control qty text-center" name="products[${count}][qty]" id="products_qty_${count}" value="1" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs form-control free_qty text-center" name="products[${count}][free_qty]" id="products_free_qty_${count}" value="0" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs text-right form-control net_unit_price" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
+        cols += `<td class="tax text-right" id="tax_tx_${count}" data-row="${count}"></td>`;
+        cols += `<td class="sub-total text-right" id="sub_total_tx_${count}" data-row="${count}"></td>`;
         cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
-        cols += `<input type="hidden" class="product-id" name="products[${count}][id]"  data-row="${count}">`;
-        cols += `<input type="hidden" class="product-code" name="products[${count}][code]" data-row="${count}">`;
-        cols += `<input type="hidden" class="batch-no" name="products[${count}][batch_no]" id="products_${count}_batch_no"  data-row="${count}">`;
-        cols += `<input type="hidden" class="product-unit" name="products[${count}][unit]" >`;
-        cols += `<input type="hidden" class="stock-qty" name="products[${count}][stock_qty]" id="products_${count}_stock_qty"  data-row="${count}">`;
-        cols += `<input type="hidden" class="free-stock-qty" name="products[${count}][free_stock_qty]" id="products_${count}_free_stock_qty" data-row="${count}">`;
-        cols += `<input type="hidden" class="net-unit-price" name="products[${count}][net_unit_price]" id="products_${count}_net_unit_price" data-row="${count}">`;
-        cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" data-row="${count}">`;
-        cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]" data-row="${count}">`;
-        cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]" data-row="${count}">`;
+        cols += `<input type="hidden" class="product-id_vl_${count}" name="products[${count}][id]" id="products_id_vl_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="product-code_vl_${count}" name="products[${count}][code]" id="products_code_vl_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="batch-no_vl_${count}" name="products[${count}][batch_no]" id="products_batch_no_${count}"  data-row="${count}">`;
+        cols += `<input type="hidden" class="product-unit_vl_${count}" name="products[${count}][unit]" id="products_unit_vl_${count}">`;
+        cols += `<input type="hidden" class="stock-qty_vl_${count}" name="products[${count}][stock_qty]" id="products_stock_qty_${count}"  data-row="${count}">`;
+        cols += `<input type="hidden" class="free-stock-qty_vl_${count}" name="products[${count}][free_stock_qty]" id="products_free_stock_qty_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" id="tax_rate_vl_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]" id="tax_value_vl_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]" id="subtotal_value_vl_${count}" data-row="${count}">`;
 
         newRow.append(cols);
         $('#product_table tbody').append(newRow);
         $('#product_table .selectpicker').selectpicker();
 
+    } 
+});
+  
+    function product_search(data,row) {
+        var customer_id  = $('#customer_id option:selected').val();
+            rowindex = $('#product_list_'+row).closest('tr').index();
+        var temp_data = $('#product_list_'+row).val();
+        if(!customer_id){
+            $('#product_list_'+row).val('');
+            $('#product_table #product_list_'+row+'.selectpicker').selectpicker('refresh');
+            notification('error','Please select customer');
+        }else{        
+            $.ajax({
+                url: '{{ route("sale.product.search.with.id") }}',
+                type: 'POST',
+                data: {
+                    data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
+                },
+                success: function(data) {
+                    temp_unit_name = data.unit_name.split(',');
+                    $('#products_code_'+row).text(data.code);
+                    $('#products_unit_'+row).text(temp_unit_name[0]);
+                    $('#products_available_qty_'+row).text(data.qty);
+                    $('#products_net_unit_price_'+row).val(data.price);
+                    $('#tax_tx_'+row).text(data.tax_name);
+                    $('#products_id_vl_'+row).val(data.id);
+                    $('#products_code_vl_'+row).val(data.code);
+                    $('#products_batch_no_'+row).val(data.batch_no);
+                    $('#products_unit_vl_'+row).val(temp_unit_name[0]);
+                    $('#products_stock_qty_'+row).val(data.tax_rate);
+                    $('#products_free_stock_qty_'+row).val(data.qty);
+                    $('#tax_rate_vl_'+row).val(data.tax_rate);
+
+                    product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                    product_qty.push(data.qty);
+                    product_free_qty.push(data.free_qty);
+                    tax_rate.push(parseFloat(data.tax_rate));
+                    tax_name.push(data.tax_name);
+                    tax_method.push(data.tax_method);
+                    unit_name.push(data.unit_name);
+                    unit_operator.push(data.unit_operator);
+                    unit_operation_value.push(data.unit_operation_value);
+                    checkQuantity(1,true,0,rowindex,input=2);
+
+                }
+            });
+        }
     }
-
-    //Add  Product to cart table
-    // var count = 1;
-    // function product_search(data) {
-    //     $.ajax({
-    //         url: '{{ route("sale.product.search") }}',
-    //         type: 'POST',
-    //         data: {
-    //             data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
-    //         },
-    //         success: function(data) {
-    //             var flag = 1;
-    //             $('.product-code').each(function(i){
-    //                 let row_index = $(this).data('row');
-    //                 if($(this).val() == data.code){
-    //                     rowindex = i;
-    //                     var qty = parseFloat($('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
-    //                     $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
-    //                     checkQuantity(String(qty),true,0);
-    //                     flag = 0;
-    //                 }
-    //             });
-    //             $('#product_code_name').val('');
-    //             if(flag)
-    //             {
-    //                 temp_unit_name = data.unit_name.split(',');
-    //                 var newRow = $('<tr>');
-    //                 var cols = '';
-    //                 cols += `<td>${data.name}</td>`;
-    //                 cols += `<td class="text-center">${data.code}</td>`
-    //                 cols += `<td class="unit-name text-center"></td>`;
-    //                 cols += `<td class="text-center">${data.qty}</td>`;
-    //                 cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1"></td>`;
-    //                 cols += `<td><input type="text" class="form-control free_qty text-center" name="products[${count}][free_qty]" id="products_${count}_free_qty" value="0"></td>`;
-    //                 cols += `<td class="text-right">${data.price}</td>`;
-    //                 cols += `<td class="tax text-right"></td>`;
-    //                 cols += `<td class="sub-total text-right"></td>`;
-    //                 cols += `<td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
-    //                 cols += `<input type="hidden" class="product-id" name="products[${count}][id]"  value="${data.id}">`;
-    //                 cols += `<input type="hidden" class="product-code" name="products[${count}][code]" value="${data.code}" data-row="${count}">`;
-    //                 cols += `<input type="hidden" class="batch-no" name="products[${count}][batch_no]" id="products_${count}_batch_no" value="${data.batch_no}">`;
-    //                 cols += `<input type="hidden" class="product-unit" name="products[${count}][unit]" value="`+temp_unit_name[0]+`">`;
-    //                 cols += `<input type="hidden" class="stock-qty" name="products[${count}][stock_qty]" id="products_${count}_stock_qty"  value="${data.qty}">`;
-    //                 cols += `<input type="hidden" class="free-stock-qty" name="products[${count}][free_stock_qty]" id="products_${count}_free_stock_qty"  value="${data.free_qty}">`;
-    //                 cols += `<input type="hidden" class="net-unit-price" name="products[${count}][net_unit_price]" id="products_${count}_net_unit_price" value="${data.price}">`;
-    //                 cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" value="${data.tax_rate}">`;
-    //                 cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]">`;
-    //                 cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]">`;
-
-    //                 newRow.append(cols);
-    //                 $('#product_table tbody').append(newRow);
-
-    //                 console.log(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
-
-    //                 product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
-    //                 product_qty.push(data.qty);
-    //                 product_free_qty.push(data.free_qty);
-    //                 tax_rate.push(parseFloat(data.tax_rate));
-    //                 tax_name.push(data.tax_name);
-    //                 tax_method.push(data.tax_method);
-    //                 unit_name.push(data.unit_name);
-    //                 unit_operator.push(data.unit_operator);
-    //                 unit_operation_value.push(data.unit_operation_value);
-    //                 rowindex = newRow.index();
-    //                 checkQuantity(1,true,0);
-    //                 count++;
-    //             }
-    //         }
-    //     });
-    // }
-
-    function checkQuantity(sale_qtyadd,flag,free_qty=0)
-    {
-        var sale_qty=0;
-        if(free_qty != 0){
-            sale_qty = (sale_qtyadd - free_qty);            
-        }else{
-            sale_qty = sale_qtyadd;   
-        }
-
-        //console.log(sale_qty);
-        var operator = unit_operator[rowindex].split(',');
-        var operation_value = unit_operation_value[rowindex].split(',');
-
-        if(operator[0] == '*')
-        {
-            total_qty = sale_qty * operation_value[0];
-        }else if(operator[0] == '/'){
-            total_qty = sale_qty / operation_value[0];
-        }
-        if(total_qty > parseFloat(product_qty[rowindex])){
-            notification('error','Quantity exceed stock quantity');
-            if(flag)
-            {
-                sale_qty = sale_qty.substring(0,sale_qty.length - 1);
-                $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
+    function checkQuantity(sale_qtyadd,flag,free_qty=0,rowindex,input=2){
+            //alert(rowindex);
+            var sale_qty=0;
+            if(free_qty != 0){
+                sale_qty = (sale_qtyadd - free_qty);            
             }else{
-                return;
+                sale_qty = sale_qtyadd;   
             }
-        }
 
-        if(!flag)
-        {
-            $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
-        }
-        calculateProductData(sale_qty);
+            //console.log(unit_operator);
+            var operator = unit_operator[rowindex].split(',');
+            var operation_value = unit_operation_value[rowindex].split(',');
+
+            if(operator[0] == '*')
+            {
+                total_qty = sale_qty * operation_value[0];
+            }else if(operator[0] == '/'){
+                total_qty = sale_qty / operation_value[0];
+            }
+            if(parseFloat(total_qty) > parseFloat(product_qty[rowindex])){
+                notification('error','Quantity exceed stock quantity');
+                if(flag)
+                {
+                    sale_qty = sale_qty.substring(0,sale_qty.length - 1);
+                    $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
+                }else{
+                    return;
+                }
+            }
+
+            if(!flag)
+            {
+                $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
+            }
+            calculateProductData(sale_qty,rowindex,input);
     }
 
 
-    function calculateProductData(quantity){ 
-        unitConversion();
+    function calculateProductData(quantity,rowindex,input=2){ 
+        unitConversion(rowindex);
 
-        // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text((product_discount[rowindex] * quantity).toFixed(2));
-        // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.discount-value').val((product_discount[rowindex] * quantity).toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-rate').val(tax_rate[rowindex].toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.unit-name').text(unit_name[rowindex].slice(0,unit_name[rowindex].indexOf(",")));
 
         if(tax_method[rowindex] == 1)
         {
+            //alert(row_product_price);
             var net_unit_price = row_product_price - 0;
             var tax = net_unit_price * quantity * (tax_rate[rowindex]/100);
             var sub_total = (net_unit_price * quantity) + tax;
@@ -557,6 +513,9 @@ $(document).ready(function () {
 
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(6)').text(net_unit_price.toFixed(2));
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.net-unit-price').val(net_unit_price.toFixed(2));
+        if(input==2){
+            $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.net_unit_price').val(net_unit_price.toFixed(2));
+        }
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text(tax.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-value').val(tax.toFixed(2));
         $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(9)').text(sub_total.toFixed(2));
@@ -565,7 +524,7 @@ $(document).ready(function () {
         calculateTotal();
     }
 
-    function unitConversion()
+    function unitConversion(rowindex)
     {
         var row_unit_operator = unit_operator[rowindex].slice(0,unit_operator[rowindex].indexOf(','));
         var row_unit_operation_value = unit_operation_value[rowindex].slice(0,unit_operation_value[rowindex].indexOf(','));
@@ -577,7 +536,6 @@ $(document).ready(function () {
             row_product_price = product_price[rowindex] / row_unit_operation_value;
         }
     }
-
     function calculateTotal()
     {
         //sum of qty
@@ -622,7 +580,6 @@ $(document).ready(function () {
 
         calculateGrandTotal();
     }
-
     function calculateGrandTotal()
     {
         var item           = $('#product_table tbody tr:last').index();
@@ -732,14 +689,13 @@ $(document).ready(function () {
         $('#due_amount').val((payable_amount - parseFloat($('#paid_amount').val())).toFixed(2));
         
     });
-});
-    
-function product_select(value,rowindex){
-    let id = $(value).val();
-    //alert(id+' '+rowindex);
-    
-}
-//loadProduct(null,1);
+
+
+function getProductDetails(value,rowindex){
+    //alert($(value).val());
+    product_search($(value).val(),rowindex);
+
+}    
 function loadProduct(warehouse_id=null,rowcount){
 
     $.ajax({
@@ -761,8 +717,6 @@ function loadProduct(warehouse_id=null,rowcount){
         }
     });
 }
-
-
 function getRouteList(salesmen_id){
     $.ajax({
         url:"{{route('sales.representative.daily.route.list')}}",
@@ -827,7 +781,6 @@ function account_list(payment_method)
         }
     });
 }
-
 
 function store_data(){
     var rownumber = $('table#product_table tbody tr:last').index();
