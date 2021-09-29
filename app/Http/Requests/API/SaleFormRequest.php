@@ -14,8 +14,6 @@ class SaleFormRequest extends FormRequest
     {
         $this->rules['memo_no']         = ['required','unique:sales,memo_no'];
         $this->rules['sale_date']       = ['required','date','date_format:Y-m-d'];
-        $this->rules['route_id']        = ['required'];
-        $this->rules['area_id']         = ['required'];
         $this->rules['customer_id']     = ['required'];
         $this->rules['order_discount']  = ['nullable','numeric','gte:0'];
         $this->rules['shipping_cost']   = ['nullable','numeric','gte:0'];
