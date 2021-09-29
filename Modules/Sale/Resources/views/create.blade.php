@@ -118,7 +118,7 @@
                                             <td class="tax text-right" id="tax_tx_1" data-row="1"></td>
                                             <td class="sub-total text-right" id="sub_total_tx_1" data-row="1"></td>
                                             <td class="text-center"></td>
-                                            <input type="hidden" class="product-id_vl_1" name="products[1][id]" id="products_id_vl_1"  data-row="1">
+                                            <input type="hidden" class="product-id_vl_1" name="products[1][id]" id="products_id_vl_1" data-row="1">
                                             <input type="hidden" class="product-code_vl_1" name="products[1][code]" id="products_code_vl_1" data-row="1">
                                             <input type="hidden" class="batch-no_vl_1" name="products[1][batch_no]" id="products_batch_no_1" data-row="1">
                                             <input type="hidden" class="product-unit_vl_1" name="products[1][unit]"  id="products_unit_vl_1" data-row="1">
@@ -435,7 +435,7 @@ $(document).ready(function () {
                     $('#products_code_vl_'+row).val(data.code);
                     $('#products_batch_no_'+row).val(data.batch_no);
                     $('#products_unit_vl_'+row).val(temp_unit_name[0]);
-                    $('#products_stock_qty_'+row).val(data.tax_rate);
+                    $('#products_stock_qty_'+row).val(data.qty);
                     $('#products_free_stock_qty_'+row).val(data.qty);
                     $('#tax_rate_vl_'+row).val(data.tax_rate);
 
@@ -449,7 +449,6 @@ $(document).ready(function () {
                     unit_operator.push(data.unit_operator);
                     unit_operation_value.push(data.unit_operation_value);
                     checkQuantity(1,true,0,rowindex,input=2);
-
                 }
             });
         }
@@ -490,7 +489,6 @@ $(document).ready(function () {
             }
             calculateProductData(sale_qty,rowindex,input);
     }
-
 
     function calculateProductData(quantity,rowindex,input=2){ 
         unitConversion(rowindex);
