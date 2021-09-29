@@ -399,7 +399,18 @@ class SalesController extends APIController
         $message = "";
         $status  = true;
 
-        $sales = DB::table('sales')->where('salesmen_id',auth()->user()->id)->orderBy('id','desc')->paginate(10);
+        $sales = DB::table('sales as s')
+        ->selectRaw('s.*,c.name as customer_name,c.shop_name,w.name as warehouse_name,
+        d.name as district_name,u.name as upazila_name,r.name as route_name,a.name as area_name')
+        ->leftjoin('customers as c','s.customer_id','=','c.id')
+        ->leftjoin('warehouses as w','s.warehouse_id','=','w.id')
+        ->leftjoin('locations as d', 'c.district_id', '=', 'd.id')
+        ->leftjoin('locations as u', 'c.upazila_id', '=', 'u.id')
+        ->leftjoin('locations as r', 'c.route_id', '=', 'r.id')
+        ->leftjoin('locations as a', 'c.area_id', '=', 'a.id')
+        ->where('s.salesmen_id',auth()->user()->id)
+        ->orderBy('s.id','desc')
+        ->paginate(10);
         if(!$sales->isEmpty())
         {
             $data = $sales;
