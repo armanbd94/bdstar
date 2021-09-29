@@ -371,8 +371,9 @@ $(document).ready(function () {
         unit_name.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit_vl_'+(rowindex + 1)).val());
         unit_operator.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operator_vl_'+(rowindex + 1)).val());
         unit_operation_value.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operation-value_vl_'+(rowindex + 1)).val());
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit_'+(rowindex + 1)).val(temp_unit_name[0]);
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name_'+(rowindex + 1)).text(temp_unit_name[0]);
+        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit_vl_'+(rowindex + 1)).val(temp_unit_name[0]);
+        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name_vl_'+(rowindex + 1)).text(temp_unit_name[0]);
+        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name_tx_'+(rowindex + 1)).text(temp_unit_name[0]);
     }
 
     //assigning value

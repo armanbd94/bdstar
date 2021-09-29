@@ -483,7 +483,7 @@ class SaleController extends BaseController
     {
         if($request->ajax()){
             if(permission('sale-edit')){
-                // dd($request->all());
+                 //dd($request->all());
                 DB::beginTransaction();
                 try {
                     
