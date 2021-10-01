@@ -83,38 +83,7 @@
                                         <th></th>
                                     </thead>
                                     <tbody>
-                                        <td class="col-md-3">                                                  
-                                            <select name="materials[1][material_id]" id="material_list_1" class="fcs selectpicker col-md-12 material_name form-control" onchange="getProductDetails(this,1)"  data-live-search="true" data-row="1">                                            
-                                                @if (!$materials->isEmpty())
-                                                    <option value="0">Please Select</option>
-                                                @foreach ($materials as $material)
-                                                    <option value="{{ $material->id }}">{{ $material->material_name.' ('.$material->code.') - [Stock Avl. Qty: '.$material->qty.']'; }}</option>
-                                                @endforeach
-                                                @endif
-                                            </select>
-                                        </td>                                        
-                                        <td class="material-code_tx_1 text-center" id="material_code_1"  data-row="1"></td>
-                                        <td class="unit-name text-center"  data-row="1"></td>
-                                        <td><input type="text" class="form-control qty text-center" name="materials[1][qty]"
-                                            id="materials_1_qty" value="1"  data-row="1"></td>
-                                        <td class="received-material-qty d-none"><input type="text" class="form-control received text-center"
-                                                name="materials[1][received]" value="0" data-row="1"></td>
 
-                                        <td class="net_unit_cost text-right" data-row="1"></td>
-                                        <td class="discount text-right" data-row="1"></td>
-                                        <td class="tax text-right" data-row="1"></td>
-                                        <td class="labor_cost text-right" data-row="1"></td>
-                                        <td class="sub-total text-right" data-row="1"></td>
-                                        <td class="text-center" data-row="1"></td>
-                                        <input type="hidden" class="material-id_1" name="materials[1][id]" data-row="1">
-                                        <input type="hidden" class="material-code_1" name="materials[1][code]" data-row="1">
-                                        <input type="hidden" class="material-unit_1" name="materials[1][unit]" data-row="1">
-                                        <input type="hidden" class="net_unit_cost_1" name="materials[1][net_unit_cost]" data-row="1">
-                                        <input type="hidden" class="discount-value_1" name="materials[1][discount]" data-row="1">
-                                        <input type="hidden" class="tax-rate" name="materials[1][tax_rate]" data-row="1">
-                                        <input type="hidden" class="tax-value" name="materials[1][tax]" data-row="1">
-                                        <input type="hidden" class="labor-cost" name="materials[1][labor_cost]" data-row="1">
-                                        <input type="hidden" class="subtotal-value" name="materials[1][subtotal]" data-row="1">
                                     </tbody>
                                     <tfoot class="bg-primary">
                                         <th colspan="3" class="font-weight-bolder">Total</th>
@@ -283,34 +252,33 @@
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
-    
-//array data depend on warehouse
-var material_array = [];
-var material_code  = [];
-var material_name  = [];
-var material_qty   = [];
-
-// array data with selection
-var material_cost        = [];
-var material_labor_cost  = [];
-var material_discount    = [];
-var tax_rate             = [];
-var tax_name             = [];
-var tax_method           = [];
-var unit_name            = [];
-var unit_operator        = [];
-var unit_operation_value = [];
-
-//temporary array
-var temp_unit_name            = [];
-var temp_unit_operator        = [];
-var temp_unit_operation_value = [];
-
-var rowindex;
-var row_material_cost;
-
 $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD'});
+
+    //array data depend on warehouse
+    var material_array = [];
+    var material_code  = [];
+    var material_name  = [];
+    var material_qty   = [];
+
+    // array data with selection
+    var material_cost        = [];
+    var material_labor_cost  = [];
+    var material_discount    = [];
+    var tax_rate             = [];
+    var tax_name             = [];
+    var tax_method           = [];
+    var unit_name            = [];
+    var unit_operator        = [];
+    var unit_operation_value = [];
+
+    //temporary array
+    var temp_unit_name            = [];
+    var temp_unit_operator        = [];
+    var temp_unit_operation_value = [];
+
+    var rowindex;
+    var row_material_cost;
 
 
     $('#material_code_name').autocomplete({
@@ -522,7 +490,7 @@ $(document).ready(function () {
                                 <button type="button" class="edit-material btn btn-sm btn-primary mr-2 small-btn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i></button>
                                 <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></button>
                             </td>`;
-                    cols += `<input type="hidden" class="material-id" name="materials[`+count+`][id]">`;
+                    cols += `<input type="hidden" class="material-id" name="materials[`+count+`][id]"  value="`+data.id+`">`;
                     cols += `<input type="hidden" class="material-code" name="materials[`+count+`][code]" value="`+data.code+`">`;
                     cols += `<input type="hidden" class="material-unit" name="materials[`+count+`][unit]" value="`+temp_unit_name[0]+`">`;
                     cols += `<input type="hidden" class="net_unit_cost" name="materials[`+count+`][net_unit_cost]">`;
@@ -805,6 +773,7 @@ function received_qty(purchase_status)
         });
     }
 }
+
 
 function store_data(){
     var rownumber = $('table#material_table tbody tr:last').index();
