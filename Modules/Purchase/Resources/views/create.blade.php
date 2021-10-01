@@ -109,7 +109,7 @@
                                         <input type="hidden" class="material-id_1" name="materials[1][id]" data-row="1">
                                         <input type="hidden" class="material-code_1" name="materials[1][code]" data-row="1">
                                         <input type="hidden" class="material-unit_1" name="materials[1][unit]" data-row="1">
-                                        <input type="hidden" class="discount-value_1" name="materials[1][discount]" data-row="1">
+                                        <input type="hidden" class="discount-value" name="materials[1][discount]" data-row="1">
                                         <input type="hidden" class="tax-rate" name="materials[1][tax_rate]" data-row="1">
                                         <input type="hidden" class="tax-value" name="materials[1][tax]" data-row="1">
                                         <input type="hidden" class="subtotal-value" name="materials[1][subtotal]" data-row="1">
@@ -465,91 +465,91 @@ $(document).ready(function () {
     });
 
     var count = 1;
-    function materialSearch(data) {
-        $.ajax({
-            url: '{{ route("material.search") }}',
-            type: 'POST',
-            data: {
-                data: data,_token:_token
-            },
-            success: function(data) {
-                var flag = 1;
-                $('.material-code').each(function(i){
-                    if($(this).val() == data.code){
-                        rowindex = i;
-                        var qty = parseFloat($('#material_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
-                        $('#material_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
-                        calculateProductData(qty);
-                        flag = 0;
-                    }
-                });
-                $('#material_code_name').val('');
-                if(flag)
-                {
+    // function materialSearch(data) {
+    //     $.ajax({
+    //         url: '{{ route("material.search") }}',
+    //         type: 'POST',
+    //         data: {
+    //             data: data,_token:_token
+    //         },
+    //         success: function(data) {
+    //             var flag = 1;
+    //             $('.material-code').each(function(i){
+    //                 if($(this).val() == data.code){
+    //                     rowindex = i;
+    //                     var qty = parseFloat($('#material_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
+    //                     $('#material_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
+    //                     calculateProductData(qty);
+    //                     flag = 0;
+    //                 }
+    //             });
+    //             $('#material_code_name').val('');
+    //             if(flag)
+    //             {
         
-                    temp_unit_name = data.unit_name.split(',');
-                    var newRow = $('<tr>');
-                    var cols = '';
-                    cols += `<td>`+data.name+`</td>`;
+    //                 temp_unit_name = data.unit_name.split(',');
+    //                 var newRow = $('<tr>');
+    //                 var cols = '';
+    //                 cols += `<td>`+data.name+`</td>`;
                     
-                    cols += `<td class="text-center">`+data.code+`</td>`;
-                    cols += `<td class="unit-name text-center"></td>`;
-                    cols += `<td><input type="text" class="form-control qty text-center" name="materials[`+count+`][qty]"
-                        id="materials_`+count+`_qty" value="1"></td>`;
+    //                 cols += `<td class="text-center">`+data.code+`</td>`;
+    //                 cols += `<td class="unit-name text-center"></td>`;
+    //                 cols += `<td><input type="text" class="form-control qty text-center" name="materials[`+count+`][qty]"
+    //                     id="materials_`+count+`_qty" value="1"></td>`;
 
-                    if($('#purchase_status option:selected').val() == 1)
-                    {
-                        cols += `<td class="received-material-qty d-none"><input type="text" class="form-control received text-center"
-                            name="materials[`+count+`][received]" value="1"></td>`;
+    //                 if($('#purchase_status option:selected').val() == 1)
+    //                 {
+    //                     cols += `<td class="received-material-qty d-none"><input type="text" class="form-control received text-center"
+    //                         name="materials[`+count+`][received]" value="1"></td>`;
 
-                    }else if($('#purchase_status option:selected').val() == 2){
+    //                 }else if($('#purchase_status option:selected').val() == 2){
 
-                        cols += `<td class="received-material-qty"><input type="text" class="form-control received text-center"
-                            name="materials[`+count+`][received]" value="1"></td>`;
-                    }else{
-                        cols += `<td class="received-material-qty d-none"><input type="text" class="form-control received text-center"
-                            name="materials[`+count+`][received]" value="0"></td>`;
-                    }
+    //                     cols += `<td class="received-material-qty"><input type="text" class="form-control received text-center"
+    //                         name="materials[`+count+`][received]" value="1"></td>`;
+    //                 }else{
+    //                     cols += `<td class="received-material-qty d-none"><input type="text" class="form-control received text-center"
+    //                         name="materials[`+count+`][received]" value="0"></td>`;
+    //                 }
 
-                    cols += `<td class="net_unit_cost text-right"></td>`;
-                    cols += `<td class="discount text-right"></td>`;
-                    cols += `<td class="tax text-right"></td>`;
-                    cols += `<td class="labor_cost text-right"></td>`;
-                    cols += `<td class="sub-total text-right"></td>`;
-                    cols += `<td class="text-center">
-                                <button type="button" class="edit-material btn btn-sm btn-primary mr-2 small-btn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i></button>
-                                <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></button>
-                            </td>`;
-                    cols += `<input type="hidden" class="material-id" name="materials[`+count+`][id]">`;
-                    cols += `<input type="hidden" class="material-code" name="materials[`+count+`][code]" value="`+data.code+`">`;
-                    cols += `<input type="hidden" class="material-unit" name="materials[`+count+`][unit]" value="`+temp_unit_name[0]+`">`;
-                    cols += `<input type="hidden" class="net_unit_cost" name="materials[`+count+`][net_unit_cost]">`;
-                    cols += `<input type="hidden" class="discount-value" name="materials[`+count+`][discount]">`;
-                    cols += `<input type="hidden" class="tax-rate" name="materials[`+count+`][tax_rate]" value="`+data.tax_rate+`">`;
-                    cols += `<input type="hidden" class="tax-value" name="materials[`+count+`][tax]">`;
-                    cols += `<input type="hidden" class="labor-cost" name="materials[`+count+`][labor_cost]">`;
-                    cols += `<input type="hidden" class="subtotal-value" name="materials[`+count+`][subtotal]">`;
+    //                 cols += `<td class="net_unit_cost text-right"></td>`;
+    //                 cols += `<td class="discount text-right"></td>`;
+    //                 cols += `<td class="tax text-right"></td>`;
+    //                 cols += `<td class="labor_cost text-right"></td>`;
+    //                 cols += `<td class="sub-total text-right"></td>`;
+    //                 cols += `<td class="text-center">
+    //                             <button type="button" class="edit-material btn btn-sm btn-primary mr-2 small-btn" data-toggle="modal" data-target="#editModal"><i class="fas fa-edit"></i></button>
+    //                             <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></button>
+    //                         </td>`;
+    //                 cols += `<input type="hidden" class="material-id" name="materials[`+count+`][id]">`;
+    //                 cols += `<input type="hidden" class="material-code" name="materials[`+count+`][code]" value="`+data.code+`">`;
+    //                 cols += `<input type="hidden" class="material-unit" name="materials[`+count+`][unit]" value="`+temp_unit_name[0]+`">`;
+    //                 cols += `<input type="hidden" class="net_unit_cost" name="materials[`+count+`][net_unit_cost]">`;
+    //                 cols += `<input type="hidden" class="discount-value" name="materials[`+count+`][discount]">`;
+    //                 cols += `<input type="hidden" class="tax-rate" name="materials[`+count+`][tax_rate]" value="`+data.tax_rate+`">`;
+    //                 cols += `<input type="hidden" class="tax-value" name="materials[`+count+`][tax]">`;
+    //                 cols += `<input type="hidden" class="labor-cost" name="materials[`+count+`][labor_cost]">`;
+    //                 cols += `<input type="hidden" class="subtotal-value" name="materials[`+count+`][subtotal]">`;
 
-                    newRow.append(cols);
-                    $('#material_table tbody').append(newRow);
+    //                 newRow.append(cols);
+    //                 $('#material_table tbody').append(newRow);
 
-                    material_cost.push(parseFloat(data.cost));
-                    material_labor_cost.push('0.00');
-                    material_discount.push('0.00');
-                    tax_rate.push(parseFloat(data.tax_rate));
-                    tax_name.push(data.tax_name);
-                    tax_method.push(data.tax_method);
-                    unit_name.push(data.unit_name);
-                    unit_operator.push(data.unit_operator);
-                    unit_operation_value.push(data.unit_operation_value);
-                    rowindex = newRow.index();
-                    calculateProductData(1);
-                    count++;
-                }
+    //                 material_cost.push(parseFloat(data.cost));
+    //                 material_labor_cost.push('0.00');
+    //                 material_discount.push('0.00');
+    //                 tax_rate.push(parseFloat(data.tax_rate));
+    //                 tax_name.push(data.tax_name);
+    //                 tax_method.push(data.tax_method);
+    //                 unit_name.push(data.unit_name);
+    //                 unit_operator.push(data.unit_operator);
+    //                 unit_operation_value.push(data.unit_operation_value);
+    //                 rowindex = newRow.index();
+    //                 calculateProductData(1);
+    //                 count++;
+    //             }
                 
-            }
-        });
-    }
+    //         }
+    //     });
+    // }
 
     function checkQuantity(purchase_qty,flag)
     {
@@ -778,6 +778,49 @@ $(document).ready(function () {
     });
 
 });
+
+ function materialSearch(data,row) {
+        var customer_id  = $('#customer_id option:selected').val();
+            rowindex = $('#material_list_'+row).closest('tr').index();
+        var temp_data = $('#material_list_'+row).val();
+        if(!customer_id){
+            $('#material_list_'+row).val('');
+            $('#product_table #material_list_'+row+'.selectpicker').selectpicker('refresh');
+            notification('error','Please select customer');
+        }else{        
+            $.ajax({
+                url: '{{ route("material.search") }}',
+                type: 'POST',
+                data: {
+                    data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
+                },
+                success: function(data) {
+                    temp_unit_name = data.unit_name.split(',');
+                    $('#material_code_'+row).text(data.code);
+                    $('#material_unit_'+row).text(temp_unit_name[0]);
+                    $('#material_available_qty_'+row).text(data.qty);
+                    $('#material_net_unit_price_'+row).val(data.price);
+                    $('#tax_tx_'+row).text(data.tax_name);
+                    $('#material_id_vl_'+row).val(data.id);
+                    $('#material_code_vl_'+row).val(data.code);
+                    $('#material_batch_no_'+row).val(data.batch_no);
+                    $('#material_unit_vl_'+row).val(temp_unit_name[0]);
+                    $('#tax_rate_vl_'+row).val(data.tax_rate);
+
+                    material_cost.push(parseFloat(data.cost));
+                    material_labor_cost.push('0.00');
+                    material_discount.push('0.00');
+                    tax_rate.push(parseFloat(data.tax_rate));
+                    tax_name.push(data.tax_name);
+                    tax_method.push(data.tax_method);
+                    unit_name.push(data.unit_name);
+                    unit_operator.push(data.unit_operator);
+                    unit_operation_value.push(data.unit_operation_value);
+                    checkQuantity(1,true,0,rowindex,input=2);
+                }
+            });
+        }
+    }
 
 function received_qty(purchase_status)
 {
