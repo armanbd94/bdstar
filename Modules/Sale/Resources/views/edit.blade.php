@@ -82,16 +82,6 @@
                                 <label for="document">Attach Document</label>
                                 <input type="file" class="form-control" name="document" id="document">
                             </div>
-
-                            <div class="form-group col-md-12">
-                                <label for="product_code_name">Select Product</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text" id="basic-addon1"><i class="fas fa-barcode"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" name="product_code_name" id="product_code_name" placeholder="Please type product code and select...">
-                                </div>
-                            </div>
                             <div class="col-md-12">
                                 <table class="table table-bordered" id="product_table">
                                     <thead class="bg-primary">
@@ -459,8 +449,12 @@ $(document).ready(function () {
             product_price[rowindex] = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .net_unit_price').val();
         }
         var qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val();
+        let free_qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val();
+        if(parseFloat($(this).val()) == ''){
+            free_qty = 0;
+        }
         if(qty > 0){
-            checkQuantity(qty,true,0,rowindex,input=1);
+            checkQuantity(qty,true,free_qty,rowindex,input=1);
         }
         
     });
@@ -583,8 +577,13 @@ $(document).ready(function () {
                     $('#products_stock_qty_'+row).val(data.qty);
                     $('#products_free_stock_qty_'+row).val(data.qty);
                     $('#tax_rate_vl_'+row).val(data.tax_rate);
+                    
+                    if(product_price[rowindex] == 'undefined'){
+                        product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                    }else{
+                        product_price[rowindex] = (parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                    }
 
-                    product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
                     product_qty.push(data.qty);
                     product_free_qty.push(data.free_qty);
                     tax_rate.push(parseFloat(data.tax_rate));

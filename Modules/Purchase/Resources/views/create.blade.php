@@ -600,7 +600,12 @@ function materialSearch(data,row) {
                     $('#material_unit_'+row).val(temp_unit_name[0]);
                     $('#tax_rate_'+row).val(data.tax_rate);
 
-                    material_cost.push(parseFloat(data.cost));
+                    if(material_cost[rowindex] == 'undefined'){
+                        material_cost.push(parseFloat(data.cost));
+                    }else{
+                        material_cost[rowindex] = parseFloat(data.cost);
+                    }
+                    
                     material_labor_cost.push('0.00');
                     material_discount.push('0.00');
                     tax_rate.push(parseFloat(data.tax_rate));

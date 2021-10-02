@@ -68,16 +68,6 @@
                                 <label for="document">Attach Document</label>
                                 <input type="file" class="form-control" name="document" id="document">
                             </div>
-
-                            <div class="form-group col-md-12">
-                                <label for="material_code_name">Select Material</label>
-                                <div class="input-group mb-3">
-                                    <div class="input-group-prepend">
-                                    <span class="input-group-text" id="basic-addon1"><i class="fas fa-barcode"></i></span>
-                                    </div>
-                                    <input type="text" class="form-control" name="material_code_name" id="material_code_name" placeholder="Please type material code and select...">
-                                </div>
-                            </div>
                             <div class="col-md-12">
                                 <table class="table table-bordered" id="material_table">
                                     <thead class="bg-primary">
@@ -351,46 +341,6 @@ var row_material_cost;
 $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD'});
 
-
-
-    $('#material_code_name').autocomplete({
-        source: "{{url('material-autocomplete-search')}}",
-        source: function( request, response ) {
-          // Fetch data
-          $.ajax({
-            url:"{{url('material-autocomplete-search')}}",
-            type: 'post',
-            dataType: "json",
-            data: {
-               _token: _token,
-               search: request.term
-            },
-            success: function( data ) {
-               response( data );
-            }
-          });
-        },
-        minLength: 1,
-        response: function(event, ui) {
-            if (ui.content.length == 1) {
-                var data = ui.content[0].value;
-                $(this).autocomplete( "close" );
-                materialSearch(data);
-            };
-        },
-        select: function (event, ui) {
-            // $('.material_search').val(ui.item.value);
-            // $('.material_id').val(ui.item.id);
-            var data = ui.item.value;
-            materialSearch(data);
-        },
-    }).data('ui-autocomplete')._renderItem = function (ul, item) {
-        return $("<li class='ui-autocomplete-row'></li>")
-            .data("item.autocomplete", item)
-            .append(item.label)
-            .appendTo(ul);
-    };
-
     var rownumber = $('#material_table tbody tr:last').index();
     
     for (rowindex = 0; rowindex <= rownumber; rowindex++) {
@@ -440,7 +390,8 @@ $(document).ready(function () {
      //Edit Product
      $('#material_table').on('click','.edit-material', function(){
         rowindex = $(this).closest('tr').index();
-        var row_material_name = $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(1)').text();
+        //var row_material_name = $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(1)').text();
+        var row_material_name = "Materials ";
         var row_material_code = $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(2)').text();
         $('#model-title').text(row_material_name+'('+row_material_code+')');
 
@@ -522,7 +473,7 @@ $(document).ready(function () {
         unit_name[rowindex] = temp_unit_name.toString() + ',';
         unit_operator[rowindex] = temp_unit_operator.toString() + ',';
         unit_operation_value[rowindex] = temp_unit_operation_value.toString() + ',';
-        checkQuantity(edit_qty,false);
+        checkQuantity(edit_qty,false,input=2);
     });
 
     $('#material_table').on('keyup','.qty',function(){
@@ -629,7 +580,7 @@ $(document).ready(function () {
         cols += `<td class="sub-total text-right" data-row="${count}"></td>`;
         cols += `<td class="text-center">
                     <button type="button" class="edit-material btn btn-sm btn-primary mr-2 small-btn d-none" data-toggle="modal" id="edit_modal_${count}" data-target="#editModal"><i class="fas fa-edit"></i></button>
-                    <button type="button" class="btn btn-danger btn-sm remove-material"><i class="fas fa-trash"></i></button>
+                    <button type="button" class="btn btn-danger btn-sm remove-material small-btn"><i class="fas fa-trash"></i></button>
                 </td>`;
         cols += `<input type="hidden" class="material-id" name="materials[`+count+`][id]" id="material_id_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="material-code" name="materials[`+count+`][code]" id="material_code_${count}" data-row="${count}">`;
@@ -686,7 +637,13 @@ function materialSearch(data,row) {
                 $('#material_unit_'+row).val(temp_unit_name[0]);
                 $('#tax_rate_'+row).val(data.tax_rate);
 
-                material_cost.push(parseFloat(data.cost));
+                if(material_cost[rowindex] == 'undefined'){
+                    material_cost.push(parseFloat(data.cost));
+                }else{
+                    material_cost[rowindex] = parseFloat(data.cost);
+                }
+                console.log(material_cost[rowindex]);
+
                 material_labor_cost.push('0.00');
                 material_discount.push('0.00');
                 tax_rate.push(parseFloat(data.tax_rate));
@@ -720,11 +677,11 @@ function checkQuantity(purchase_qty,flag,input=2){
         if(status == '1' || status == '2'){
             $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('.received').val(purchase_qty);
         }
-        calculateProductData(purchase_qty);
+        calculateProductData(purchase_qty,input);
 
     }
 
-function calculateProductData(quantity){ 
+function calculateProductData(quantity,input=2){ 
     unitConversion();
 
     $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(7)').text((material_discount[rowindex] * quantity).toFixed(2));
@@ -732,7 +689,8 @@ function calculateProductData(quantity){
     $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('.tax-rate').val(tax_rate[rowindex].toFixed(2));
     $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('.unit-name').text(unit_name[rowindex].slice(0,unit_name[rowindex].indexOf(",")));
     $('#material_table tbody tr:nth-child('+(rowindex + 1)+')').find('.material-unit').val(unit_name[rowindex].slice(0,unit_name[rowindex].indexOf(",")));
-    console.log(row_material_cost,material_labor_cost[rowindex]);
+    //console.log(material_cost);
+    //console.log(row_material_cost,material_labor_cost[rowindex]);
     if(tax_method[rowindex] == 1)
     {
         var net_unit_cost = row_material_cost - material_discount[rowindex];

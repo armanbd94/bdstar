@@ -346,6 +346,10 @@ $(document).ready(function () {
             product_price[rowindex] = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .net_unit_price').val();
         }
         var qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val();
+        let free_qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val();
+        if(parseFloat($(this).val()) == ''){
+            free_qty = 0;
+        }
         if(qty > 0){
             checkQuantity(qty,true,0,rowindex,input=1);
         }
@@ -438,8 +442,12 @@ $(document).ready(function () {
                     $('#products_stock_qty_'+row).val(data.qty);
                     $('#products_free_stock_qty_'+row).val(data.qty);
                     $('#tax_rate_vl_'+row).val(data.tax_rate);
-
-                    product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                    
+                    if(product_price[rowindex] == 'undefined'){
+                        product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                    }else{
+                        product_price[rowindex] = (parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+                    }
                     product_qty.push(data.qty);
                     product_free_qty.push(data.free_qty);
                     tax_rate.push(parseFloat(data.tax_rate));
