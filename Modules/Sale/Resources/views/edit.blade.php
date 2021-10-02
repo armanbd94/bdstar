@@ -10,6 +10,12 @@
         vertical-align: top !important;
         padding: 0 !important;
     }
+     .small-btn{
+        width: 20px !important;
+        height: 20px !important;
+        padding: 0 !important;
+    }
+    .small-btn i{font-size: 10px !important;} 
 </style>
 @endpush
 
@@ -198,7 +204,7 @@
                                         <th></th>
                                         <th id="total-tax" class="text-right font-weight-bolder">{{ number_format($sale->total_tax,2,'.','') }}</th>
                                         <th id="total" class="text-right font-weight-bolder">{{ number_format($sale->total_price,2,'.','') }}</th>
-                                        <th class="text-center"><button type="button" class="btn btn-success btn-md add-product"><i class="fas fa-plus"></i></button></th>
+                                        <th class="text-center"><button type="button" class="btn btn-success btn-md add-product small-btn"><i class="fas fa-plus"></i></button></th>
                                     </tfoot>
                                 </table>
                             </div>
@@ -504,7 +510,7 @@ $(document).ready(function () {
         cols += `<td><input type="text" class="fcs text-right form-control net_unit_price" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
         cols += `<td class="tax text-right" id="tax_tx_${count}" data-row="${count}"></td>`;
         cols += `<td class="sub-total text-right" id="sub_total_tx_${count}" data-row="${count}"></td>`;
-        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
+        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger small-btn btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
         cols += `<input type="hidden" class="product-id_vl_${count}" name="products[${count}][id]" id="products_id_vl_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="product-code_vl_${count}" name="products[${count}][code]" id="products_code_vl_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="batch-no_vl_${count}" name="products[${count}][batch_no]" id="products_batch_no_${count}"  data-row="${count}">`;
