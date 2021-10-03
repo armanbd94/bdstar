@@ -29,6 +29,13 @@
             <div class="card-header flex-wrap py-5">
                 <form method="POST" id="form-filter" class="col-md-12 px-0">
                     <div class="row justify-content-center">
+                        <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="selectpicker">
+                            @if (!$salesmen->isEmpty())
+                                @foreach ($salesmen as $value)
+                                    <option value="{{ $value->id }}">{{ $value->name.' - '.$value->phone }}</option>
+                                @endforeach
+                            @endif
+                        </x-form.selectbox>
                         <div class="form-group col-md-3">
                             <label for="name">Choose Your Date</label>
                             <div class="input-group">
@@ -97,11 +104,12 @@ function report()
 {
     var start_date   = $('input[name="start_date"]').val();
     var end_date     = $('input[name="end_date"]').val();
+    var salesmen_id     = $('#salesmen_id').val();
 
     $.ajax({
-        url:"{{ url('profit-loss/report') }}",
+        url:"{{ url('invoice/report') }}",
         type:"POST",
-        data:{start_date:start_date,end_date:end_date,_token:_token},
+        data:{salesmen_id:salesmen_id,start_date:start_date,end_date:end_date,_token:_token},
         success:function(data){
             $('#report').empty();
             $('#report').append(data);
@@ -111,7 +119,5 @@ function report()
         }
     });
 }
-
-
 </script>
 @endpush

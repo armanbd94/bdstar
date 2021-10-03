@@ -767,6 +767,38 @@ class SaleController extends BaseController
         ]);
         $output  = $this->store_message($result, $request->sale_id);
         return response()->json($output);
+    } 
+
+
+    public function invoice_report()
+    {
+        if(permission('invoice-report-access')){
+            $this->setPageData('Invoice Report','Invoice Report','far fa-money-bill-alt',[['name'=>'Sale','link'=>'javascript::void(0);'],['name'=>'Sale','link'=>'javascript::void(0);'],['name'=>'Invoice Report']]);
+            
+            $data = [
+                'salesmen'    => DB::table('salesmen')->where([['status',1]])->select('name','id','phone')->get()                
+            ];
+            return view('sale::invoice-report.index',$data);
+        }else{
+            return $this->access_blocked();
+        }
+    }
+
+    public function invoice_report_details(Request $request)
+    {
+        if ($request->ajax()) {
+
+            $start_date = $request->start_date ? $request->start_date : date('Y-m-d');
+            $end_date = $request->end_date ? $request->end_date : date('Y-m-d');
+            $sales = $this->model->with('sale_products','customer','salesmen')->where('salesmen_id',$request->salesmen_id)->whereBetween('sale_date',[$start_date,$end_date])->get();
+//dd($sales);
+            $data = [
+                'sales'   => $sales,
+                'start_date'   => $start_date,
+                'end_date'   => $end_date,
+            ];
+            return view('sale::invoice-report.report',$data)->render();
+        }
     }
 
 }

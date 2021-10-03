@@ -190,8 +190,7 @@ class PurchaseController extends BaseController
                     //purchase materials
                     $materials = [];
                     if($request->has('materials'))
-                    {
-                        
+                    {                        
                         foreach ($request->materials as $key => $value) {
                             $unit = Unit::where('unit_name',$value['unit'])->first();
                             // dd($unit);
@@ -206,9 +205,9 @@ class PurchaseController extends BaseController
 
                             if($material->tax_method == 1){
                                 if($unit->operator == '*'){
-                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) / $unit->operation_value;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $labor_cost + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) / $unit->operation_value;
                                 }elseif ($unit->operator == '/') {
-                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) * $unit->operation_value;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $labor_cost + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) * $unit->operation_value;
                                 }
                             }else{
                                 if($unit->operator == '*'){
@@ -218,6 +217,7 @@ class PurchaseController extends BaseController
                                 }
                                 
                             }
+                            $new_cost = (($material_cost + $material->cost)/2);
                             $materials[$value['id']] = [
                                 'qty'              => $value['qty'],
                                 'received'         => $value['received'],
@@ -227,14 +227,14 @@ class PurchaseController extends BaseController
                                 'discount'         => $value['discount'],
                                 'tax_rate'         => $value['tax_rate'],
                                 'tax'              => $value['tax'],
-                                'labor_cost'       => $value['labor_cost'] ? $value['labor_cost'] : null,
+                                'labor_cost'       => $labor_cost ? $labor_cost : null,
                                 'total'            => $value['subtotal']
                             ];
 
                             
                             if($material){
                                 $material->qty += $qty;
-                                $material->cost = $material_cost;
+                                $material->cost = $new_cost;
                                 $material->save();    
                             }
                             
@@ -535,9 +535,9 @@ class PurchaseController extends BaseController
                             if($material->tax_method == 1){
 
                                 if($unit->operator == '*'){
-                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) / $unit->operation_value;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $labor_cost + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) / $unit->operation_value;
                                 }elseif ($unit->operator == '/') {
-                                    $material_cost = (((floatval($value['net_unit_cost'] + $value['labor_cost'] + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) * $unit->operation_value;
+                                    $material_cost = (((floatval($value['net_unit_cost'] + $labor_cost + ($value['discount'] / $value['qty'])) * $value['qty']) +  $shipping_cost) /  $value['qty']) * $unit->operation_value;
                                 }
                             }else{
                                 if($unit->operator == '*'){
@@ -548,6 +548,8 @@ class PurchaseController extends BaseController
                                 
                             }
 
+                            $new_cost = (($material_cost + $material->cost)/2);
+
                             $materials[$value['id']] = [
                                 'qty'              => $value['qty'],
                                 'received'         => $value['received'],
@@ -557,14 +559,14 @@ class PurchaseController extends BaseController
                                 'discount'         => $value['discount'],
                                 'tax_rate'         => $value['tax_rate'],
                                 'tax'              => $value['tax'],
-                                'labor_cost'       => $value['labor_cost'] ? $value['labor_cost'] : null,
+                                'labor_cost'       => $labor_cost ? $labor_cost : null,
                                 'total'            => $value['subtotal']
                             ];
 
                             
                             if($material){
                                 $material->qty += $qty;
-                                $material->cost = $material_cost;
+                                $material->cost = $new_cost;
                                 $material->save();    
                             }
                             
