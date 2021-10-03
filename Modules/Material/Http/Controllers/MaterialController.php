@@ -390,6 +390,47 @@ class MaterialController extends BaseController
         }
     }
 
+    //Purchase Form On Select Material Fetch All Data of It
+    public function search_material_by_id(Request $request)
+    {
+
+        $material_data = $this->model->where('id', $request->data)->first();
+        if($material_data)
+        {
+            $material['id']         = $material_data->id;
+            $material['name']       = $material_data->material_name;
+            $material['code']       = $material_data->material_code;
+            $material['cost']       = $material_data->cost;
+            $material['tax_rate']   = $material_data->tax->rate ? $material_data->tax->rate : 0;
+            $material['tax_name']   = $material_data->tax->name;
+            $material['tax_method'] = $material_data->tax_method;
+
+            $units = Unit::where('base_unit',$material_data->unit_id)->orWhere('id',$material_data->unit_id)->get();
+            $unit_name            = [];
+            $unit_operator        = [];
+            $unit_operation_value = [];
+            if($units)
+            {
+                foreach ($units as $unit) {
+                    if($material_data->purchase_unit_id == $unit->id)
+                    {
+                        array_unshift($unit_name,$unit->unit_name);
+                        array_unshift($unit_operator,$unit->operator);
+                        array_unshift($unit_operation_value,$unit->operation_value);
+                    }else{
+                        $unit_name           [] = $unit->unit_name;
+                        $unit_operator       [] = $unit->operator;
+                        $unit_operation_value[] = $unit->operation_value;
+                    }
+                }
+            }
+            $material['unit_name'] = implode(',',$unit_name).',';
+            $material['unit_operator'] = implode(',',$unit_operator).',';
+            $material['unit_operation_value'] = implode(',',$unit_operation_value).',';
+            return $material;
+        }
+    }
+
     //Product Wise Material List Show In Production Form
     public function warehouse_wise_materials(Request $request)
     {

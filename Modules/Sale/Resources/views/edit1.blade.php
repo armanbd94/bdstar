@@ -10,12 +10,6 @@
         vertical-align: top !important;
         padding: 0 !important;
     }
-     .small-btn{
-        width: 20px !important;
-        height: 20px !important;
-        padding: 0 !important;
-    }
-    .small-btn i{font-size: 10px !important;} 
 </style>
 @endpush
 
@@ -81,6 +75,16 @@
                             <div class="form-group col-md-3">
                                 <label for="document">Attach Document</label>
                                 <input type="file" class="form-control" name="document" id="document">
+                            </div>
+
+                            <div class="form-group col-md-12">
+                                <label for="product_code_name">Select Product</label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="basic-addon1"><i class="fas fa-barcode"></i></span>
+                                    </div>
+                                    <input type="text" class="form-control" name="product_code_name" id="product_code_name" placeholder="Please type product code and select...">
+                                </div>
                             </div>
                             <div class="col-md-12">
                                 <table class="table table-bordered" id="product_table">
@@ -154,35 +158,34 @@
                                                         $temp_unit_operation_value = $unit_operation_value = implode(",",$unit_operation_value).',';
                                                     }
                                                 @endphp
-                                                <td  data-row="{{ $key + 1 }}">{{ $sale_product->name.' ('.$sale_product->code.') - [Stock Avl. Qty: '.$stock_qty.']' }}</td>
-                                                <td class="product-code_tx_{{ $key + 1 }} text-center" id="products_code_{{ $key + 1 }}" data-row="{{ $key + 1 }}">{{ $sale_product->code }}</td>
-                                                <td class="unit-name_tx_{{ $key + 1 }} text-center" id="products_unit_{{ $key + 1 }}"  data-row="{{ $key + 1 }}">{{$temp_unit_name[0]}}</td>
-                                                <td class="available-qty_tx_{{ $key + 1 }} text-center" id="products_available_qty_{{ $key + 1 }}" data-row="{{ $key + 1 }}">{{ $stock_qty }}</td>
-                                                <td><input type="text" class="form-control qty text-center" name="products[{{ $key + 1 }}][qty]" id="products_qty_{{ $key + 1 }}" value="{{ number_format($sale_product->pivot->qty,2,'.','') }}" data-row="{{ $key + 1 }}"></td>
-                                                <td><input type="text" class="form-control free_qty text-center" name="products[{{ $key + 1 }}][free_qty]" id="products_free_qty_{{ $key + 1 }}" value="{{ number_format($sale_product->pivot->free_qty,2,'.','') }}" data-row="{{ $key + 1 }}"></td>
-                                                <td><input type="text" class="fcs text-right form-control net_unit_price" name="products[{{ $key + 1 }}][net_unit_price]" id="products_net_unit_price_{{ $key + 1 }}" value="{{ $product_price }}" data-row="{{ $key + 1 }}"></td>
-                                                <td class="tax text-right" id="tax_tx_{{ $key + 1 }}" data-row="{{ $key + 1 }}">{{ number_format((float)$sale_product->pivot->tax, 2, '.','') }}</td>
-                                                <td class="sub-total text-right" id="sub_total_tx_{{ $key + 1 }}" data-row="{{ $key + 1 }}">{{ number_format((float)$sale_product->pivot->total, 2, '.','') }}</td>
-                                                
-                                                <!-- <td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td> -->
-                                                
-                                                <input type="hidden" class="product-id_vl_{{ $key+1 }}" name="products[{{ $key + 1 }}][id]"  value="{{ $sale_product->pivot->product_id }}" id="products_id_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="product-code_vl_{{ $key+1 }}" name="products[{{ $key + 1 }}][code]" value="{{ $sale_product->code }}" id="products_code_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="batch-no_vl_{{ $key+1 }}" name="products[{{ $key + 1 }}][batch_no]" id="products_batch_no_{{ $key + 1 }}" value="{{ $sale_product->pivot->batch_no }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden"   class="stock-qty_vl_{{ $key+1 }} form-control text-center" name="products[{{ $key+1 }}][stock_qty]"  value="{{ $stock_qty }}" id="products_stock_qty_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden"   class="free-stock-qty_vl_{{ $key+1 }} form-control text-center" name="products[{{ $key+1 }}][free_stock_qty]"  value="{{ $sale_product->pivot->free_qty }}" id="products_free_stock_qty_{{ $key+1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="sale-unit_vl_{{ $key+1 }}" name="products[{{ $key+1 }}][unit]" value="{{ $unit_name }}" id="sale_unit_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="sale-unit-operator_vl_{{ $key+1 }}"  value="{{ $unit_operator }}" id="sale_unit_operator_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="sale-unit-operation-value_vl_{{ $key+1 }}"  value="{{ $unit_operation_value }}" id="sale_unit_operation_value_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="tax-rate" name="products[{{ $key+1 }}][tax_rate]" value="{{ $sale_product->pivot->tax_rate }}" id="tax_rate_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
+                                                <td>{{ $sale_product->name }}</td>
+                                                <td class="text-center">{{ $sale_product->code }}</td>
+                                                <td class="unit-name text-center"></td>
+                                                <td class="text-center">{{ $stock_qty }}</td>
+                                                <td><input type="text" class="form-control qty text-center" name="products[{{ $key + 1 }}][qty]" id="products_{{ $key + 1 }}_qty" value="{{ number_format($sale_product->pivot->qty,2,'.','') }}"></td>
+                                                <td><input type="text" class="form-control free_qty text-center" name="products[{{ $key + 1 }}][free_qty]" id="products_{{ $key + 1 }}_free_qty" value="{{ number_format($sale_product->pivot->free_qty,2,'.','') }}"></td>
+                                                <td class="text-right">{{ $product_price }}</td>
+                                                <td class="tax text-right">{{ number_format((float)$sale_product->pivot->tax, 2, '.','') }}</td>
+                                                <td class="sub-total text-right">{{ number_format((float)$sale_product->pivot->total, 2, '.','') }}</td>
+                                                <td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>
+                                                <input type="hidden" class="product-id" name="products[{{ $key + 1 }}][id]"  value="{{ $sale_product->pivot->product_id }}">
+                                                <input type="hidden" class="product-code" name="products[{{ $key + 1 }}][code]" value="{{ $sale_product->code }}" data-row="{{ $key + 1 }}">
+                                                <input type="hidden" class="batch-no" name="products[{{ $key + 1 }}][batch_no]" id="products_{{ $key + 1 }}_batch_no" value="{{ $sale_product->pivot->batch_no }}">
+                                                <input type="hidden"   class="stock-qty form-control text-center" name="products[{{ $key+1 }}][stock_qty]"  value="{{ $stock_qty }}">
+                                                <input type="hidden"   class="free-stock-qty form-control text-center" name="products[{{ $key+1 }}][free_stock_qty]"  value="{{ $sale_product->pivot->free_qty }}">
+                                                <input type="hidden" class="product-price" name="products[{{ $key+1 }}][net_unit_price]" value="{{ $product_price }}">
+                                                <input type="hidden" class="sale-unit" name="products[{{ $key+1 }}][unit]" value="{{ $unit_name }}">
+                                                <input type="hidden" class="sale-unit-operator"  value="{{ $unit_operator }}">
+                                                <input type="hidden" class="sale-unit-operation-value"  value="{{ $unit_operation_value }}">
+                                                <input type="hidden" class="tax-rate" name="products[{{ $key+1 }}][tax_rate]" value="{{ $sale_product->pivot->tax_rate }}">
                                                 @if ($tax)
-                                                <input type="hidden" class="tax-name" value="{{ $tax->name }}" id="tax_name_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
+                                                <input type="hidden" class="tax-name" value="{{ $tax->name }}">
                                                 @else
-                                                <input type="hidden" class="tax-name" value="No Tax" id="tax_name_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
+                                                <input type="hidden" class="tax-name" value="No Tax">
                                                 @endif
-                                                <input type="hidden" class="tax-method" value="{{ $sale_product->tax_method }}" id="tax_method_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="tax-value" name="products[{{ $key+1 }}][tax]" value="{{ $sale_product->pivot->tax }}" id="tax_value_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
-                                                <input type="hidden" class="subtotal-value" name="products[{{ $key+1 }}][subtotal]" value="{{ $sale_product->pivot->total }}" id="subtotal_value_vl_{{ $key + 1 }}" data-row="{{ $key + 1 }}">
+                                                <input type="hidden" class="tax-method" value="{{ $sale_product->tax_method }}">
+                                                <input type="hidden" class="tax-value" name="products[{{ $key+1 }}][tax]" value="{{ $sale_product->pivot->tax }}">
+                                                <input type="hidden" class="subtotal-value" name="products[{{ $key+1 }}][subtotal]" value="{{ $sale_product->pivot->total }}">
                                             </tr>
                                             @endforeach
                                         @endif
@@ -194,7 +197,7 @@
                                         <th></th>
                                         <th id="total-tax" class="text-right font-weight-bolder">{{ number_format($sale->total_tax,2,'.','') }}</th>
                                         <th id="total" class="text-right font-weight-bolder">{{ number_format($sale->total_price,2,'.','') }}</th>
-                                        <th class="text-center"><button type="button" class="btn btn-success btn-md add-product small-btn"><i class="fas fa-plus"></i></button></th>
+                                        <th></th>
                                     </tfoot>
                                 </table>
                             </div>
@@ -313,7 +316,20 @@
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
- //array data depend on warehouse
+
+$(document).ready(function () {
+
+    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
+
+    $('#product_code_name').on('input',function(){
+        var customer_id  = $('#customer_id_hidden').val();
+        var temp_data = $('#product_code_name').val();
+        if(!customer_id){
+            $('#product_code_name').val(temp_data.substring(0,temp_data.length - 1));
+            notification('error','Please select customer');
+        }
+    });
+    //array data depend on warehouse
     var product_array = [];
     var product_code  = [];
     var product_name  = [];
@@ -335,41 +351,26 @@
     var temp_unit_operation_value = [];
 
     var rowindex;
-    var customer_group_rate=0;
+    var customer_group_rate;
     var row_product_price;
-$(document).ready(function () {
-
-
-    $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
-
-    $('#product_code_name').on('input',function(){
-        var customer_id  = $('#customer_id_hidden').val();
-        var temp_data = $('#product_code_name').val();
-        if(!customer_id){
-            $('#product_code_name').val(temp_data.substring(0,temp_data.length - 1));
-            notification('error','Please select customer');
-        }
-    });   
 
     var rownumber = $('#product_table tbody tr:last').index();
 
     for (rowindex = 0; rowindex <= rownumber; rowindex++) {
         
-        product_price.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.net_unit_price').val()));
+        product_price.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.product-price').val()));
         var quantity = parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.qty').val());
         var free_quantity = parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.free_qty').val());
-        product_qty.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.stock-qty_vl_'+(rowindex + 1)).val()));
-        product_free_qty.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.free-stock-qty_vl_'+(rowindex + 1)).val()));
+        product_qty.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.stock-qty').val()));
         tax_rate.push(parseFloat($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.tax-rate').val()));
         tax_name.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.tax-name').val());
         tax_method.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.tax-method').val());
-        temp_unit_name = $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit_vl_'+(rowindex + 1)).val().split(',');
-        unit_name.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit_vl_'+(rowindex + 1)).val());
-        unit_operator.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operator_vl_'+(rowindex + 1)).val());
-        unit_operation_value.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operation-value_vl_'+(rowindex + 1)).val());
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit_vl_'+(rowindex + 1)).val(temp_unit_name[0]);
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name_vl_'+(rowindex + 1)).text(temp_unit_name[0]);
-        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name_tx_'+(rowindex + 1)).text(temp_unit_name[0]);
+        temp_unit_name = $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit').val().split(',');
+        unit_name.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit').val());
+        unit_operator.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operator').val());
+        unit_operation_value.push($('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit-operation-value').val());
+        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.sale-unit').val(temp_unit_name[0]);
+        $('#product_table tbody tr:nth-child('+ (rowindex + 1) +')').find('.unit-name').text(temp_unit_name[0]);
     }
 
     //assigning value
@@ -400,7 +401,7 @@ $(document).ready(function () {
     $.get('{{ url("customer/group-data") }}/'+cid,function(data){
         customer_group_rate = (data/100);
     });
-        //alert(customer_group_rate);
+
     //Get customer group rate for special price
     $('#customer_id').on('change',function(){
         var id = $(this).val();
@@ -412,6 +413,42 @@ $(document).ready(function () {
         });
     });
     
+    //Search product by name or barcode
+    $('#product_code_name').autocomplete({
+        source: function( request, response ) {
+          $.ajax({
+            url:"{{url('sale/product-autocomplete-search')}}",
+            type: 'post',
+            dataType: "json",
+            data: {
+               _token: _token,
+               search: request.term,
+               warehouse_id: document.getElementById('warehouse_id').value
+            },
+            success: function( data ) {
+               response( data );
+            }
+          });
+        },
+        minLength: 3,
+        response: function(event, ui) {
+            if (ui.content.length == 1) {
+                var data = ui.content[0];
+                $(this).autocomplete( "close" );
+                product_search(data);
+            };
+        },
+        select: function (event, ui) {
+            var data = ui.item;
+            product_search(data);
+        },
+    }).data('ui-autocomplete')._renderItem = function (ul, item) {
+        return $("<li class='ui-autocomplete-row'></li>")
+            .data("item.autocomplete", item)
+            .append(item.label)
+            .appendTo(ul);
+    };
+
     //Update product qty
     $('#product_table').on('keyup','.qty',function(){
         rowindex = $(this).closest('tr').index();
@@ -423,7 +460,7 @@ $(document).ready(function () {
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(1);
             notification('error','Qunatity can\'t be less than 1');
         }
-        checkQuantity($(this).val(),true,free_qty,rowindex,input=2);
+        checkQuantity($(this).val(),true,free_qty);
     });
 
     //Update product free qty
@@ -437,26 +474,7 @@ $(document).ready(function () {
             console.log(qty);
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val(0);
         }
-        checkQuantity(qty,true,$(this).val(),rowindex,input=2);
-    });
-
-    $('#product_table').on('keyup','.net_unit_price',function(){
-        rowindex = $(this).closest('tr').index();
-        if($(this).val() < 1 && $(this).val() != ''){
-            $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .net_unit_price').val(1);
-            notification('error','Net unit price can\'t be less than 1');
-        }else{
-            product_price[rowindex] = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .net_unit_price').val();
-        }
-        var qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val();
-        let free_qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val();
-        if(parseFloat($(this).val()) == ''){
-            free_qty = 0;
-        }
-        if(qty > 0){
-            checkQuantity(qty,true,free_qty,rowindex,input=1);
-        }
-        
+        checkQuantity(qty,true,$(this).val());
     });
 
     //Remove product from cart table
@@ -472,142 +490,84 @@ $(document).ready(function () {
         $(this).closest('tr').remove();
         calculateTotal();
     });
-    
-    //Remove product from cart table
+
     //Add  Product to cart table
     @if (!$sale->sale_products->isEmpty())
     var count = "{{ count($sale->sale_products) + 1 }}" ;
     @else 
     var count = 1;
     @endif
-
-    $('#product_table').on('click','.add-product',function(){
-        count++;
-        product_row_add(count);
-    });    
-    function product_row_add(count){
-        var newRow = $('<tr>');
-        var cols = '';
-        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs selectpicker col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count})" data-live-search="true" data-row="${count}">
-            @if (!$products->isEmpty())
-            <option value="0">Please Select</option>
-            @foreach ($products as $product)
-                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
-            @endforeach
-            @endif
-        </select></td>`;
-        cols += `<td class="product-code_tx_${count} text-center" id="products_code_${count}" data-row="${count}"></td>`
-        cols += `<td class="unit-name_tx_${count} text-center" id="products_unit_${count}" data-row="${count}"></td>`;
-        cols += `<td class="available-qty_tx_${count} text-center" id="products_available_qty_${count}" data-row="${count}"></td>`;
-        cols += `<td><input type="text" class="fcs form-control qty text-center" name="products[${count}][qty]" id="products_qty_${count}" value="1" data-row="${count}"></td>`;
-        cols += `<td><input type="text" class="fcs form-control free_qty text-center" name="products[${count}][free_qty]" id="products_free_qty_${count}" value="0" data-row="${count}"></td>`;
-        cols += `<td><input type="text" class="fcs text-right form-control net_unit_price" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
-        cols += `<td class="tax text-right" id="tax_tx_${count}" data-row="${count}"></td>`;
-        cols += `<td class="sub-total text-right" id="sub_total_tx_${count}" data-row="${count}"></td>`;
-        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger small-btn btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
-        cols += `<input type="hidden" class="product-id_vl_${count}" name="products[${count}][id]" id="products_id_vl_${count}" data-row="${count}">`;
-        cols += `<input type="hidden" class="product-code_vl_${count}" name="products[${count}][code]" id="products_code_vl_${count}" data-row="${count}">`;
-        cols += `<input type="hidden" class="batch-no_vl_${count}" name="products[${count}][batch_no]" id="products_batch_no_${count}"  data-row="${count}">`;
-        cols += `<input type="hidden" class="product-unit_vl_${count}" name="products[${count}][unit]" id="products_unit_vl_${count}">`;
-        cols += `<input type="hidden" class="stock-qty_vl_${count}" name="products[${count}][stock_qty]" id="products_stock_qty_${count}"  data-row="${count}">`;
-        cols += `<input type="hidden" class="free-stock-qty_vl_${count}" name="products[${count}][free_stock_qty]" id="products_free_stock_qty_${count}" data-row="${count}">`;
-        cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" id="tax_rate_vl_${count}" data-row="${count}">`;
-        cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]" id="tax_value_vl_${count}" data-row="${count}">`;
-        cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]" id="subtotal_value_vl_${count}" data-row="${count}">`;
-
-        newRow.append(cols);
-        $('#product_table tbody').append(newRow);
-        $('#product_table .selectpicker').selectpicker();
-
-    }
-});
-
-    function getProductDetails(value,rowindex){
-        product_search($(value).val(),rowindex);
-    }    
-    function loadProduct(warehouse_id=null,rowcount){
-
+    function product_search(data) {
         $.ajax({
-            url:"{{url('sale/product-select-search')}}",
-            type: 'post',
-            data: { _token: _token,warehouse_id:warehouse_id},
-            success: function( data ) {
-                var html = `<option value="">Select Please</option>`;
-                $.each(data, function(key, value) {
-                    html += '<option value="'+ value.id +'">'+ value.label +'</option>';
-                });
-
-                $('#product_table #product_list_'+rowcount).empty().html(html);
-                // $('#product_table .products-alls').selectpicker();
-                $('#product_table #product_list_'+rowcount+'.selectpicker').selectpicker('refresh');
+            url: '{{ route("sale.product.search") }}',
+            type: 'POST',
+            data: {
+                data: data,_token:_token, warehouse_id: document.getElementById('warehouse_id').value
             },
-            error: function (xhr, ajaxOption, thrownError) {
-                console.log(thrownError + '\r\n' + xhr.statusText + '\r\n' + xhr.responseText);
-            }
-        });
-    }
-
-    function product_search(data,row) {
-        console.log(row);
-        var customer_id  = $('#customer_id_hidden').val();
-        var rowindex = $('#product_list_'+row).closest('tr').index();
-        var temp_data = $('#product_list_'+row).val();
-        if(!customer_id){
-            $('#product_list_'+row).val('');
-            $('#product_table #product_list_'+row+'.selectpicker').selectpicker('refresh');
-            notification('error','Please select customer');
-        }else{        
-            $.ajax({
-                url: '{{ route("sale.product.search.with.id") }}',
-                type: 'POST',
-                data: {
-                    data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
-                },
-                success: function(data) {
-                    temp_unit_name = data.unit_name.split(',');
-                    $('#products_code_'+row).text(data.code);
-                    $('#products_unit_'+row).text(temp_unit_name[0]);
-                    $('#products_available_qty_'+row).text(data.qty);
-                    $('#products_net_unit_price_'+row).val(data.price);
-                    $('#tax_tx_'+row).text(data.tax_name);
-                    $('#products_id_vl_'+row).val(data.id);
-                    $('#products_code_vl_'+row).val(data.code);
-                    $('#products_batch_no_'+row).val(data.batch_no);
-                    $('#products_unit_vl_'+row).val(temp_unit_name[0]);
-                    $('#products_stock_qty_'+row).val(data.qty);
-                    $('#products_free_stock_qty_'+row).val(data.qty);
-                    $('#tax_rate_vl_'+row).val(data.tax_rate);
-                    
-                    if(product_price[rowindex] == 'undefined'){
-                        product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
-                    }else{
-                        product_price[rowindex] = (parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
+            success: function(data) {
+                var flag = 1;
+                $('.product-code').each(function(i){
+                    let row_index = $(this).data('row');
+                    if($(this).val() == data.code){
+                        rowindex = i;
+                        var qty = parseFloat($('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val()) + 1;
+                        $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(qty);
+                        checkQuantity(String(qty),true,0);
+                        flag = 0;
                     }
+                });
+                $('#product_code_name').val('');
+                if(flag)
+                {
+                    temp_unit_name = data.unit_name.split(',');
+                    var newRow = $('<tr>');
+                    var cols = '';
+                    cols += `<td>${data.name}</td>`;
+                    cols += `<td class="text-center">${data.code}</td>`;
+                    cols += `<td class="unit-name text-center"></td>`;
+                    cols += `<td class="text-center">${data.qty}</td>`;
+                    cols += `<td><input type="text" class="form-control qty text-center" name="products[${count}][qty]" id="products_${count}_qty" value="1"></td>`;
+                    cols += `<td class="text-right">${data.price}</td>`;
+                    cols += `<td class="tax text-right"></td>`;
+                    cols += `<td class="sub-total text-right"></td>`;
+                    cols += `<td class="text-center"><button type="button" class="btn btn-danger btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
+                    cols += `<input type="hidden" class="product-id" name="products[${count}][id]"  value="${data.id}">`;
+                    cols += `<input type="hidden" class="product-code" name="products[${count}][code]" value="${data.code}" data-row="${count}">`;
+                    cols += `<input type="hidden" class="batch-no" name="products[${count}][batch_no]" id="products_${count}_batch_no" value="${data.batch_no}">`;
+                    cols += `<input type="hidden" class="product-unit" name="products[${count}][unit]" value="`+temp_unit_name[0]+`">`;
+                    cols += `<input type="hidden" class="stock-qty" name="products[${count}][stock_qty]" id="products_${count}_stock_qty"  value="${data.qty}">`;
+                    cols += `<input type="hidden" class="net-unit-price" name="products[${count}][net_unit_price]" id="products_${count}_net_unit_price" value="${data.price}">`;
+                    cols += `<input type="hidden" class="tax-rate" name="products[${count}][tax_rate]" value="${data.tax_rate}">`;
+                    cols += `<input type="hidden" class="tax-value" name="products[${count}][tax]">`;
+                    cols += `<input type="hidden" class="subtotal-value" name="products[${count}][subtotal]">`;
 
+                    newRow.append(cols);
+                    $('#product_table tbody').append(newRow);
+
+                    product_price.push(parseFloat(data.price) + parseFloat(data.price * customer_group_rate));
                     product_qty.push(data.qty);
-                    product_free_qty.push(data.free_qty);
                     tax_rate.push(parseFloat(data.tax_rate));
                     tax_name.push(data.tax_name);
                     tax_method.push(data.tax_method);
                     unit_name.push(data.unit_name);
                     unit_operator.push(data.unit_operator);
                     unit_operation_value.push(data.unit_operation_value);
-                    checkQuantity(1,true,0,rowindex,input=2);
-
+                    rowindex = newRow.index();
+                    checkQuantity(1,true,0);
+                    count++;
                 }
-            });
-        }
+            }
+        });
     }
-    function checkQuantity(sale_qtyadd,flag,free_qty=0,rowindex,input=2)
+
+    function checkQuantity(sale_qtyadd,flag,free_qty=0)
     {
-        console.log('roe '+rowindex);
         var sale_qty=0;
         if(free_qty != 0){
             sale_qty = (sale_qtyadd - free_qty);            
         }else{
             sale_qty = sale_qtyadd;   
         }
-        console.log(unit_operator);
 
         var operator = unit_operator[rowindex].split(',');
         var operation_value = unit_operation_value[rowindex].split(',');
@@ -618,7 +578,7 @@ $(document).ready(function () {
         }else if(operator[0] == '/'){
             total_qty = sale_qty / operation_value[0];
         }
-        if(parseFloat(total_qty) > parseFloat(product_qty[rowindex])){
+        if(total_qty > parseFloat(product_qty[rowindex])){
             notification('error','Quantity exceed stock quantity');
             if(flag)
             {
@@ -633,11 +593,12 @@ $(document).ready(function () {
         {
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.qty').val(sale_qty);
         }
-        calculateProductData(sale_qty,rowindex,input);
+        calculateProductData(sale_qty);
     }
 
-    function calculateProductData(quantity,rowindex,input=2){ 
-        unitConversion(rowindex);
+
+    function calculateProductData(quantity){ 
+        unitConversion();
 
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('td:nth-child(8)').text((product_discount[rowindex] * quantity).toFixed(2));
         // $('#product_table tbody tr:nth-child('+(rowindex + 1)+')').find('.discount-value').val((product_discount[rowindex] * quantity).toFixed(2));
@@ -666,7 +627,7 @@ $(document).ready(function () {
         calculateTotal();
     }
 
-    function unitConversion(rowindex)
+    function unitConversion()
     {
         var row_unit_operator = unit_operator[rowindex].slice(0,unit_operator[rowindex].indexOf(','));
         var row_unit_operation_value = unit_operation_value[rowindex].slice(0,unit_operation_value[rowindex].indexOf(','));
@@ -830,6 +791,7 @@ $(document).ready(function () {
         $('#due_amount').val((payable_amount - parseFloat($('#paid_amount').val())).toFixed(2));
         
     });
+});
 
 account_list("{{ $sale->payment_method }}","{{ $sale->account_id }}");
 function account_list(payment_method,account_id='')
@@ -853,6 +815,8 @@ function account_list(payment_method,account_id='')
         }
     });
 }
+
+
 
 function update_data(){
     var rownumber = $('table#product_table tbody tr:last').index();

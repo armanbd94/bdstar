@@ -129,9 +129,11 @@ class PurchaseController extends BaseController
         if(permission('purchase-add')){
             $this->setPageData('Add Purchase','Add Purchase','fas fa-shopping-cart',[['name' => 'Add Purchase']]);
             $purchase = $this->model->select('memo_no')->orderBy('memo_no','desc')->first();
+            $material = Material::get();
             $data = [
                 'suppliers'  => Supplier::allSuppliers(),
                 'taxes'      => Tax::activeTaxes(),
+                'materials'      => $material,
                 'memo_no'   => 'PINV-'.($purchase ? explode('PINV-',$purchase->memo_no)[1] + 1 : self::MEMO_NO)
             ];
             
@@ -427,6 +429,7 @@ class PurchaseController extends BaseController
             $data = [
                 'purchase'   => $this->model->with('purchase_materials','supplier')->find($id),
                 'taxes'      => Tax::activeTaxes(),
+                'materials'      => Material::get()
             ];
             return view('purchase::edit',$data);
         }else{
@@ -438,7 +441,7 @@ class PurchaseController extends BaseController
     {
         if($request->ajax()){
             if(permission('purchase-edit')){
-                // dd($request->all());
+                //dd($request->all());
                 DB::beginTransaction();
                 try {
                     $purchaseData = $this->model->with('purchase_materials')->find($request->purchase_id);
@@ -485,6 +488,7 @@ class PurchaseController extends BaseController
                         foreach ($purchaseData->purchase_materials as  $purchase_material) {
                             $old_received_qty = $purchase_material->pivot->received;
                             $purchase_unit = Unit::find($purchase_material->pivot->purchase_unit_id);
+                            //dd($purchase_unit);
                             if($purchase_unit->operator == '*'){
                                 $old_received_qty = $old_received_qty * $purchase_unit->operation_value;
                             }else{

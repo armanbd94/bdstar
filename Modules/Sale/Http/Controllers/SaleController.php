@@ -457,7 +457,17 @@ class SaleController extends BaseController
     {
         if(permission('sale-edit')){
             $this->setPageData('Edit Sale','Edit Sale','fas fa-edit',[['name'=>'Sale','link' => route('sale')],['name' => 'Edit Sale']]);
+
+            $products = DB::table('warehouse_product as wp')
+                ->join('products as p','wp.product_id','=','p.id')
+                ->leftjoin('taxes as t','p.tax_id','=','t.id')
+                ->leftjoin('units as u','p.base_unit_id','=','u.id')
+                ->selectRaw('wp.*,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
+                ->where([['wp.warehouse_id',1],['wp.qty','>',0]])
+                ->orderBy('p.name','asc')
+                ->get();
             $data = [
+                'products'       => $products,
                 'sale'      => $this->model->with('sale_products','customer','salesmen','route','area')->find($id),
                 'taxes'      => Tax::activeTaxes(),
                 'warehouses'   => DB::table('warehouses')->where('status', 1)->pluck('name','id'),
@@ -473,7 +483,7 @@ class SaleController extends BaseController
     {
         if($request->ajax()){
             if(permission('sale-edit')){
-                // dd($request->all());
+                 //dd($request->all());
                 DB::beginTransaction();
                 try {
                     
