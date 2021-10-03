@@ -10,6 +10,8 @@ use Modules\Location\Entities\Route;
 use Modules\SalesMen\Entities\Salesmen;
 use Modules\Setting\Entities\Warehouse;
 use App\Http\Controllers\BaseController;
+use Modules\Account\Entities\Transaction;
+use Modules\Account\Entities\ChartOfAccount;
 use Modules\SalesMen\Entities\SalesMenDailyRoute;
 use Modules\SalesMen\Http\Requests\SalesMenFormRequest;
 
@@ -65,6 +67,8 @@ class SalesMenController extends BaseController
             $list = $this->model->getDatatableList();//get table data
             $data = [];
             $no = $request->input('start');
+            $currency_symbol   = config('settings.currency_symbol');
+            $currency_position = config('settings.currency_position');
             foreach ($list as $value) {
                 $no++;
                 $action = '';
@@ -82,6 +86,8 @@ class SalesMenController extends BaseController
                 if(permission('sr-bulk-delete')){
                     $row[] = row_checkbox($value->id);//custom helper function to show the table each row checkbox
                 }
+                $balance = $this->model->salesmen_balance($value->id);
+                $balance = ($currency_position == 1) ? $currency_symbol.' '.$balance : $balance.' '.$currency_symbol;
                 $row[] = $no;
                 $row[] = $this->table_image(SALESMEN_AVATAR_PATH,$value->avatar,$value->name,1);
                 $row[] = $value->name;
@@ -94,6 +100,7 @@ class SalesMenController extends BaseController
                 $row[] = $value->upazila->name;
                 $row[] = $value->email ? $value->email : '<span class="label label-danger label-pill label-inline" style="min-width:70px !important;">No Email</span>';
                 $row[] = permission('sr-edit') ? change_status($value->id,$value->status, $value->name) : STATUS_LABEL[$value->status];
+                $row[] = $balance;
                 $row[] = action_button($action);//custom helper function for action button
                 $data[] = $row;
             }
@@ -135,6 +142,32 @@ class SalesMenController extends BaseController
                     $result       = $this->model->updateOrCreate(['id'=>$request->update_id],$collection->all());
                     $salesmen = $this->model->with('routes')->find($result->id);
                     $salesmen->routes()->sync($routes);
+                    
+                    if(empty($request->update_id))
+                    {
+                        $coa_max_code      = ChartOfAccount::where('level',3)->where('code','like','50201%')->max('code');
+                        $code              = $coa_max_code ? ($coa_max_code + 1) : $this->coa_head_code('default_supplier');
+                        $head_name         = $salesmen->id.'-'.$salesmen->name;
+                        $salesmen_coa_data = $this->salesmen_coa($code,$head_name,$salesmen->id);
+                        
+                        $salesmen_coa      = ChartOfAccount::create($salesmen_coa_data);
+                        if(!empty($request->previous_balance))
+                        {
+                            if($salesmen_coa){
+                                $this->previous_balance_add($request->previous_balance,$salesmen_coa->id,$salesmen->name);
+                            }
+                        }
+                    }else{
+                        $old_head_name = $request->update_id.'-'.$request->old_name;
+                        $new_head_name = $request->update_id.'-'.$request->name;
+                        $salesmen_coa = ChartOfAccount::where(['name'=>$old_head_name,'salesmen_id'=>$request->update_id])->first();
+                        if($salesmen_coa)
+                        {
+                            $salesmen_coa_id = $salesmen_coa->id;
+                            $salesmen_coa->update(['name'=>$new_head_name]);
+                        }
+                    }
+
                     $output       = $this->store_message($result, $request->update_id);
                     DB::commit();
                 } catch (Exception $e) {
@@ -148,6 +181,67 @@ class SalesMenController extends BaseController
             return response()->json($output);
         }else{
             return response()->json($this->unauthorized());
+        }
+    }
+    
+
+    private function salesmen_coa(string $code,string $head_name,int $salesmen_id)
+    {
+        return [
+            'code'              => $code,
+            'name'              => $head_name,
+            'parent_name'       => 'Account Payable',
+            'level'             => 3,
+            'type'              => 'L',
+            'transaction'       => 1,
+            'general_ledger'    => 2,
+            'customer_id'       => null,
+            'supplier_id'       => null,
+            'salesmen_id'       => $salesmen_id,
+            'budget'            => 2,
+            'depreciation'      => 2,
+            'depreciation_rate' => '0',
+            'status'            => 1,
+            'created_by'        => auth()->user()->name
+        ];
+    }
+
+    private function previous_balance_add($balance, int $salesman_coa_id, string $salesman_name) {
+        if(!empty($balance) && !empty($salesman_coa_id) && !empty($salesman_name)){
+            $transaction_id = generator(10);
+            // salesman debit for previous balance
+            $cosdr = array(
+                'warehouse_id'        => 1,
+                'chart_of_account_id' => $salesman_coa_id,
+                'voucher_no'          => $transaction_id,
+                'voucher_type'        => 'PR Balance',
+                'voucher_date'        => date("Y-m-d"),
+                'description'         => 'Salesman debit For previous balance '.$salesman_name,
+                'debit'               => $balance,
+                'credit'              => 0,
+                'posted'              => 1,
+                'approve'             => 1,
+                'created_by'          => auth()->user()->name,
+                'created_at'          => date('Y-m-d H:i:s')
+            );
+            $inventory = array(
+                'warehouse_id'        => 1,
+                'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('inventory'))->value('id'),
+                'voucher_no'          => $transaction_id,
+                'voucher_type'        => 'PR Balance',
+                'voucher_date'        => date("Y-m-d"),
+                'description'         => 'Inventory credit for old sale for '.$salesman_name,
+                'debit'               => 0,
+                'credit'              => $balance,
+                'posted'              => 1,
+                'approve'             => 1,
+                'created_by'          => auth()->user()->name,
+                'created_at'          => date('Y-m-d H:i:s')
+            ); 
+
+            Transaction::insert([
+                $cosdr,$inventory
+            ]);
         }
     }
 

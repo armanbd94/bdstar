@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Modules\Product\Entities\Product;
 use Modules\Sale\Entities\SaleProduct;
 use Modules\Customer\Entities\Customer;
+use Modules\SalesMen\Entities\Salesmen;
 use App\Http\Controllers\BaseController;
 use Modules\Account\Entities\Transaction;
 use Modules\Setting\Entities\CustomerGroup;
@@ -179,6 +180,7 @@ class SaleController extends BaseController
                 DB::beginTransaction();
                 try {
                     $customer = Customer::with('coa')->find($request->customer_id);
+                    $salesmen  = Salesmen::with('coa')->find($request->salesmen_id);
                     $warehouse_id = $request->warehouse_id;
                     $sale_data = [
                         'memo_no'        => $request->memo_no,
@@ -191,7 +193,7 @@ class SaleController extends BaseController
                         'customer_id'    => $customer->id,
                         'item'           => $request->item,
                         'total_qty'      => $request->total_qty,
-                        'total_free_qty'      => $request->total_free_qty,
+                        'total_free_qty' => $request->total_free_qty,
                         'total_discount' => $request->total_discount ? $request->total_discount : 0,
                         'total_tax'      => $request->total_tax ? $request->total_tax : 0,
                         'total_price'    => $request->total_price,
@@ -282,7 +284,6 @@ class SaleController extends BaseController
                             SaleProduct::insert($products);
                         }
                     }
-
                     $sum_direct_cost = array_sum($direct_cost);
                     $total_tax = ($request->total_tax ? $request->total_tax : 0) + ($request->order_tax ? $request->order_tax : 0);
                     
@@ -291,12 +292,10 @@ class SaleController extends BaseController
                         if($request->hasFile('document')){
                             $this->delete_file($sale_data['document'], SALE_DOCUMENT_PATH);
                         }
-                    }
-
-                    
+                    }                   
 
                     $data = $this->sale_balance_add($sale->id,$request->memo_no,$request->grand_total,$total_tax,
-                    $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id);
+                    $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id,$salesmen->coa->id,$salesmen->name,$request->sr_commission_rate);
 
                     $output  = $this->store_message($sale, $request->sale_id);
                     DB::commit();
@@ -314,7 +313,7 @@ class SaleController extends BaseController
     }
 
  
-    private function sale_balance_add(int $sale_id, $invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id) {
+    private function sale_balance_add(int $sale_id, $invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id,int $salesmen_coa_id, string $salesmen_name,$sr_commission_rate) {
 
         //Inventory Credit
         $coscr = array(
@@ -383,6 +382,24 @@ class SaleController extends BaseController
                 'created_at'          => date('Y-m-d H:i:s')
             ); 
             Transaction::create($tax_info);
+        }
+
+        if($sr_commission_rate){
+            $sr_commission_info = array(
+                'chart_of_account_id' => $salesmen_coa_id,
+                'warehouse_id'        => $warehouse_id,
+                'voucher_no'          => $invoice_no,
+                'voucher_type'        => 'INVOICE',
+                'voucher_date'        => $sale_date,
+                'description'         => 'Sale Total SR Commission For Invoice NO - ' . $invoice_no . ' Sales Men ' .$salesmen_name,
+                'debit'               => 0,
+                'credit'              => $sr_commission_rate,
+                'posted'              => 1,
+                'approve'             => 1,
+                'created_by'          => auth()->user()->name,
+                'created_at'          => date('Y-m-d H:i:s')
+            );
+            Transaction::create($sr_commission_info);
         }
         
 
@@ -605,6 +622,7 @@ class SaleController extends BaseController
                         }
                     }
                     $customer = Customer::with('coa')->find( $saleData->customer_id);
+                    $salesmen  = Salesmen::with('coa')->find($request->salesmen_id);
                     $sale = $saleData->update($sale_data);
                     $sum_direct_cost = array_sum($direct_cost);
                     $total_tax = ($request->total_tax ? $request->total_tax : 0) + ($request->order_tax ? $request->order_tax : 0);
@@ -617,7 +635,7 @@ class SaleController extends BaseController
 
                     Transaction::where(['voucher_no'=>$request->memo_no,'voucher_type'=>'INVOICE'])->delete();
                     
-                    $this->sale_balance_add($request->sale_id,$request->memo_no,$request->grand_total,$total_tax,$sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data,$warehouse_id);
+                    $this->sale_balance_add($request->sale_id,$request->memo_no,$request->grand_total,$total_tax,$sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data,$warehouse_id,$salesmen->coa->id,$salesmen->name,$request->sr_commission_rate);
                     $output  = $this->store_message($sale, $request->sale_id);
                     DB::commit();
                 } catch (Exception $e) {

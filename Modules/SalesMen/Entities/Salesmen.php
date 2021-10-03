@@ -1,13 +1,16 @@
 <?php
 namespace Modules\SalesMen\Entities;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Modules\Location\Entities\Route;
 use Modules\Location\Entities\Upazila;
 use Modules\Location\Entities\District;
-use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Modules\Setting\Entities\Warehouse;
+use Tymon\JWTAuth\Contracts\JWTSubject;
+use Modules\Account\Entities\Transaction;
+use Modules\Account\Entities\ChartOfAccount;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class Salesmen extends Authenticatable implements JWTSubject
 {
@@ -20,6 +23,15 @@ class Salesmen extends Authenticatable implements JWTSubject
         'password',
         'remember_token',  
     ];
+    public function coa(){
+        return $this->hasOne(ChartOfAccount::class,'salesmen_id','id');
+    }
+
+    public function previous_balance()
+    {
+        return $this->hasOneThrough(Transaction::class,ChartOfAccount::class,'salesmen_id','chart_of_account_id','id','id')
+        ->where('voucher_type','PR Balance')->withDefault(['debit' => '']);
+    }
 
     public function warehouse()
     {
@@ -38,6 +50,20 @@ class Salesmen extends Authenticatable implements JWTSubject
         return $this->belongsToMany(Route::class,'sales_men_daily_routes','salesmen_id','route_id','id','id')
         ->withPivot('id','day')            
         ->withTimestamps();
+    }
+
+    public function salesmen_balance(int $id)
+    {
+        $data = DB::table('salesmen as s')
+            ->selectRaw('s.id,b.id as coaid,b.code,((select ifnull(sum(debit),0) from transactions where chart_of_account_id= b.id AND approve = 1)-(select ifnull(sum(credit),0) from transactions where chart_of_account_id= b.id AND approve = 1)) as balance')
+            ->leftjoin('chart_of_accounts as b', 's.id', '=', 'b.salesmen_id')
+            ->where('s.id',$id)->first();
+        $balance = 0;
+        if($data)
+        {
+            $balance = $data->balance ? $data->balance : 0;
+        }
+        return $balance;
     }
 
 

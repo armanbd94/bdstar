@@ -107,6 +107,7 @@
                                         <th>Upazila</th>
                                         <th>Email</th>
                                         <th>Status</th>
+                                        <th>Balance</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -166,9 +167,9 @@ $(document).ready(function(){
         },
         "columnDefs": [{
             @if (permission('sr-bulk-delete'))
-            "targets": [0,13],
+            "targets": [0,14],
             @else
-            "targets": [12],
+            "targets": [13],
             @endif
                 
                 "orderable": false,
@@ -176,9 +177,9 @@ $(document).ready(function(){
             },
             {
                 @if (permission('sr-bulk-delete'))
-                "targets": [1,2,4,7,8,9,10,11,12],
+                "targets": [1,2,4,7,8,9,10,11,12,13],
                 @else
-                "targets": [0,1,3,6,7,8,9,10,11],
+                "targets": [0,1,3,6,7,8,9,10,11,12],
                 @endif
                 "className": "text-center"
             },
@@ -369,6 +370,7 @@ $(document).ready(function(){
                         $('#store_or_update_form #monthly_target_value').val(data.monthly_target_value);
                         $('#store_or_update_form #cpr').val(data.cpr);
                         $('#store_or_update_form #old_avatar').val(data.avatar);
+                        $('#store_or_update_form .pbalance').addClass('d-none');
                         $('#store_or_update_form .selectpicker').selectpicker('refresh');
 
                         $('#password, #password_confirmation').parents('.form-group').removeClass('required');
@@ -570,6 +572,7 @@ function showSalesmenFormModal(modal_title, btn_text) {
     $('#avatar .spartan_remove_row').css('display','none');
     $('#avatar .img_').css('display','none');
     $('#avatar .img_').attr('src','');
+    $('#store_or_update_form .pbalance').removeClass('d-none');
 
     $('#password, #password_confirmation').removeClass('fa-eye-slash').addClass("fa-eye");
         
