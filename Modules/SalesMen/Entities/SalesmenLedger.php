@@ -53,7 +53,7 @@ class SalesmenLedger extends BaseModel
         $this->column_order = ['transactions.voucher_date','transactions.description', 'transactions.voucher_no','transactions.debit','transactions.credit',null];
         
         
-        $query = self::select('transactions.*','coa.id as coa_id','coa.code','coa.name','coa.parent_name','s.id as salesmen_id','s.name','s.mobile')
+        $query = self::select('transactions.*','coa.id as coa_id','coa.code','coa.name','coa.parent_name','s.id as salesmen_id','s.name','s.phone')
         ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('salesmen as s','coa.salesmen_id','s.id')
         ->where(['coa.parent_name'=>self::TYPE,'transactions.approve'=>1]);
@@ -95,7 +95,7 @@ class SalesmenLedger extends BaseModel
 
     public function count_all()
     {
-        return self::select('transactions.*','coa.id as coa_id','coa.code','coa.name','coa.parent_name','s.id as salesmen_id','s.name','s.mobile')
+        return self::select('transactions.*','coa.id as coa_id','coa.code','coa.name','coa.parent_name','s.id as salesmen_id','s.name','s.phone')
         ->join('chart_of_accounts as coa','transactions.chart_of_account_id','=','coa.id')
         ->join('salesmen as s','coa.salesmen_id','s.id')
         ->where(['coa.parent_name'=>self::TYPE,'transactions.approve'=>1])->get()->count();
