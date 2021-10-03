@@ -53,6 +53,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('customer-receive', 'CustomerReceiveController')->only(['index','store']);
     Route::get('customer-receive/{id}/{payment_type}', 'CustomerReceiveController@show');
 
+    //Supplier Payment Route
+    Route::resource('salesmen-payment', 'SalesmenPaymentController')->only(['index','store']);
+    Route::get('salesmen-payment/{id}/{payment_type}', 'SalesmenPaymentController@show');
+
     //Debit Voucher Route
     Route::get('debit-voucher', 'DebitVoucherController@index');
     Route::group(['prefix' => 'debit-voucher', 'as'=>'debit.voucher.'], function () {

@@ -217,30 +217,16 @@ class SalesMenController extends BaseController
                 'voucher_type'        => 'PR Balance',
                 'voucher_date'        => date("Y-m-d"),
                 'description'         => 'Salesman debit For previous balance '.$salesman_name,
-                'debit'               => $balance,
-                'credit'              => 0,
-                'posted'              => 1,
-                'approve'             => 1,
-                'created_by'          => auth()->user()->name,
-                'created_at'          => date('Y-m-d H:i:s')
-            );
-            $inventory = array(
-                'warehouse_id'        => 1,
-                'chart_of_account_id' => DB::table('chart_of_accounts')->where('code', $this->coa_head_code('inventory'))->value('id'),
-                'voucher_no'          => $transaction_id,
-                'voucher_type'        => 'PR Balance',
-                'voucher_date'        => date("Y-m-d"),
-                'description'         => 'Inventory credit for old sale for '.$salesman_name,
                 'debit'               => 0,
                 'credit'              => $balance,
                 'posted'              => 1,
                 'approve'             => 1,
                 'created_by'          => auth()->user()->name,
                 'created_at'          => date('Y-m-d H:i:s')
-            ); 
+            );
 
             Transaction::insert([
-                $cosdr,$inventory
+                $cosdr
             ]);
         }
     }
@@ -359,5 +345,15 @@ class SalesMenController extends BaseController
     {
         $salesmen = $this->model->where('warehouse_id',$warehouse_id)->pluck('name','id');
         return json_encode($salesmen);
+    }
+    public function due_amount(int $id)
+    {
+        
+        $due_amount = $this->model->salesmen_balance($id);
+        if($due_amount < 0)
+        {
+            $due_amount = explode('-',$due_amount)[1];
+        }
+        return response()->json($due_amount);
     }
 }
