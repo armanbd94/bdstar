@@ -90,7 +90,6 @@ class SalesmenController extends APIController
             $start_date = $request->start_date ? $request->start_date : date('Y-m-01');
             $end_date   = $request->end_date ? $request->end_date :date('Y-m-31');
        
-            //dd($start_date);     
             $product_sale_data= DB::table('sales')
                                 ->select(DB::raw("SUM(grand_total) as sales_amount"),
                                 DB::raw("SUM(paid_amount) as collection_amount")
