@@ -6,12 +6,12 @@ use App\Models\BaseModel;
 use Modules\Customer\Entities\Customer;
 use Modules\Supplier\Entities\Supplier;
 use Modules\Account\Entities\Transaction;
-
+use Modules\SalesMen\Entities\Salesmen;
 
 class ChartOfAccount extends BaseModel
 {
     protected $fillable = [ 'code', 'name', 'parent_name', 'level', 'type', 'transaction', 'general_ledger', 
-    'customer_id', 'supplier_id', 'bank_id','mobile_bank_id','budget', 'depreciation', 'depreciation_rate', 'status', 'created_by', 'modified_by'];
+    'customer_id', 'supplier_id', 'salesmen_id', 'bank_id','mobile_bank_id','budget', 'depreciation', 'depreciation_rate', 'status', 'created_by', 'modified_by'];
 
     public function transactions()
     {
@@ -41,6 +41,10 @@ class ChartOfAccount extends BaseModel
     public function customer()
     {
         return $this->belongsTo(Customer::class,'customer_id','id');
+    }
+    public function salesmen()
+    {
+        return $this->belongsTo(Salesmen::class,'salesmen_id','id');
     }
 
 

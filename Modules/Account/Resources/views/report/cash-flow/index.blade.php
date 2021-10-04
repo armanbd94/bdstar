@@ -68,6 +68,7 @@
 
 @push('scripts')
 <script src="js/jquery.printarea.js"></script>
+<script src="js/moment.js"></script>
 <script src="js/knockout-3.4.2.js"></script>
 <script src="js/daterangepicker.min.js"></script>
 <script>
