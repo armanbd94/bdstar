@@ -80,7 +80,6 @@ class SalesmenController extends APIController
         $collection_amount = 0;
         $customer_total_dues = 0;
         $sr_commission = 0;
-        $due_commission = 0;
         $sr_total_commission_paid = 0;
         $sr_previous_commission = 0;
         $sr_total_due_commission = 0;
@@ -155,9 +154,8 @@ class SalesmenController extends APIController
                 $collection_amount = ($product_sale_data) ? $product_sale_data->collection_amount : 0;
                 $sr_commission = ($sr_commission_data) ? $sr_commission_data->sr_commission : 0;
                 $sr_total_commission_paid = ($sr_commission_data) ? $sr_commission_data->sr_total_commission_paid : 0;
-                $due_commission = ($sr_commission_due) ? $sr_commission_due->due_commission : 0;
                 $sr_previous_commission = ($sr_commission_previous_due) ? $sr_commission_previous_due->sr_previous_commission : 0;
-                $sr_total_due_commission = $due_commission;
+                $sr_total_due_commission = ($sr_commission_due) ? $sr_commission_due->due_commission : 0;
 
                 $data['sales_amount']  = ($sales_amount) ? $sales_amount : 0;
                 $data['collection_amount']  = ($collection_amount) ? $collection_amount : 0;
