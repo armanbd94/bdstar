@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Modules\SalesMen\Entities\Salesmen;
 use App\Http\Controllers\API\APIController;
 use Modules\SalesMen\Entities\SalesMenDailyRoute;
 
@@ -69,16 +70,17 @@ class SalesmenController extends APIController
         return $this->sendResult($message,$data,$errors,$status);
     }
 
-    public function salesmen_data_summery(Request $request){
+    public function salesmen_data_summary(Request $request){
         $errors    = [];
         $data    = [];
         $message = "";
         $status  = true;
         try {            
             $salesmen_id = auth()->user()->id;
+            $coa_id = auth()->user()->coa->id;
             if($request->start_date == null && $request->end_date == null){
-                $start_date = date('Y-m-d');
-                $end_date   = date('Y-m-d');
+                $start_date = date('Y-m-01');
+                $end_date   = date('Y-m-31');
             }else{                
                 $start_date = $request->start_date;
                 $end_date   = $request->end_date;
@@ -119,11 +121,23 @@ class SalesmenController extends APIController
                         }
                     }
                 }
+                $sr_commission_data= DB::table('transactions')
+                                    ->select(DB::raw("SUM(debit) as commissin_paid"),
+                                    DB::raw("SUM(credit) as commissin_unpaid"),
+                                    DB::raw("(SUM(credit) - SUM(debit)) as due_commission")
+                                    )
+                                    ->where('chart_of_account_id',$coa_id)
+                                    ->whereDate('voucher_date','>=',$start_date)
+                                    ->whereDate('voucher_date','<=',$end_date)
+                                    ->groupBy('chart_of_account_id')
+                                    ->first();
 
                 $data['sales_amount']  = $product_sale_data->sales_amount;
                 $data['collection_amount']  = $product_sale_data->collection_amount;
                 $data['sr_commission']  = $product_sale_data->sr_commission;
                 $data['due_amount']  = $total_dues;
+                $data['commission_paid']  = $sr_commission_data->commissin_paid;
+                $data['due_commission']  = $sr_commission_data->due_commission;
             
         } catch (Exception $e) {
             $status  = false;

@@ -347,8 +347,7 @@ class SalesMenController extends BaseController
         return json_encode($salesmen);
     }
     public function due_amount(int $id)
-    {
-        
+    {        
         $due_amount = $this->model->salesmen_balance($id);
         if($due_amount < 0)
         {

@@ -25,6 +25,7 @@ Route::group(['prefix' => 'salesmen','middleware' => ['jwt.verify']],function ()
     Route::get('tax-list', 'API\SalesController@tax_list');
     Route::get('payment-account-list/{payment_method}', 'API\SalesController@account_list');
     Route::post('store-sale-data', 'API\SalesController@store_sale_data');
+    Route::post('summary-data', 'API\SalesmenController@salesmen_data_summary');
     Route::get('sales-list', 'API\SalesController@sales_list');
     Route::get('sale/{id}/view', 'API\SalesController@sale_view');
     Route::post('change-password', 'API\SalesmenPasswordChangeController@change_password');
