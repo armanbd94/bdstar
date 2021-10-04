@@ -17,8 +17,7 @@ class SalesmenController extends APIController
         $data    = [];
         $message = "";
         $status  = true;
-        try {
-            
+        try {            
             $search_text = $request->customer;
             $salesman_routes = DB::table('sales_men_daily_routes')->where('salesmen_id',auth()->user()->id)->select('route_id')->get();
             $routes = [];
@@ -68,6 +67,70 @@ class SalesmenController extends APIController
             $message = $e->getMessage();
         }
         return $this->sendResult($message,$data,$errors,$status);
+    }
+
+    public function salesmen_data_summery(Request $request){
+        $errors    = [];
+        $data    = [];
+        $message = "";
+        $status  = true;
+        try {            
+            $salesmen_id = auth()->user()->id;
+            if($request->start_date == null && $request->end_date == null){
+                $start_date = date('Y-m-d');
+                $end_date   = date('Y-m-d');
+            }else{                
+                $start_date = $request->start_date;
+                $end_date   = $request->end_date;
+            }            
+            $product_sale_data= DB::table('sales')
+                                ->select(DB::raw("SUM(grand_total) as sales_amount"),
+                                DB::raw("SUM(paid_amount) as collection_amount"),
+                                DB::raw("SUM(total_commission) as sr_commission")
+                                )
+                                ->where('salesmen_id',$salesmen_id)
+                                ->whereDate('sale_date','>=',$start_date)
+                                ->whereDate('sale_date','<=',$end_date)
+                                ->groupBy('salesmen_id')
+                                ->first();
+
+            $customer_dues = DB::table('sales as s')
+                ->leftJoin('customers as c','s.customer_id','=','c.id')
+                    ->selectRaw('s.customer_id,s.due_amount,max(s.id) as last_due_id')
+                    ->groupBy('s.customer_id')
+                    ->where('s.due_amount','>',0)
+                    ->when($start_date,function($q) use($start_date){
+                        $q->whereDate('s.sale_date','>=',$start_date);
+                    })
+                    ->when($end_date,function($q) use($end_date){
+                        $q->whereDate('s.sale_date','<=',$end_date);
+                    })
+                    ->when($salesmen_id,function($q) use($salesmen_id){
+                        $q->where('s.salesmen_id',$salesmen_id);
+                    })
+                    ->get();
+                $total_dues = 0;
+                if($customer_dues)
+                {
+                    foreach ($customer_dues->chunk(10) as $chunk) {
+                        foreach ($chunk as $value)
+                        {
+                            $total_dues += $value->due_amount;
+                        }
+                    }
+                }
+
+                $data['sales_amount']  = $product_sale_data->sales_amount;
+                $data['collection_amount']  = $product_sale_data->collection_amount;
+                $data['sr_commission']  = $product_sale_data->sr_commission;
+                $data['due_amount']  = $total_dues;
+            
+        } catch (Exception $e) {
+            $status  = false;
+            $message = $e->getMessage();
+        }
+        return $this->sendResult($message,$data,$errors,$status);
+
     }
 
 }

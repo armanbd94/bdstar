@@ -18,7 +18,6 @@ Route::post('salesmen/login', 'API\SalesmenLoginController@login');
 
 Route::group(['prefix' => 'salesmen','middleware' => ['jwt.verify']],function ()
 {
-
     Route::get('customer-list', 'API\SalesmenController@customer_list');
     Route::get('customer/{id}', 'API\SalesController@customer_data');
     Route::get('products', 'API\ProductSearchController@products');

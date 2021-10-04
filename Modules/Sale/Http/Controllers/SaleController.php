@@ -295,7 +295,7 @@ class SaleController extends BaseController
                     }                   
 
                     $data = $this->sale_balance_add($sale->id,$request->memo_no,$request->grand_total,$total_tax,
-                    $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id,$salesmen->coa->id,$salesmen->name,$request->sr_commission_rate);
+                    $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id,$salesmen->coa->id,$salesmen->name,$request->total_commission);
 
                     $output  = $this->store_message($sale, $request->sale_id);
                     DB::commit();
@@ -313,7 +313,7 @@ class SaleController extends BaseController
     }
 
  
-    private function sale_balance_add(int $sale_id, $invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id,int $salesmen_coa_id, string $salesmen_name,$sr_commission_rate) {
+    private function sale_balance_add(int $sale_id, $invoice_no, $grand_total, $total_tax,$sum_direct_cost, int $customer_coa_id, string $customer_name, $sale_date, array $payment_data,int $warehouse_id,int $salesmen_coa_id, string $salesmen_name,$sr_commission) {
 
         //Inventory Credit
         $coscr = array(
@@ -384,7 +384,7 @@ class SaleController extends BaseController
             Transaction::create($tax_info);
         }
 
-        if($sr_commission_rate){
+        if($sr_commission){
             $sr_commission_info = array(
                 'chart_of_account_id' => $salesmen_coa_id,
                 'warehouse_id'        => $warehouse_id,
@@ -393,7 +393,7 @@ class SaleController extends BaseController
                 'voucher_date'        => $sale_date,
                 'description'         => 'Sale Total SR Commission For Invoice NO - ' . $invoice_no . ' Sales Men ' .$salesmen_name,
                 'debit'               => 0,
-                'credit'              => $sr_commission_rate,
+                'credit'              => $sr_commission,
                 'posted'              => 1,
                 'approve'             => 1,
                 'created_by'          => auth()->user()->name,
@@ -635,7 +635,7 @@ class SaleController extends BaseController
 
                     Transaction::where(['voucher_no'=>$request->memo_no,'voucher_type'=>'INVOICE'])->delete();
                     
-                    $this->sale_balance_add($request->sale_id,$request->memo_no,$request->grand_total,$total_tax,$sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data,$warehouse_id,$salesmen->coa->id,$salesmen->name,$request->sr_commission_rate);
+                    $this->sale_balance_add($request->sale_id,$request->memo_no,$request->grand_total,$total_tax,$sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data,$warehouse_id,$salesmen->coa->id,$salesmen->name,$request->total_commission);
                     $output  = $this->store_message($sale, $request->sale_id);
                     DB::commit();
                 } catch (Exception $e) {
