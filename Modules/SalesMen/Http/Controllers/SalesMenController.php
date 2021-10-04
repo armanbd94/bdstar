@@ -216,7 +216,7 @@ class SalesMenController extends BaseController
                 'voucher_no'          => $transaction_id,
                 'voucher_type'        => 'PR Balance',
                 'voucher_date'        => date("Y-m-d"),
-                'description'         => 'Salesman debit For previous balance '.$salesman_name,
+                'description'         => 'Salesman credit For previous balance '.$salesman_name,
                 'debit'               => 0,
                 'credit'              => $balance,
                 'posted'              => 1,

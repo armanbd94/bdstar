@@ -75,16 +75,23 @@ class SalesmenController extends APIController
         $data    = [];
         $message = "";
         $status  = true;
+
+        $sales_amount = 0;
+        $collection_amount = 0;
+        $customer_total_dues = 0;
+        $sr_commission = 0;
+        $due_commission = 0;
+        $sr_total_commission_paid = 0;
+        $sr_previous_commission = 0;
+        $sr_total_due_commission = 0;
+
         try {            
             $salesmen_id = auth()->user()->id;
             $coa_id = auth()->user()->coa->id;
-            if($request->start_date == null && $request->end_date == null){
-                $start_date = date('Y-m-01');
-                $end_date   = date('Y-m-31');
-            }else{                
-                $start_date = $request->start_date;
-                $end_date   = $request->end_date;
-            }            
+            $start_date = $request->start_date ? $request->start_date : date('Y-m-01');
+            $end_date   = $request->end_date ? $request->end_date :date('Y-m-31');
+       
+            //dd($start_date);     
             $product_sale_data= DB::table('sales')
                                 ->select(DB::raw("SUM(grand_total) as sales_amount"),
                                 DB::raw("SUM(paid_amount) as collection_amount")
@@ -110,8 +117,6 @@ class SalesmenController extends APIController
                         $q->where('s.salesmen_id',$salesmen_id);
                     })
                     ->get();
-                $customer_total_dues = 0;
-                $sr_total_due_commission = 0;
                 if($customer_dues)
                 {
                     foreach ($customer_dues->chunk(10) as $chunk) {
@@ -121,6 +126,7 @@ class SalesmenController extends APIController
                         }
                     }
                 }
+
                 $sr_commission_data= DB::table('transactions')
                                     ->select(DB::raw("SUM(debit) as sr_total_commission_paid"),
                                     DB::raw("SUM(credit) as sr_commission"),
@@ -145,17 +151,21 @@ class SalesmenController extends APIController
                                     ->groupBy('chart_of_account_id')
                                     ->first();
 
+                $sales_amount = ($product_sale_data) ? $product_sale_data->sales_amount : 0;
+                $collection_amount = ($product_sale_data) ? $product_sale_data->collection_amount : 0;
+                $sr_commission = ($sr_commission_data) ? $sr_commission_data->sr_commission : 0;
+                $sr_total_commission_paid = ($sr_commission_data) ? $sr_commission_data->sr_total_commission_paid : 0;
+                $due_commission = ($sr_commission_due) ? $sr_commission_due->due_commission : 0;
                 $sr_previous_commission = ($sr_commission_previous_due) ? $sr_commission_previous_due->sr_previous_commission : 0;
+                $sr_total_due_commission = $due_commission;
 
-                $sr_total_due_commission = ($sr_previous_commission + $sr_commission_due->due_commission);
-
-                $data['sales_amount']  = ($product_sale_data->sales_amount) ? $product_sale_data->sales_amount : 0;
-                $data['collection_amount']  = ($product_sale_data->collection_amount) ? $product_sale_data->collection_amount : 0;
+                $data['sales_amount']  = ($sales_amount) ? $sales_amount : 0;
+                $data['collection_amount']  = ($collection_amount) ? $collection_amount : 0;
                 $data['customer_due_amount']  = ($customer_total_dues) ? $customer_total_dues : 0;
-                $data['sr_commission']  = ($sr_commission_data->sr_commission) ? $sr_commission_data->sr_commission : 0;
+                $data['sr_commission']  = ($sr_commission) ? $sr_commission : 0;
                 $data['sr_previous_commission']  = ($sr_commission_previous_due) ? $sr_previous_commission : 0;
                 $data['sr_total_due_commission']  = ($sr_total_due_commission) ? $sr_total_due_commission : 0;
-                $data['sr_total_commission_paid']  = ($sr_commission_data->sr_total_commission_paid) ? $sr_commission_data->sr_total_commission_paid : 0;
+                $data['sr_total_commission_paid']  = ($sr_total_commission_paid) ? $sr_total_commission_paid : 0;
             
         } catch (Exception $e) {
             $status  = false;
