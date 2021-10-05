@@ -5,6 +5,7 @@ namespace Modules\DamageProduct\Http\Controllers;
 use Illuminate\Http\Request;
 use Modules\Sale\Entities\Sale;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\BaseController;
 use Illuminate\Contracts\Support\Renderable;
 
@@ -28,8 +29,18 @@ class DamageController extends BaseController
 
             if($sale){
                 $this->setPageData('Damage Product','Damage Product','fas fa-undo-alt',[['name' => 'Damage Product']]);
+
+                $products = DB::table('warehouse_product as wp')
+                    ->join('products as p','wp.product_id','=','p.id')
+                    ->leftjoin('taxes as t','p.tax_id','=','t.id')
+                    ->leftjoin('units as u','p.base_unit_id','=','u.id')
+                    ->selectRaw('wp.*,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
+                    ->where([['wp.warehouse_id',1],['wp.qty','>',0]])
+                    ->orderBy('p.name','asc')
+                    ->get();
                 $data = [
                     'sale'=>$sale,
+                    'products'=>$products,
                 ];
                 return view('damageproduct::edit',$data);
             }else{

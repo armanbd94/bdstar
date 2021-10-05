@@ -4,6 +4,14 @@
 
 @push('styles')
 <link href="css/bootstrap-datetimepicker.min.css" rel="stylesheet" type="text/css" />
+<style>
+     .small-btn{
+        width: 25px !important;
+        height: 25px !important;
+        padding: 0 !important;
+    }
+    .small-btn i{font-size: 10px !important;} 
+</style>
 @endpush
 
 @section('content')
@@ -80,9 +88,9 @@
                                         <th class="text-center">Sold Qty</th>
                                         <th class="text-center">Damage Qty</th>
                                         <th class="text-right">Net Unit Price</th>
-                                        <th class="text-right">Deduction (%)</th>
                                         <th class="text-right">Subtotal</th>
-                                        <th>Check Return</th>
+                                        <th>Action
+                                        <button type="button" class="btn btn-success btn-md add-product small-btn"><i class="fas fa-plus"></i></button></th>
                                     </thead>
                                     <tbody>
                                         @if (!$sale->sale_products->isEmpty())
@@ -108,22 +116,16 @@
                                                     <td class="text-center">{{ $sale_product->code }}</td>
                                                     <td class="unit-name text-center">{{ $unit_name }}</td>
                                                     <td><input type="text" class="sold_qty_{{ $key+1 }} form-control text-center" name="products[{{ $key+1 }}][sold_qty]"  value="{{ $sold_qty }}" readonly></td>
-                                                    <td><input type="text" class="form-control return_qty_{{ $key+1 }} text-center" onkeyup="quantity_calculate('{{ $key+1 }}')" onchange="quantity_calculate('{{ $key+1 }}')" name="products[{{ $key+1 }}][return_qty]" id="products_{{ $key+1 }}_return_qty" placeholder="0"></td>
+                                                    <td><input type="text" class="form-control damage_qty_{{ $key+1 }} text-center" onkeyup="quantity_calculate('{{ $key+1 }}')" onchange="quantity_calculate('{{ $key+1 }}')" name="products[{{ $key+1 }}][damage_qty]" id="products_{{ $key+1 }}_damage_qty" placeholder="0"></td>
                                                     <td><input type="text" class="net_unit_price_{{ $key+1 }} form-control text-right" name="products[{{ $key+1 }}][net_unit_price]" value="{{ $sale_product->pivot->net_unit_price }}"></td>
-                                                    <td><input type="text" class="deduction_rate_{{ $key+1 }} form-control text-right" onkeyup="quantity_calculate('{{ $key+1 }}')" onchange="quantity_calculate('{{ $key+1 }}')" name="products[{{ $key+1 }}][deduction_rate]" placeholder="0.00"></td>
                                                     <td class="sub-total sub-total-{{ $key+1 }} text-right"></td>
                                                     <td class="text-center">
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input type="hidden" id="return_{{ $key+1 }}"  name="products[{{ $key+1 }}][return]" value="2">
-                                                            <input type="checkbox" class="custom-control-input chk" onchange="setReturnValue('{{ $key+1 }}')"  id="products_{{ $key+1 }}_return_checkbox">
-                                                            <label class="custom-control-label" for="products_{{ $key+1 }}_return_checkbox"></label>
-                                                        </div>
+                                                        <button type="button" class="btn btn-danger btn-md remove-product small-btn"><i class="fas fa-trash"></i></button>
                                                     </td>
                                                     <input type="hidden" class="product-id" name="products[{{ $key+1 }}][id]"  value="{{ $sale_product->pivot->product_id }}">
                                                     <input type="hidden" class="product-code" name="products[{{ $key+1 }}][code]" value="{{ $sale_product->code }}">
                                                     <input type="hidden" class="product-batch" name="products[{{ $key+1 }}][batch_no]" value="{{ $sale_product->pivot->batch_no }}">
                                                     <input type="hidden" class="sale-unit" name="products[{{ $key+1 }}][unit]" value="{{ $unit_name }}">
-                                                    <input type="hidden" class="deduction_amount deduction_amount_{{ $key+1 }}" name="products[{{ $key+1 }}][deduction_amount]" >
                                                     <input type="hidden" class="subtotal subtotal_{{ $key+1 }}" name="products[{{ $key+1 }}][total]" >
                                 
                                                 </tr>
@@ -136,10 +138,6 @@
                                                 <label  for="reason">Reason</label>
                                                 <textarea class="form-control" name="reason" id="reason"></textarea><br>
                                             </td>
-                                            <td class="text-right" colspan="1"><b>Total Deduction</b></td>
-                                            <td class="text-right">
-                                                <input type="text" id="total_deduction_ammount" class="form-control text-right" placeholder="0.00" name="total_deduction" readonly="readonly" />
-                                            </td>
                                         </tr>
                                         <tr class="d-none">
                                             <td class="text-right" colspan="1" ><b>Total Tax</b></td>
@@ -150,7 +148,7 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td colspan="1"  class="text-right"><b>Net Return</b></td>
+                                            <td colspan="1"  class="text-right"><b>Net Damage</b></td>
                                             <td class="text-right">
                                                 <input type="text" id="grandTotal" class="form-control text-right" name="grand_total_price" placeholder="0.00" readonly="readonly" />
                                             </td>
@@ -189,6 +187,50 @@ $(document).ready(function () {
                 $('#save-btn').attr('disabled', true);
             }
         }
+    }); 
+    @if (!$sale->sale_products->isEmpty())
+    var count = "{{ count($sale->sale_products) + 1 }}" ;
+    @else 
+    var count = 1;
+    @endif
+    $('#product_table').on('click','.add-product',function(){
+        count++;
+        product_row_add(count);
+    });    
+    function product_row_add(count){
+        var newRow = $('<tr>');
+        var cols = '';
+        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs selectpicker col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count})" data-live-search="true" data-row="${count}">
+            @if (!$products->isEmpty())
+            <option value="0">Please Select</option>
+            @foreach ($products as $product)
+                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+            @endforeach
+            @endif
+        </select></td>`;
+        cols += `<td class="product-code_tx_${count} text-center" id="products_code_${count}" data-row="${count}"></td>`
+        cols += `<td class="unit-name_tx_${count} text-center" id="products_unit_${count}" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs form-control sold_qty_${count} text-center" name="products[${count}][sold_qty]" id="sold_qty_${count}" value="0" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs form-control damage_qty_${count} text-center" name="products[${count}][damage_qty]" id="products_${count}_damage_qty" onkeyup="quantity_calculate('${count}')" onchange="quantity_calculate('${count}')" value="0" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs text-right form-control net_unit_price net_unit_price_${count}" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
+        cols += `<td class="sub-total text-right" id="sub_total_tx_${count}" data-row="${count}"></td>`;
+        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger small-btn btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
+        cols += `<input type="hidden" class="product-id_vl_${count}" name="products[${count}][id]" id="products_id_vl_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="product-code_vl_${count}" name="products[${count}][code]" id="products_code_vl_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="product-batch_vl_${count}" name="products[${count}][batch_no]" id="products_batch_no_${count}"  data-row="${count}">`;
+        cols += `<input type="hidden" class="sale-unit_vl_${count}" name="products[${count}][unit]" id="sale_unit_${count}"  data-row="${count}">`;
+        cols += `<input type="hidden" class="deduction_amount deduction_amount_${count}" name="products[${count}][deduction_amount]" id="deduction_amount_${count}" data-row="${count}">`;
+        cols += `<input type="hidden" class="subtotal subtotal_${count}" name="products[${count}][total]" id="subtotal_value_vl_${count}" data-row="${count}">`;
+        newRow.append(cols);
+        $('#product_table tbody').append(newRow);
+        $('#product_table .selectpicker').selectpicker();
+
+    }
+
+    //Remove product from cart table
+    $('#product_table').on('click','.remove-product',function(){
+        rowindex = $(this).closest('tr').index();
+        $(this).closest('tr').remove();
     });
 });
 
@@ -200,18 +242,15 @@ function setReturnValue(row)
 function quantity_calculate(row) {
     var a = 0,o = 0,d = 0,p = 0;
     var sold_qty = $(".sold_qty_" + row).val();
-    var return_qty = $(".return_qty_" + row).val();
+    var return_qty = $(".damage_qty_" + row).val();
     var price_item = $(".net_unit_price_" + row).val();
-    var deduction_rate = $(".deduction_rate_" + row).val();
     if(parseFloat(sold_qty) < parseFloat(return_qty)){
         alert("Sold quantity less than quantity!");
         $("#return_qty_"+row).val("");
     }
     if (parseFloat(return_qty) > 0) {
         var price = (return_qty * price_item);
-        var deduction = price * (deduction_rate / 100);
-        $(".deduction_amount_" + row).val(deduction);
-        var deduction_amount = $(".deduction_amount_" + row).val();
+        var deduction_amount = 0;
 
         //Total price calculate per product
         var temp = price - deduction_amount;
@@ -227,11 +266,6 @@ function quantity_calculate(row) {
         $("#total_price").val(a.toFixed(2, 2));
         $("#total_tax_ammount").val(total_tax_ammount.toFixed(2, 2));
         $("#grandTotal").val(grand_total.toFixed(2, 2));
-
-        $(".deduction_amount").each(function () {
-            isNaN(this.value) || p == this.value.length || (d += parseFloat(this.value));
-        });
-        $("#total_deduction_ammount").val(d.toFixed(2, 2));
     }
 
 }
