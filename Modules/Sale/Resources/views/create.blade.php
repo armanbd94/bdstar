@@ -42,7 +42,7 @@
                             <input type="hidden" name="sale_id" id="sale_id" >
                             <div class="form-group col-md-3 required">
                                 <label for="memo_no">Memo No.</label>
-                                <input type="text" class="fcs form-control" name="memo_no" id="memo_no" value="{{  $memo_no }}"  />
+                                <input type="text" class="fcs form-control" name="memo_no" id="memo_no" value="{{  $memo_no }}"/>
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label for="sale_date">Sale Date</label>
@@ -257,19 +257,18 @@
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script src="js/jquery.fcs.js"></script>
 <script>
-    $('body').on('keydown', 'input, select, selectpicker', function(e) {
-        if (e.key === "Enter") {
-            var self = $(this), form = self.parents('form:eq(0)'), focusable, next;
-            focusable = form.find('input,a,select,button,textarea,selectpicker').filter(':visible');
-            next = focusable.eq(focusable.index(this)+1);
-            if (next.length) {
-                next.focus();
-            } else {
-                form.submit();
-            }
-            return false;
+
+    $("input,select").bind("keydown", function (e) {
+        var keyCode = e.keyCode || e.which;
+        alert(e.keyCode+' '+e.which);
+        if(keyCode == 13) {
+            e.preventDefault();
+            $('input, selectpicker, textarea')
+            [$('input,selectpicker,textarea').index(this)+1].focus();
         }
     });
+   
+
     //$(document).fcs(".fcs");
     //array data depend on warehouse
     var product_array = [];
