@@ -55,6 +55,7 @@
                                 <label>Order Received By</label>
                                 <input type="text" class="form-control" value="{{ $sale->salesmen->name }}" readonly />
                                 <input type="hidden" class="form-control" name="sr_commission_rate" value="{{ $sale->sr_commission_rate }}" />
+                                <input type="hidden" class="form-control" name="salesmen_id" value="{{ $sale->salesmen_id }}" />
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label>Route</label>

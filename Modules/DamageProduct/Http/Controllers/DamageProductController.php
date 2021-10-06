@@ -260,7 +260,7 @@ class DamageProductController extends BaseController
                             'voucher_no'          => $request->memo_no,
                             'voucher_type'        => 'DAMAGE',
                             'voucher_date'        => $request->damage_date,
-                            'description'         => 'Damage Total SR Commission For Invoice NO - ' . $request->damage_date . ' Sales Men ' .$salesmen->name,
+                            'description'         => 'Damage Total SR Commission For Invoice NO - ' . $request->memo_no . ' Sales Men ' .$salesmen->name,
                             'debit'               => $deducted_commission,
                             'credit'              => 0,
                             'posted'              => 1,

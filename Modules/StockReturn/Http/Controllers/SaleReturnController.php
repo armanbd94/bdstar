@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Modules\Product\Entities\Product;
 use Modules\Customer\Entities\Customer;
+use Modules\SalesMen\Entities\Salesmen;
 use App\Http\Controllers\BaseController;
 use Modules\Account\Entities\Transaction;
 use Modules\Product\Entities\ProductVariant;
@@ -198,7 +199,26 @@ class SaleReturnController extends BaseController
                         'created_by'          => auth()->user()->name,
                         'created_at'          => date('Y-m-d H:i:s')
                     );
-                    Transaction::create($customer_credit);
+                    Transaction::create($customer_credit);                   
+
+                    $salesmen = Salesmen::with('coa')->find($request->salesmen_id);
+                    if($deducted_commission){
+                        $sr_commission_info_return = array(
+                            'chart_of_account_id' => $salesmen->coa->id,
+                            'warehouse_id'        => $warehouse_id,
+                            'voucher_no'          => $request->memo_no,
+                            'voucher_type'        => 'Return',
+                            'voucher_date'        => $request->damage_date,
+                            'description'         => 'Return Total SR Commission For Invoice NO - ' . $request->invoice_no . ' Sales Men ' .$salesmen->name,
+                            'debit'               => $deducted_commission,
+                            'credit'              => 0,
+                            'posted'              => 1,
+                            'approve'             => 1,
+                            'created_by'          => auth()->user()->name,
+                            'created_at'          => date('Y-m-d H:i:s')
+                        );
+                        Transaction::create($sr_commission_info_return);
+                    }   
                     $output  = $this->store_message($sale_return, null);
                     DB::commit();
                 } catch (\Exception $e) {

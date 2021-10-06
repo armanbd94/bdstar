@@ -218,7 +218,7 @@ $(document).ready(function () {
         </select></td>`;
         cols += `<td class="product-code_tx_${count} text-center" id="products_code_${count}" data-row="${count}"></td>`
         cols += `<td class="unit-name_tx_${count} text-center" id="products_unit_${count}" data-row="${count}"></td>`;
-        cols += `<td><input type="text" class="fcs form-control sold_qty_${count} text-center" name="products[${count}][sold_qty]" id="sold_qty_${count}" value="0" data-row="${count}"></td>`;
+        cols += `<td><input type="text" class="fcs form-control sold_qty_${count} text-center" name="products[${count}][sold_qty]" id="sold_qty_${count}" value="0" data-row="${count}" readonly></td>`;
         cols += `<td><input type="text" class="fcs form-control damage_qty_${count} text-center" name="products[${count}][damage_qty]" id="products_${count}_damage_qty" onkeyup="quantity_calculate('${count}')" onchange="quantity_calculate('${count}')" value="0" data-row="${count}"></td>`;
         cols += `<td><input type="text" class="fcs text-right form-control net_unit_price net_unit_price_${count}" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
         cols += `<td class="sub-total text-right sub-total-${count}" id="sub_total_tx_${count}" data-row="${count}"></td>`;
