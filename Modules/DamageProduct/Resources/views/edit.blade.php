@@ -25,7 +25,7 @@
                 </div>
                 <div class="card-toolbar">
                     <!--begin::Button-->
-                    <a href="{{ route('sale.return') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
+                    <a href="{{ route('damage.product') }}" class="btn btn-warning btn-sm font-weight-bolder"> 
                         <i class="fas fa-arrow-left"></i> Back</a>
                     <!--end::Button-->
                 </div>
@@ -51,8 +51,8 @@
                                 <input type="text" class="form-control" name="sale_date" id="sale_date" value="{{ $sale->sale_date }}" readonly />
                             </div>
                             <div class="form-group col-md-3 required">
-                                <label for="return_date">Return Date</label>
-                                <input type="text" class="form-control date" name="return_date" id="return_date" value="{{ date('Y-m-d') }}" readonly />
+                                <label for="damage_date">Damage Date</label>
+                                <input type="text" class="form-control date" name="damage_date" id="damage_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label>Warehouse</label>
@@ -62,7 +62,9 @@
                             <div class="form-group col-md-3 required">
                                 <label>Order Received By</label>
                                 <input type="text" class="form-control" value="{{ $sale->salesmen->name }}" readonly />
+                                <input type="hidden" class="form-control" name="salesmen_id" value="{{ $sale->salesmen_id }}" />
                                 <input type="hidden" class="form-control" name="sr_commission_rate" value="{{ $sale->sr_commission_rate }}" />
+                                <input type="hidden" class="form-control" name="total_commission" value="{{ $sale->total_commission }}" />
                             </div>
                             <div class="form-group col-md-3 required">
                                 <label>Route</label>
@@ -93,7 +95,7 @@
                                         <button type="button" class="btn btn-success btn-md add-product small-btn"><i class="fas fa-plus"></i></button></th>
                                     </thead>
                                     <tbody>
-                                        @if (!$sale->sale_products->isEmpty())
+                                        <!-- @if (!$sale->sale_products->isEmpty())
                                             @foreach ($sale->sale_products as $key => $sale_product)
                                                 <tr>
                                                     @php
@@ -101,14 +103,14 @@
 
                                                         $unit_name = DB::table('units')->where('id',$sale_product->pivot->sale_unit_id)->value('unit_name');
                                                         
-                                                        $total_return_qty = \DB::table('sale_return_products')
+                                                        $total_damage_qty = \DB::table('damage_products')
                                                         ->where([
                                                             ['memo_no',$sale->memo_no],
                                                             ['product_id',$sale_product->pivot->product_id],
                                                             ['batch_no', $sale_product->pivot->batch_no]
                                                         ])
-                                                        ->sum('return_qty');
-                                                        $sold_qty = $sale_product->pivot->qty - $total_return_qty;
+                                                        ->sum('damage_qty');
+                                                        $sold_qty = $sale_product->pivot->qty - $total_damage_qty;
 
       
                                                     @endphp
@@ -130,7 +132,7 @@
                                 
                                                 </tr>
                                             @endforeach
-                                        @endif
+                                        @endif -->
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -157,7 +159,7 @@
                                 </table>
                             </div>
                             <div class="form-grou col-md-12 text-right pt-5">
-                                <button type="button" class="btn btn-primary btn-sm mr-3" id="save-btn" onclick="save_data()">Return</button>
+                                <button type="button" class="btn btn-primary btn-sm mr-3" id="save-btn" onclick="save_data()">Damage</button>
                             </div>
                         </div>
                     </form>
@@ -179,15 +181,15 @@ $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
 
     $('#save-btn').prop("disabled", true);
-    $('input:checkbox').click(function () {
-        if ($(this).is(':checked')) {
-            $('#save-btn').prop("disabled", false);
-        } else {
-            if ($('.chk').filter(':checked').length < 1) {
-                $('#save-btn').attr('disabled', true);
-            }
-        }
-    }); 
+    // $('input:checkbox').click(function () {
+    //     if ($(this).is(':checked')) {
+    //         $('#save-btn').prop("disabled", false);
+    //     } else {
+    //         if ($('.chk').filter(':checked').length < 1) {
+    //             $('#save-btn').attr('disabled', true);
+    //         }
+    //     }
+    // }); 
     @if (!$sale->sale_products->isEmpty())
     var count = "{{ count($sale->sale_products) + 1 }}" ;
     @else 
@@ -196,15 +198,21 @@ $(document).ready(function () {
     $('#product_table').on('click','.add-product',function(){
         count++;
         product_row_add(count);
+        
+        if($('#product_table tbody tr').length >= 1){
+            $('#save-btn').prop("disabled", false);
+        }else{
+            $('#save-btn').attr('disabled', true);
+        }
     });    
     function product_row_add(count){
         var newRow = $('<tr>');
         var cols = '';
-        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs selectpicker col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count})" data-live-search="true" data-row="${count}">
+        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs selectpicker col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count},{{ $sale->id }})" data-live-search="true" data-row="${count}">
             @if (!$products->isEmpty())
             <option value="0">Please Select</option>
             @foreach ($products as $product)
-                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name }}</option>
             @endforeach
             @endif
         </select></td>`;
@@ -213,26 +221,53 @@ $(document).ready(function () {
         cols += `<td><input type="text" class="fcs form-control sold_qty_${count} text-center" name="products[${count}][sold_qty]" id="sold_qty_${count}" value="0" data-row="${count}"></td>`;
         cols += `<td><input type="text" class="fcs form-control damage_qty_${count} text-center" name="products[${count}][damage_qty]" id="products_${count}_damage_qty" onkeyup="quantity_calculate('${count}')" onchange="quantity_calculate('${count}')" value="0" data-row="${count}"></td>`;
         cols += `<td><input type="text" class="fcs text-right form-control net_unit_price net_unit_price_${count}" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
-        cols += `<td class="sub-total text-right" id="sub_total_tx_${count}" data-row="${count}"></td>`;
+        cols += `<td class="sub-total text-right sub-total-${count}" id="sub_total_tx_${count}" data-row="${count}"></td>`;
         cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger small-btn btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
         cols += `<input type="hidden" class="product-id_vl_${count}" name="products[${count}][id]" id="products_id_vl_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="product-code_vl_${count}" name="products[${count}][code]" id="products_code_vl_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="product-batch_vl_${count}" name="products[${count}][batch_no]" id="products_batch_no_${count}"  data-row="${count}">`;
         cols += `<input type="hidden" class="sale-unit_vl_${count}" name="products[${count}][unit]" id="sale_unit_${count}"  data-row="${count}">`;
-        cols += `<input type="hidden" class="deduction_amount deduction_amount_${count}" name="products[${count}][deduction_amount]" id="deduction_amount_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="subtotal subtotal_${count}" name="products[${count}][total]" id="subtotal_value_vl_${count}" data-row="${count}">`;
         newRow.append(cols);
         $('#product_table tbody').append(newRow);
         $('#product_table .selectpicker').selectpicker();
-
     }
 
     //Remove product from cart table
     $('#product_table').on('click','.remove-product',function(){
         rowindex = $(this).closest('tr').index();
         $(this).closest('tr').remove();
+        
+        if($('#product_table tbody tr').length >= 1){
+            $('#save-btn').prop("disabled", false);
+        }else{
+            $('#save-btn').attr('disabled', true);
+        }
     });
 });
+function getProductDetails(data,row,sale_id) {
+        var rowindex = $('#product_list_'+row).closest('tr').index();
+        var temp_data = $(data).val();   
+        $.ajax({
+            url: '{{ route("damage.product.search.with.id.for.damage") }}',
+            type: 'POST',
+            data: {
+                data: temp_data,sale_id: sale_id,_token:_token
+            },
+            success: function(data) {
+                temp_unit_name = data.unit_name.split(',');
+                $('#products_code_'+row).text(data.code);
+                $('#sale-unit_'+row).text(temp_unit_name[0]);
+                $('#sold_qty_'+row).val(data.qty);
+                $('#products_net_unit_price_'+row).val(data.price);
+                $('#tax_tx_'+row).text(data.tax_name);
+                $('#products_id_vl_'+row).val(data.id);
+                $('#products_code_vl_'+row).val(data.code);
+                $('#products_batch_no_'+row).val(data.batch_no);
+                $('#sale_unit_'+row).val(temp_unit_name[0]);
+            }
+        });
+    }
 
 function setReturnValue(row)
 {
@@ -242,14 +277,14 @@ function setReturnValue(row)
 function quantity_calculate(row) {
     var a = 0,o = 0,d = 0,p = 0;
     var sold_qty = $(".sold_qty_" + row).val();
-    var return_qty = $(".damage_qty_" + row).val();
+    var damage_qty = $(".damage_qty_" + row).val();
     var price_item = $(".net_unit_price_" + row).val();
-    if(parseFloat(sold_qty) < parseFloat(return_qty)){
-        alert("Sold quantity less than quantity!");
-        $("#return_qty_"+row).val("");
+    if(parseFloat(sold_qty) < parseFloat(damage_qty)){
+        $(".damage_qty_"+row).val("0");
+        notification('error','Sold quantity less than quantity!');
     }
-    if (parseFloat(return_qty) > 0) {
-        var price = (return_qty * price_item);
+    if (parseFloat(damage_qty) > 0) {
+        var price = (damage_qty * price_item);
         var deduction_amount = 0;
 
         //Total price calculate per product
@@ -277,7 +312,7 @@ function save_data(){
     }else{
         let form = document.getElementById('sale_update_form');
         let formData = new FormData(form);
-        let url = "{{route('sale.return.store')}}";
+        let url = "{{route('damage.product.store')}}";
         $.ajax({
             url: url,
             type: "POST",
@@ -307,7 +342,7 @@ function save_data(){
                 } else {
                     notification(data.status, data.message);
                     if (data.status == 'success') {
-                        window.location.replace("{{ route('sale.return') }}");
+                        window.location.replace("{{ route('damage') }}");
                     }
                 }
 

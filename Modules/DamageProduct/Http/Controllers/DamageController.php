@@ -4,10 +4,8 @@ namespace Modules\DamageProduct\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Modules\Sale\Entities\Sale;
-use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\BaseController;
-use Illuminate\Contracts\Support\Renderable;
 
 class DamageController extends BaseController
 {

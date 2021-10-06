@@ -3,12 +3,12 @@
 namespace Modules\DamageProduct\Entities;
 
 use App\Models\BaseModel;
+use Modules\Sale\Entities\Sale;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Customer\Entities\Customer;
 use Modules\Setting\Entities\Warehouse;
 use Modules\DamageProduct\Entities\DamageProduct;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Damage extends BaseModel
 {
@@ -67,7 +67,7 @@ class Damage extends BaseModel
         $this->column_order = ['dm.id','dm.damage_no','dm.memo_no', 'dm.customer_id', 's.salemen_id','s.upazila_id','s.route_id',
         's.area_id','dm.damage_date', 'dm.total_deduction','dm.grand_total', null];
          
-        $query = DB::table('damages as sr')
+        $query = DB::table('damages as dm')
         ->leftjoin('sales as s','dm.memo_no','=','s.memo_no')
         ->leftJoin('customers as c','dm.customer_id','=','c.id')
         ->leftJoin('salesmen as sm','s.salesmen_id','=','sm.id')

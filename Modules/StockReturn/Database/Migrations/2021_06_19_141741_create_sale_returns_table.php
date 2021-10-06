@@ -26,6 +26,7 @@ class CreateSaleReturnsTable extends Migration
             $table->double('tax_rate')->nullable();
             $table->double('total_tax')->nullable();
             $table->double('grand_total');
+            $table->double('deducted_sr_commission')->nullable();
             $table->text('reason')->nullable();
             $table->date('date');
             $table->date('return_date');
