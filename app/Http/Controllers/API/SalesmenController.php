@@ -88,7 +88,7 @@ class SalesmenController extends APIController
             $salesmen_id = auth()->user()->id;
             $coa_id = auth()->user()->coa->id;
             $start_date = $request->start_date ? $request->start_date : date('Y-m-01');
-            $end_date   = $request->end_date ? $request->end_date :date('Y-m-31');
+            $end_date   = $request->end_date ? $request->end_date : date('Y-m-31');
        
             $product_sale_data= DB::table('sales')
                                 ->select(DB::raw("SUM(grand_total) as sales_amount"),
@@ -115,7 +115,7 @@ class SalesmenController extends APIController
                         $q->where('s.salesmen_id',$salesmen_id);
                     })
                     ->get();
-                if($customer_dues)
+                if(!$customer_dues->isEmpty())
                 {
                     foreach ($customer_dues->chunk(10) as $chunk) {
                         foreach ($chunk as $value)
