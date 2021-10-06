@@ -222,7 +222,8 @@ class SalesController extends APIController
                         $warehouse_product->update();
                     }
                 }
-                if(count($products) > 0)
+               
+                if(!empty($products) && count($products) > 0)
                 {
                     SaleProduct::insert($products);
                 }
@@ -237,7 +238,6 @@ class SalesController extends APIController
                     $this->delete_file($sale_data['document'], SALE_DOCUMENT_PATH);
                 }
             }
-
             
 
             $data = $this->sale_balance_add($request->memo_no,$request->grand_total,$total_tax,
