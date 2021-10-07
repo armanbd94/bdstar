@@ -30,10 +30,11 @@ class DamageController extends BaseController
 
                 $products = DB::table('warehouse_product as wp')
                     ->join('products as p','wp.product_id','=','p.id')
+                    ->leftjoin('sale_products as sp','sp.product_id','=','p.id')
                     ->leftjoin('taxes as t','p.tax_id','=','t.id')
                     ->leftjoin('units as u','p.base_unit_id','=','u.id')
-                    ->selectRaw('wp.*,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
-                    ->where([['wp.warehouse_id',1],['wp.qty','>',0]])
+                    ->selectRaw('wp.*,sp.product_id,sp.sale_id as spro_id,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
+                    ->where([['wp.warehouse_id',1],['wp.qty','>',0],['sp.sale_id','=',$sale->id]])
                     ->orderBy('p.name','asc')
                     ->get();
                 $data = [

@@ -177,6 +177,14 @@
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
+    $("input,select,textarea").bind("keydown", function (e) {
+        var keyCode = e.keyCode || e.which;
+        if(keyCode == 13) {
+            e.preventDefault();
+            $('input, select, textarea')
+            [$('input,select,textarea').index(this)+1].focus();
+        }
+    });
 $(document).ready(function () {
     $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
 
@@ -208,7 +216,7 @@ $(document).ready(function () {
     function product_row_add(count){
         var newRow = $('<tr>');
         var cols = '';
-        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs selectpicker col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count},{{ $sale->id }})" data-live-search="true" data-row="${count}">
+        cols += `<td><select name="products[${count}][pro_id]" id="product_list_${count}" class="fcs col-md-12  products-alls product_details_${count} form-control" onchange="getProductDetails(this,${count},{{ $sale->id }})" data-live-search="true" data-row="${count}">
             @if (!$products->isEmpty())
             <option value="0">Please Select</option>
             @foreach ($products as $product)
@@ -257,7 +265,7 @@ function getProductDetails(data,row,sale_id) {
             success: function(data) {
                 temp_unit_name = data.unit_name.split(',');
                 $('#products_code_'+row).text(data.code);
-                $('#sale-unit_'+row).text(temp_unit_name[0]);
+                $('#products_unit_'+row).text(temp_unit_name[0]);
                 $('#sold_qty_'+row).val(data.qty);
                 $('#products_net_unit_price_'+row).val(data.price);
                 $('#tax_tx_'+row).text(data.tax_name);

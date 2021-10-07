@@ -47,7 +47,7 @@
                             </div>
                             <x-form.textbox labelName="Purchase Date" name="purchase_date" value="{{ date('Y-m-d') }}" required="required" class="date" col="col-md-4"/>
 
-                            <x-form.selectbox labelName="Supplier" name="supplier_id" required="required" col="col-md-4" class="selectpicker">
+                            <x-form.selectbox labelName="Supplier" name="supplier_id" required="required" col="col-md-4">
                                 @if (!$suppliers->isEmpty())
                                     @foreach ($suppliers as $supplier)
                                         <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
@@ -55,7 +55,7 @@
                                 @endif
                             </x-form.selectbox>
 
-                            <x-form.selectbox labelName="Purchase Status" name="purchase_status" required="required" col="col-md-4" class="selectpicker" onchange="received_qty(this.value)">
+                            <x-form.selectbox labelName="Purchase Status" name="purchase_status" required="required" col="col-md-4" onchange="received_qty(this.value)">
                                 @foreach (PURCHASE_STATUS as $key => $value)
                                     <option value="{{ $key }}" {{ ($key == 1) ? 'selected' : '' }}>{{ $value }}</option>
                                 @endforeach
@@ -82,7 +82,7 @@
                                     </thead>
                                     <tbody>
                                         <td class="col-md-3">                                                  
-                                            <select name="materials[1][material_id]" id="material_list_1" class="fcs selectpicker col-md-12 material_name form-control" onchange="getMaterialDetails(this,1)"  data-live-search="true" data-row="1">                                            
+                                            <select name="materials[1][material_id]" id="material_list_1" class="fcs col-md-12 material_name form-control" onchange="getMaterialDetails(this,1)"  data-live-search="true" data-row="1">                                            
                                                 @if (!$materials->isEmpty())
                                                     <option value="0">Please Select</option>
                                                 @foreach ($materials as $material)
@@ -126,7 +126,7 @@
                                     </tfoot>
                                 </table>
                             </div>
-                            <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-3" class="selectpicker">
+                            <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-3">
                                 <option value="0" selected>No Tax</option>
                                 @if (!$taxes->isEmpty())
                                     @foreach ($taxes as $tax)
@@ -143,7 +143,7 @@
                                 <label for="shipping_cost">Shipping Cost</label>
                                 <input type="text" class="form-control" name="shipping_cost" id="shipping_cost">
                             </div>
-                            <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-3" class="selectpicker">
+                            <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-3">
                                 @foreach (PAYMENT_STATUS as $key => $value)
                                 <option value="{{ $key }}">{{ $value }}</option>
                                 @endforeach
@@ -185,12 +185,12 @@
                                         <label for="due_amount">Due Amount</label>
                                         <input type="text" class="form-control" id="due_amount" readonly>
                                     </div>
-                                    <x-form.selectbox labelName="Payment Method" name="payment_method" required="required"  col="col-md-3" class="selectpicker">
+                                    <x-form.selectbox labelName="Payment Method" name="payment_method" required="required"  col="col-md-3">
                                         @foreach (PAYMENT_METHOD as $key => $value)
                                         <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </x-form.selectbox>
-                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-3" class="selectpicker"/>
+                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-3"/>
                                     <div class="form-group col-md-3 d-none cheque_number required">
                                         <label for="cheque_number">Cheque No.</label>
                                         <input type="text" class="form-control" name="cheque_number" id="cheque_number">
@@ -280,6 +280,14 @@
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
+    $("input,select,textarea").bind("keydown", function (e) {
+        var keyCode = e.keyCode || e.which;
+        if(keyCode == 13) {
+            e.preventDefault();
+            $('input, select, textarea')
+            [$('input,select,textarea').index(this)+1].focus();
+        }
+    });
     
 //array data depend on warehouse
 var material_array = [];
@@ -520,7 +528,7 @@ $(document).ready(function () {
     function material_row_add(count){
         var newRow = $('<tr>');
         var cols = '';
-        cols += `<td><select name="materials[`+count+`][material_id]" id="material_list_${count}" class="fcs selectpicker col-md-12 material_name form-control" onchange="getMaterialDetails(this,${count})"  data-live-search="true" data-row="${count}">                                            
+        cols += `<td><select name="materials[`+count+`][material_id]" id="material_list_${count}" class="fcs col-md-12 material_name form-control" onchange="getMaterialDetails(this,${count})"  data-live-search="true" data-row="${count}">                                            
                                     @if (!$materials->isEmpty())
                                         <option value="0">Please Select</option>
                                     @foreach ($materials as $material)
