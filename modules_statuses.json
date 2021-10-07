@@ -15,6 +15,7 @@
     "MobileBank": true,
     "Transfer": true,
     "Expense": true,
+    "StockLedger": true,
     "StockReturn": true,
     "HRM": true,
     "Loan": true,

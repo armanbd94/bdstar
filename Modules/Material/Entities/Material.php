@@ -9,7 +9,7 @@ use App\Models\BaseModel;
 
 class Material extends BaseModel
 {
-    protected $fillable = ['category_id','material_name', 'material_code', 'unit_id', 'purchase_unit_id', 'cost', 'qty', 'alert_qty', 
+    protected $fillable = ['category_id','material_name', 'material_code', 'unit_id', 'purchase_unit_id', 'cost', 'old_cost', 'qty', 'alert_qty', 
     'tax_id', 'tax_method','type', 'status', 'has_opening_stock', 'opening_stock_qty','opening_cost', 'opening_warehouse_id', 'created_by', 'modified_by'];
 
 

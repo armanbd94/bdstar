@@ -24,6 +24,7 @@ class CreateMaterialsTable extends Migration
             $table->unsignedBigInteger('purchase_unit_id');
             $table->foreign('purchase_unit_id')->references('id')->on('units');
             $table->double('cost')->nullable();
+            $table->double('old_cost')->nullable();
             $table->double('qty')->nullable();
             $table->double('alert_qty')->nullable();
             $table->unsignedBigInteger('tax_id')->nullable();

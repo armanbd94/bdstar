@@ -223,6 +223,7 @@ class PurchaseController extends BaseController
                                 'received'         => $value['received'],
                                 'purchase_unit_id' => $unit ? $unit->id : null,
                                 'net_unit_cost'    => $value['net_unit_cost'],
+                                'new_unit_cost'    => $new_cost,
                                 'old_cost'         => $material->cost,
                                 'discount'         => $value['discount'],
                                 'tax_rate'         => $value['tax_rate'],
@@ -235,6 +236,7 @@ class PurchaseController extends BaseController
                             if($material){
                                 $material->qty += $qty;
                                 $material->cost = $new_cost;
+                                $material->old_cost = $material->cost;
                                 $material->save();    
                             }
                             
@@ -556,6 +558,7 @@ class PurchaseController extends BaseController
                                 'purchase_unit_id' => $unit ? $unit->id : null,
                                 'net_unit_cost'    => $value['net_unit_cost'],
                                 'old_cost'         => $material->cost,
+                                'new_unit_cost'    => $new_cost,
                                 'discount'         => $value['discount'],
                                 'tax_rate'         => $value['tax_rate'],
                                 'tax'              => $value['tax'],
@@ -567,6 +570,7 @@ class PurchaseController extends BaseController
                             if($material){
                                 $material->qty += $qty;
                                 $material->cost = $new_cost;
+                                $material->old_cost = $material->cost;
                                 $material->save();    
                             }
                             

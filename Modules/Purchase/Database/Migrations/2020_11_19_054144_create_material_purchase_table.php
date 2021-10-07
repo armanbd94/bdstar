@@ -24,6 +24,8 @@ class CreateMaterialPurchaseTable extends Migration
             $table->unsignedBigInteger('purchase_unit_id')->nullable();
             $table->foreign('purchase_unit_id')->references('id')->on('units');
             $table->double('net_unit_cost');
+            $table->double('new_unit_cost');
+            $table->double('old_cost');
             $table->double('discount');
             $table->double('tax_rate');
             $table->double('tax');
