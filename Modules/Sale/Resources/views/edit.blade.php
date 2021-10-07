@@ -200,7 +200,7 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="row justify-content-between">
-                                    <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-2" class="selectpicker">
+                                    <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-2">
                                         <option value="0" selected>No Tax</option>
                                         @if (!$taxes->isEmpty())
                                             @foreach ($taxes as $tax)
@@ -222,7 +222,7 @@
                                         <input type="text" class="form-control" name="labor_cost" id="labor_cost"  value="{{ number_format($sale->labor_cost,2,'.','') }}" />
                                     </div>
 
-                                    <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2" class="selectpicker">
+                                    <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2">
                                         @foreach (PAYMENT_STATUS as $key => $value)
                                         <option value="{{ $key }}" {{ $sale->payment_status == $key ? 'selected' : '' }}>{{ $value }}</option>
                                         @endforeach
@@ -279,12 +279,12 @@
                                         <label for="due_amount">Due Amount</label>
                                         <input type="text" class="form-control" name="due_amount" id="due_amount" value="{{$sale->due_amount }}" readonly>
                                     </div>
-                                    <x-form.selectbox labelName="Payment Method" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-4" class="selectpicker">
+                                    <x-form.selectbox labelName="Payment Method" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-4">
                                         @foreach (SALE_PAYMENT_METHOD as $key => $value)
                                         <option value="{{ $key }}" @if($sale->payment_method) {{ $sale->payment_method == $key ? 'selected' : '' }} @endif>{{ $value }}</option>
                                         @endforeach
                                     </x-form.selectbox>
-                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4" class="selectpicker"/>
+                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4"/>
                                     <div class="form-group required col-md-4 @if($sale->payment_method) {{ $sale->payment_method != 1  ? '' : 'd-none' }} @endif reference_no">
                                         <label for="reference_no">Reference No</label>
                                         <input type="text" class="form-control" name="reference_no" id="reference_no" value="{{ $sale->reference_no }}">
@@ -313,6 +313,16 @@
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
 <script>
+    
+    $("input,select,textarea").bind("keydown", function (e) {
+        var keyCode = e.keyCode || e.which;
+        if(keyCode == 13) {
+            e.preventDefault();
+            $('input, select, textarea')
+            [$('input,select,textarea').index(this)+1].focus();
+        }
+    });
+
  //array data depend on warehouse
     var product_array = [];
     var product_code  = [];

@@ -48,14 +48,14 @@
                                 <label for="sale_date">Sale Date</label>
                                 <input type="text" class="fcs form-control date" name="sale_date" id="sale_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
-                            <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" class="fcs selectpicker">
+                            <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" class="fcs">
                                 @if (!$warehouses->isEmpty())
                                 @foreach ($warehouses as $id => $name)
                                     <option value="{{ $id }}" {{ $id == 1 ? 'selected' : '' }}>{{ $name }}</option>
                                 @endforeach
                                 @endif
                             </x-form.selectbox>
-                            <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="fcs selectpicker" onchange="getRouteList(this.value)">
+                            <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="fcs" onchange="getRouteList(this.value)">
                                 @if (!$salesmen->isEmpty())
                                 @foreach ($salesmen as $value)
                                 <option value="{{ $value->id }}" data-cpr="{{ $value->cpr }}">{{ $value->name.' - '.$value->phone }}</option>
@@ -63,10 +63,10 @@
                                 @endif
                             </x-form.selectbox>
     
-                            <x-form.selectbox labelName="Route" name="route_id" col="col-md-3" class="fcs selectpicker" onchange="getAreaList(this.value);"/>
+                            <x-form.selectbox labelName="Route" name="route_id" col="col-md-3" class="fcs" onchange="getAreaList(this.value);"/>
     
-                            <x-form.selectbox labelName="Area" name="area_id" col="col-md-3" class="fcs selectpicker" onchange="customer_list(this.value)"/>
-                            <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="fcs selectpicker"/>
+                            <x-form.selectbox labelName="Area" name="area_id" col="col-md-3" class="fcs" onchange="customer_list(this.value)"/>
+                            <x-form.selectbox labelName="Customer" name="customer_id" col="col-md-3" class="fcs"/>
                             
                             <div class="form-group col-md-3">
                                 <label for="document">Attach Document</label>
@@ -99,7 +99,7 @@
                                     <tbody>
                                         <tr>
                                             <td class="col-md-3">                                                
-                                                <select name="products[1][pro_id]" id="product_list_1" class="fcs selectpicker col-md-12 product_name form-control" onchange="getProductDetails(this,1)"  data-live-search="true" data-row="1">
+                                                <select name="products[1][pro_id]" id="product_list_1" class="fcs col-md-12 product_name form-control" onchange="getProductDetails(this,1)"  data-live-search="true" data-row="1">
                                                 
                                                 @if (!$products->isEmpty())
                                                 <option value="0">Please Select</option>
@@ -143,7 +143,7 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="row justify-content-between">
-                                    <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-2" class="fcs selectpicker">
+                                    <x-form.selectbox labelName="Order Tax" name="order_tax_rate" col="col-md-2" class="fcs">
                                         <option value="0" selected>No Tax</option>
                                         @if (!$taxes->isEmpty())
                                             @foreach ($taxes as $tax)
@@ -165,7 +165,7 @@
                                         <input type="text" class="fcs form-control" name="labor_cost" id="labor_cost"/>
                                     </div>
 
-                                    <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2" class="fcs selectpicker">
+                                    <x-form.selectbox labelName="Payment Status" name="payment_status" required="required"  col="col-md-2" class="fcs">
                                         @foreach (PAYMENT_STATUS as $key => $value)
                                         <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
@@ -222,12 +222,12 @@
                                         <label for="due_amount">Due Amount</label>
                                         <input type="text" class="fcs form-control" name="due_amount" id="due_amount" readonly>
                                     </div>
-                                    <x-form.selectbox labelName="Payment Method" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-4" class="selectpicker">
+                                    <x-form.selectbox labelName="Payment Method" name="payment_method" onchange="account_list(this.value)" required="required"  col="col-md-4">
                                         @foreach (SALE_PAYMENT_METHOD as $key => $value)
                                         <option value="{{ $key }}">{{ $value }}</option>
                                         @endforeach
                                     </x-form.selectbox>
-                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4" class="fcs selectpicker"/>
+                                    <x-form.selectbox labelName="Account" name="account_id" required="required"  col="col-md-4" class="fcs"/>
                                     <div class="form-group required col-md-4 d-none reference_no">
                                         <label for="reference_no">Reference No</label>
                                         <input type="text" class="fcs form-control" name="reference_no" id="reference_no">
@@ -255,16 +255,13 @@
 <script src="js/jquery-ui.js"></script>
 <script src="js/moment.js"></script>
 <script src="js/bootstrap-datetimepicker.min.js"></script>
-<script src="js/jquery.fcs.js"></script>
-<script>
-
-    $("input,select").bind("keydown", function (e) {
+<script>    
+    $("input,select,textarea").bind("keydown", function (e) {
         var keyCode = e.keyCode || e.which;
-        //alert(e.keyCode+' '+e.which);
         if(keyCode == 13) {
             e.preventDefault();
-            $('input, selectpicker, textarea')
-            [$('input,selectpicker,textarea').index(this)+1].focus();
+            $('input, select, textarea')
+            [$('input,select,textarea').index(this)+1].focus();
         }
     });
    

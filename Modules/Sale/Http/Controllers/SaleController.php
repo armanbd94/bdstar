@@ -176,7 +176,7 @@ class SaleController extends BaseController
     {
         if($request->ajax()){
             if(permission('sale-add')){
-                // dd($request->all());
+                //dd($request->all());
                 DB::beginTransaction();
                 try {
                     $customer = Customer::with('coa')->find($request->customer_id);
@@ -229,7 +229,7 @@ class SaleController extends BaseController
                         $sale_data['document'] = $this->upload_file($request->file('document'),SALE_DOCUMENT_PATH);
                     }
                     $sale  = $this->model->create($sale_data);
-
+                    //dd($sale->id);
                     $saleData = $this->model->with('sale_products')->find($sale->id);
                     //purchase products
                     $products = [];
@@ -292,11 +292,9 @@ class SaleController extends BaseController
                         if($request->hasFile('document')){
                             $this->delete_file($sale_data['document'], SALE_DOCUMENT_PATH);
                         }
-                    }                   
-
+                    }        
                     $data = $this->sale_balance_add($sale->id,$request->memo_no,$request->grand_total,$total_tax,
                     $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id,$salesmen->coa->id,$salesmen->name,$request->total_commission);
-
                     $output  = $this->store_message($sale, $request->sale_id);
                     DB::commit();
                 } catch (Exception $e) {
