@@ -7,10 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 class APIController extends Controller
 {
-    public function __construct()
-    {
-        Auth::shouldUse('salesmen-api');
-    }
+    
     public function sendResult($message,$data = [],$errors = [],$status = true)
     {
         $result = [

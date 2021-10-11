@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Salesman;
 
 use Exception;
 use Illuminate\Http\Request;

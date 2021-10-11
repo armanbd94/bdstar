@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Salesman;
 
 use Exception;
 use App\Models\Unit;
+use App\Traits\UploadAble;
 use Illuminate\Http\Request;
 use Modules\Sale\Entities\Sale;
 use Illuminate\Support\Facades\DB;
@@ -11,7 +12,7 @@ use Modules\Sale\Entities\SaleProduct;
 use Modules\Customer\Entities\Customer;
 use Modules\Account\Entities\Transaction;
 use App\Http\Requests\API\SaleFormRequest;
-use App\Traits\UploadAble;
+use App\Http\Controllers\API\APIController;
 use Modules\Product\Entities\WarehouseProduct;
 
 class SalesController extends APIController

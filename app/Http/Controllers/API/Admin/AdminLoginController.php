@@ -1,20 +1,15 @@
 <?php
+namespace App\Http\Controllers\API\Admin;
 
-namespace App\Http\Controllers\API;
-
-
-use Validator;
 use JWTAuthException;
 use Illuminate\Http\Request;
-use Tymon\JWTAuth\Facades\JWTAuth;
-use App\Http\Controllers\Controller;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\API\APIController;
 
-class SalesmenLoginController extends APIController
+class AdminLoginController extends APIController
 {
     
-
     public function login(Request $request)
     {
         $errors  = [];
@@ -35,7 +30,7 @@ class SalesmenLoginController extends APIController
         }
 		$token = null;
 		try {
-		    if (!$token = JWTAuth::attempt($validator->validated())) {
+		    if (!$token = $this->guard()->attempt($validator->validated())) {
                 $status = false;
                 $errors = [
                     "login" => "Invalid username or password",
@@ -58,7 +53,7 @@ class SalesmenLoginController extends APIController
 		// return $this->createNewToken($token);
     }
 
-    public function salesmenProfile()
+    public function adminProfile()
     {
         return response()->json(auth()->user());
     }
@@ -71,6 +66,11 @@ class SalesmenLoginController extends APIController
      */
     public function refresh() {
         return $this->createNewToken(auth()->refresh());
+    }
+
+    public function guard()
+    {
+        return Auth::guard('api');
     }
 
     

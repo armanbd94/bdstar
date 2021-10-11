@@ -1,13 +1,10 @@
 <?php
-
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Salesman;
 
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Modules\SalesMen\Entities\Salesmen;
 use App\Http\Controllers\API\APIController;
-use Modules\SalesMen\Entities\SalesMenDailyRoute;
 
 class SalesmenController extends APIController
 {
@@ -37,7 +34,7 @@ class SalesmenController extends APIController
                     ->orWhere('c.shop_name','like','%'.$search_text.'%');
                 })
                 ->get();
-                if($customers){
+                if(!$customers->isEmpty()){
                     foreach ($customers as $value) {
                         $customer_previous_balance = DB::table('transactions as t')
                         ->leftjoin('chart_of_accounts as coa','t.chart_of_account_id','=','coa.id')

@@ -14,19 +14,26 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('salesmen/login', 'API\SalesmenLoginController@login');
+Route::post('salesmen/login', 'API\Salesman\SalesmenLoginController@login');
 
-Route::group(['prefix' => 'salesmen','middleware' => ['jwt.verify']],function ()
+Route::group(['prefix' => 'salesmen','middleware' => ['jwt.verify','auth:salesmen-api']],function ()
 {
-    Route::get('customer-list', 'API\SalesmenController@customer_list');
-    Route::get('customer/{id}', 'API\SalesController@customer_data');
-    Route::get('products', 'API\ProductSearchController@products');
-    Route::get('product/{id}', 'API\ProductSearchController@product_data');
-    Route::get('tax-list', 'API\SalesController@tax_list');
-    Route::get('payment-account-list/{payment_method}', 'API\SalesController@account_list');
-    Route::post('store-sale-data', 'API\SalesController@store_sale_data');
-    Route::post('summary-data', 'API\SalesmenController@salesmen_data_summary');
-    Route::get('sales-list', 'API\SalesController@sales_list');
-    Route::get('sale/{id}/view', 'API\SalesController@sale_view');
-    Route::post('change-password', 'API\SalesmenPasswordChangeController@change_password');
+    Route::get('customer-list', 'API\Salesman\SalesmenController@customer_list');
+    Route::get('customer/{id}', 'API\Salesman\SalesController@customer_data');
+    Route::get('products', 'API\Salesman\ProductSearchController@products');
+    Route::get('product/{id}', 'API\Salesman\ProductSearchController@product_data');
+    Route::get('tax-list', 'API\Salesman\SalesController@tax_list');
+    Route::get('payment-account-list/{payment_method}', 'API\Salesman\SalesController@account_list');
+    Route::post('store-sale-data', 'API\Salesman\SalesController@store_sale_data');
+    Route::post('summary-data', 'API\Salesman\SalesmenController@salesmen_data_summary');
+    Route::get('sales-list', 'API\Salesman\SalesController@sales_list');
+    Route::get('sale/{id}/view', 'API\Salesman\SalesController@sale_view');
+    Route::post('change-password', 'API\Salesman\SalesmenPasswordChangeController@change_password');
+});
+
+Route::post('login', 'API\Admin\AdminLoginController@login');
+
+Route::group(['middleware' => ['jwt.verify','auth:api']],function ()
+{
+    Route::get('my-profile','API\Admin\AdminLoginController@adminProfile');
 });

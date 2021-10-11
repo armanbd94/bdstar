@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Salesman;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\API\APIController;
-use Modules\Production\Entities\ProductionCoupon;
 
 class CouponValidationController extends APIController
 {
+
     public function index(Request $request)
     {
         // qrcode = 'ID:1;CODE:64T1OSYJO2';

@@ -1,6 +1,5 @@
 <?php
-
-namespace App\Http\Controllers\API;
+namespace App\Http\Controllers\API\Salesman;
 
 use Exception;
 use Illuminate\Http\Request;
@@ -12,6 +11,7 @@ use Modules\Production\Entities\ProductionCoupon;
 
 class CouponReceivedController extends APIController
 {
+
     public function store_received_coupon(Request $request)
     {
         $errors  = [];
