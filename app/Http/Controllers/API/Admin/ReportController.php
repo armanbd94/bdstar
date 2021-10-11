@@ -115,9 +115,57 @@ class ReportController extends APIController
         $message = "";
         $status  = true;
         try{
-            $warehouse_id = $request->get('warehouse_id') ? $request->get('warehouse_id') : 1;
+            $material_id = $request->get('material_id');
+            $materials = DB::table('materials as m')
+            ->leftJoin('units as u','m.unit_id','=','u.id')
+            ->select('m.id','m.material_name','m.material_code','m.qty','u.unit_name','m.cost')
+            ->when($material_id,function($q) use ($material_id){
+                $q->where('m.id',$material_id);
+            })
+            ->paginate(10);
+            if(!$materials->isEmpty())
+            {
+                $data = $materials;
+            }else{
+                $status = false;
+                $message = 'No data found!';
+            }
+        }catch (Exception $e) {
+            $status  = false;
+            $message = $e->getMessage();
+        }
+        return $this->sendResult($message,$data,$errors,$status);
+    }
 
-        } catch (Exception $e) {
+    public function product_stock_report(Request $request)
+    {
+        $errors  = [];
+        $data    = [];
+        $message = "";
+        $status  = true;
+        try{
+            $warehouse_id = $request->get('warehouse_id');
+            
+            $product_id = $request->get('product_id');
+            $products = DB::table('products as p')
+            ->leftJoin('warehouse_product as wp','p.id','=','wp.product_id')
+            ->leftJoin('units as u','p.base_unit_id','=','u.id')
+            ->select('p.id','p.name','p.code','wp.qty','u.unit_name','p.base_unit_price as price')
+            ->when($warehouse_id,function($q) use ($warehouse_id){
+                $q->where('wp.warehouse_id',$warehouse_id);
+            })
+            ->when($product_id,function($q) use ($product_id){
+                $q->where('wp.product_id',$product_id);
+            })
+            ->get();
+            if(!$products->isEmpty())
+            {
+                $data = $products;
+            }else{
+                $status = false;
+                $message = 'No data found!';
+            }
+        }catch (Exception $e) {
             $status  = false;
             $message = $e->getMessage();
         }

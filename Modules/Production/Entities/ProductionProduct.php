@@ -32,10 +32,10 @@ class ProductionProduct extends BaseModel
         ->withTimeStamps(); 
     }
 
-    public function coupons()
-    {
-        return $this->hasMany(ProductionCoupon::class,'production_product_id','id');
-    }
+    // public function coupons()
+    // {
+    //     return $this->hasMany(ProductionCoupon::class,'production_product_id','id');
+    // }
 
     /******************************************
      * * * Begin :: Custom Datatable Code * * *

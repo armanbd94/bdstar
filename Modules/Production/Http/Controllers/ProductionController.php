@@ -9,6 +9,7 @@ use Modules\Material\Entities\Material;
 use Modules\Setting\Entities\Warehouse;
 use App\Http\Controllers\BaseController;
 use Modules\Production\Entities\Production;
+use Modules\Product\Entities\WarehouseProduct;
 use Modules\Material\Entities\WarehouseMaterial;
 use Modules\Production\Entities\ProductionCoupon;
 use Modules\Production\Entities\ProductionProduct;
@@ -79,9 +80,9 @@ class ProductionController extends BaseController
                     if(permission('production-view')){
                         $action .= ' <a class="dropdown-item" href="'.url("production/view/".$value->id).'">'.self::ACTION_BUTTON['View'].'</a>';
                     }
-                    if(permission('production-delete') && $value->production_status != 3 && $value->transfer_status == 1){
+                    // if(permission('production-delete') && $value->production_status != 3 && $value->transfer_status == 1){
                         $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->name . '">'.self::ACTION_BUTTON['Delete'].'</a>';
-                    }
+                    // }
 
                     // if(permission('production-transfer') && $value->status == 1 && $value->production_status == 3 && $value->transfer_status == 1){
                     //     $action .= ' <a class="dropdown-item" href="'.url("production/transfer/".$value->id).'"><i class="fas fa-dolly-flatbed text-dark mr-2"></i> Transfer</a>';
@@ -427,7 +428,7 @@ class ProductionController extends BaseController
                     $productionData = $this->model->with('products')->find($request->id);
                     if (!$productionData->products->isEmpty()) {
                         foreach ($productionData->products as $item) {
-                            $product = ProductionProduct::with('materials','coupons')->find($item->id);
+                            $product = ProductionProduct::with('materials')->find($item->id);
                             if($product)
                             {
                                 if(!$product->materials->isEmpty())
@@ -451,6 +452,15 @@ class ProductionController extends BaseController
                                             }
                                         }
                                     }elseif ($productionData->status == 1 && $productionData->production_status == 3) {
+                                        $warehouse_product = WarehouseProduct::where([
+                                            ['warehouse_id', $productionData->warehouse_id],
+                                            ['product_id', $product->product_id]
+                                        ])->first();
+                                        if($warehouse_product)
+                                        {
+                                            $warehouse_product->qty -= $product->base_unit_qty;
+                                            $warehouse_product->update();
+                                        }
                                         foreach ($product->materials as $value) {
                                             $used_qty = $value->pivot->used_qty + ($value->pivot->damaged_qty ? $value->pivot->damaged_qty : 0);
                                             $warehouse_material = WarehouseMaterial::where([

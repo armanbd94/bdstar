@@ -9,6 +9,7 @@ use Modules\Material\Entities\Material;
 use Modules\Setting\Entities\Warehouse;
 use App\Http\Controllers\BaseController;
 use Modules\Production\Entities\Production;
+use Modules\Product\Entities\WarehouseProduct;
 use Modules\Material\Entities\WarehouseMaterial;
 use Modules\Production\Entities\ProductionProduct;
 use Modules\Production\Http\Requests\OperationRequest;
@@ -117,6 +118,7 @@ class ProductionOperationController extends BaseController
                     DB::beginTransaction();
                     try {
                         $productionData = $this->model->find($request->production_id);
+                        $warehouse_id = $productionData->warehouse_id;
                         $approve_status = $productionData->status;
                         $productionData->production_status = $request->production_status;
                         if($request->production_status == 3)
@@ -152,6 +154,32 @@ class ProductionOperationController extends BaseController
                                         }
                                     }
                                 }
+
+                                $production_products = DB::table('production_products')
+                                ->where('production_id',$request->production_id)
+                                ->get();
+                                
+                                if(!$production_products->isEmpty())
+                                {
+                                    foreach ($production_products as  $value) {
+                                        $warehouse_product = WarehouseProduct::where([
+                                            ['warehouse_id', $warehouse_id],
+                                            ['product_id', $value->product_id]
+                                        ])->first();
+                                        // dd($warehouse_product);
+                                        if ($warehouse_product) {
+                                            $warehouse_product->qty += $value->base_unit_qty;
+                                            $warehouse_product->update();
+                                        }else{
+                                            WarehouseProduct::create([
+                                                'warehouse_id'=> $warehouse_id,
+                                                'product_id'=> $value->product_id,
+                                                'qty'=> $value->base_unit_qty,
+                                            ]);
+                                        }
+                                    }
+                                }
+
                             }
                             $output = ['status' => 'success', 'message' => 'Production Status Changed Successfully'];
                         } else {

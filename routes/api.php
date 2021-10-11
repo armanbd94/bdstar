@@ -37,4 +37,6 @@ Route::group(['middleware' => ['jwt.verify','auth:api']],function ()
 {
     Route::get('dashboard-summary','API\Admin\DashboardController@summaryData');
     Route::get('daily-summary-report','API\Admin\ReportController@daily_summary_report');
+    Route::get('material-stock-report','API\Admin\ReportController@material_stock_report');
+    Route::get('product-stock-report','API\Admin\ReportController@product_stock_report');
 });
