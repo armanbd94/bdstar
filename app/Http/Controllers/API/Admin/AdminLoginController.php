@@ -41,8 +41,8 @@ class AdminLoginController extends APIController
                 $data = [
                     'access_token' => $token,
                     'token_type' => 'bearer',
-                    'expires_in' => auth()->factory()->getTTL(),
-                    'user' => auth()->user(),
+                    'expires_in' => auth('api')->factory()->getTTL(),
+                    'user' => auth('api')->user(),
                 ];
             }
 		} catch (JWTAuthException $e) {
@@ -55,7 +55,7 @@ class AdminLoginController extends APIController
 
     public function adminProfile()
     {
-        return response()->json(auth()->user());
+        return response()->json(auth('api')->user());
     }
 
     
@@ -65,7 +65,7 @@ class AdminLoginController extends APIController
      * @return \Illuminate\Http\JsonResponse
      */
     public function refresh() {
-        return $this->createNewToken(auth()->refresh());
+        return $this->createNewToken(auth('api')->refresh());
     }
 
     public function guard()
