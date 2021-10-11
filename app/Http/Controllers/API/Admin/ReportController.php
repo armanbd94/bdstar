@@ -78,6 +78,7 @@ class ReportController extends APIController
             ->join('chart_of_accounts as coa','t.chart_of_account_id','=','coa.id')
             ->select(DB::raw("(SUM(t.credit) - SUM(t.debit)) as due_commission"))
             ->whereNotNull('coa.salesmen_id')
+            ->where('t.warehouse_id',$warehouse_id)
             ->whereDate('t.voucher_date','<=',$end_date)
             ->first();
 
@@ -85,6 +86,7 @@ class ReportController extends APIController
             ->join('chart_of_accounts as coa','t.chart_of_account_id','=','coa.id')
             ->select(DB::raw("(SUM(t.credit) - SUM(t.debit)) as due"))
             ->whereNotNull('coa.supplier_id')
+            ->where('t.warehouse_id',$warehouse_id)
             ->whereDate('t.voucher_date','<=',$end_date)
             ->first();
             
@@ -157,7 +159,7 @@ class ReportController extends APIController
             ->when($product_id,function($q) use ($product_id){
                 $q->where('wp.product_id',$product_id);
             })
-            ->get();
+            ->paginate(10);
             if(!$products->isEmpty())
             {
                 $data = $products;

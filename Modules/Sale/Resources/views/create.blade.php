@@ -104,7 +104,7 @@
                                                 @if (!$products->isEmpty())
                                                 <option value="0">Please Select</option>
                                                 @foreach ($products as $product)
-                                                    <option value="{{ $product->id }}" data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+                                                    <option value="{{ $product->product_id }}" data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
                                                 @endforeach
                                                 @endif
                                                 </select>
@@ -379,7 +379,7 @@ $(document).ready(function () {
             @if (!$products->isEmpty())
             <option value="0">Please Select</option>
             @foreach ($products as $product)
-                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
+                <option value="{{ $product->product_id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name.' ('.$product->code.') - [Stock Avl. Qty: '.$product->qty.']'; }}</option>
             @endforeach
             @endif
         </select></td>`;
@@ -425,6 +425,7 @@ $(document).ready(function () {
                     data: data,_token:_token,warehouse_id: document.getElementById('warehouse_id').value
                 },
                 success: function(data) {
+                    console.log(data);
                     temp_unit_name = data.unit_name.split(',');
                     $('#products_code_'+row).text(data.code);
                     $('#products_unit_'+row).text(temp_unit_name[0]);
@@ -694,7 +695,7 @@ $(document).ready(function () {
 
 
 function getProductDetails(value,rowindex){
-    //alert($(value).val());
+    // alert($(value).val());
     product_search($(value).val(),rowindex);
 
 }    
