@@ -35,5 +35,6 @@ Route::post('login', 'API\Admin\AdminLoginController@login');
 
 Route::group(['middleware' => ['jwt.verify','auth:api']],function ()
 {
-    Route::get('my-profile','API\Admin\AdminLoginController@adminProfile');
+    Route::get('dashboard-summary','API\Admin\DashboardController@summaryData');
+    Route::get('daily-summary-report','API\Admin\ReportController@daily_summary_report');
 });

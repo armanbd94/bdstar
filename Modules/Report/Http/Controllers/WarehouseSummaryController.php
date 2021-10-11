@@ -57,8 +57,8 @@ class WarehouseSummaryController extends BaseController
             
             $total_damage_value = DB::table('sale_returns')
                                 ->where('warehouse_id',$warehouse_id)
-                                ->whereDate('date','>=',$start_date)
-                                ->whereDate('date','<=',$end_date)
+                                ->whereDate('return_date','>=',$start_date)
+                                ->whereDate('return_date','<=',$end_date)
                                 ->sum('grand_total');
 
 
