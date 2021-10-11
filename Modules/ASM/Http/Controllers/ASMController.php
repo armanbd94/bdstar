@@ -37,9 +37,9 @@ class ASMController extends BaseController
             if (!empty($request->name)) {
                 $this->model->setName($request->name);
             }
-            if (!empty($request->username)) {
-                $this->model->setUsername($request->username);
-            }
+            // if (!empty($request->username)) {
+            //     $this->model->setUsername($request->username);
+            // }
             if (!empty($request->phone)) {
                 $this->model->setPhone($request->phone);
             }
@@ -66,9 +66,9 @@ class ASMController extends BaseController
                 if(permission('asm-view')){
                 $action .= ' <a class="dropdown-item view_data" data-id="' . $value->id . '" data-name="' . $value->name . '">'.self::ACTION_BUTTON['View'].'</a>';
                 }
-                if(permission('asm-permission')){
-                $action .= ' <a class="dropdown-item" href="'.route('asm.permission',['id'=>$value->id]).'"><i class="fas fa-tasks text-success mr-2"></i> Permission</a>';
-                }
+                // if(permission('asm-permission')){
+                // $action .= ' <a class="dropdown-item" href="'.route('asm.permission',['id'=>$value->id]).'"><i class="fas fa-tasks text-success mr-2"></i> Permission</a>';
+                // }
                 if(permission('asm-delete')){
                     $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->name . '">'.self::ACTION_BUTTON['Delete'].'</a>';
                 }
@@ -81,7 +81,7 @@ class ASMController extends BaseController
                 $row[] = $no;
                 $row[] = $this->table_image(ASM_AVATAR_PATH,$value->avatar,$value->name,1);
                 $row[] = $value->name;
-                $row[] = $value->username;
+                // $row[] = $value->username;
                 $row[] = number_format($value->monthly_target_value,2,'.','');
                 $row[] = $value->warehouse->name;
                 $row[] = $value->district->name;

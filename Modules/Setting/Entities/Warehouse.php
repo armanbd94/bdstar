@@ -69,8 +69,8 @@ class Warehouse extends BaseModel
         $query = DB::table('warehouses as w')
                 ->select('w.id','w.name', 'w.phone', 'w.email', 'w.address','w.district_id','w.asm_id', 
                 'w.status', 'w.deletable','d.name as district_name','a.name as asm_name','a.phone as asm_phone')
-                ->join('locations as d','w.district_id','=','d.id')
-                ->join('asms as a','w.asm_id','=','a.id');
+                ->leftjoin('locations as d','w.district_id','=','d.id')
+                ->leftjoin('asms as a','w.asm_id','=','a.id');
 
         //search query
         if (!empty($this->name)) {

@@ -37,13 +37,13 @@
                                     <div class="col-md-9">
                                         <div class="row">
                                             <x-form.textbox labelName="Name" name="name" value="{{ Auth::guard('asm')->user()->name }}" required="required" col="col-md-6" placeholder="Enter name"/>
-                                                <div class="form-group col-md-6">
-                                                    <label for="">Username</label>
-                                                    <input type="text" class="form-control" value="{{ Auth::guard('asm')->user()->username }}" readonly/>
-                                                </div>
-                                                <x-form.textbox labelName="Phone No." name="phone" value="{{ Auth::guard('asm')->user()->phone }}" required="required" col="col-md-6" placeholder="Enter phone number"/>
-                                                <x-form.textbox labelName="Email" type="email" name="email" value="{{ Auth::guard('asm')->user()->email }}" col="col-md-6" placeholder="Enter email"/>
-                                                <x-form.textarea labelName="Address" name="address" value="{{ Auth::guard('asm')->user()->address }}" required="required" col="col-md-6" placeholder="Enter address"/>
+                                            {{-- <div class="form-group col-md-6">
+                                                <label for="">Username</label>
+                                                <input type="text" class="form-control" value="{{ Auth::guard('asm')->user()->username }}" readonly/>
+                                            </div> --}}
+                                            <x-form.textbox labelName="Phone No." name="phone" value="{{ Auth::guard('asm')->user()->phone }}" required="required" col="col-md-6" placeholder="Enter phone number"/>
+                                            <x-form.textbox labelName="Email" type="email" name="email" value="{{ Auth::guard('asm')->user()->email }}" col="col-md-6" placeholder="Enter email"/>
+                                            <x-form.textarea labelName="Address" name="address" value="{{ Auth::guard('asm')->user()->address }}" required="required" col="col-md-6" placeholder="Enter address"/>
                                         </div>
                                     </div>
                                     <div class="col-md-3">

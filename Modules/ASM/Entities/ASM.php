@@ -77,7 +77,7 @@ class ASM extends Authenticatable
     }
 
     protected $_name;
-    protected $_username;
+    // protected $_username;
     protected $_phone;
     protected $_email;
     protected $_district_id;
@@ -87,10 +87,10 @@ class ASM extends Authenticatable
     {
         $this->_name = $name;
     }
-    public function setUsername($username)
-    {
-        $this->_username = $username;
-    }
+    // public function setUsername($username)
+    // {
+    //     $this->_username = $username;
+    // }
     public function setPhone($phone)
     {
         $this->_phone = $phone;
@@ -116,9 +116,9 @@ class ASM extends Authenticatable
     private function get_datatable_query()
     { 
         if (permission('user-bulk-delete')){
-            $this->column_order = [null,'id','id','name','username','warehouse_id','district_id','phone','email','status', null];
+            $this->column_order = [null,'id','id','name','warehouse_id','district_id','phone','email','status', null];
         }else{
-            $this->column_order = ['id','id','name','username','warehouse_id','district_id','phone','email','status', null];
+            $this->column_order = ['id','id','name','warehouse_id','district_id','phone','email','status', null];
         }
         
 
@@ -127,9 +127,9 @@ class ASM extends Authenticatable
         if (!empty($this->_name)) {
             $query->where('name', 'like', '%' . $this->_name . '%');
         }
-        if (!empty($this->_username)) {
-            $query->where('username', 'like', '%' . $this->_username . '%');
-        }
+        // if (!empty($this->_username)) {
+        //     $query->where('username', 'like', '%' . $this->_username . '%');
+        // }
         if (!empty($this->_phone)) {
             $query->where('phone', 'like', '%' . $this->_phone . '%');
         }

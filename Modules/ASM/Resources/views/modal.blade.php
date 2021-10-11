@@ -21,7 +21,7 @@
                         <div class="row">
                             <input type="hidden" name="update_id" id="update_id"/>
                                 <x-form.textbox labelName="Name" name="name" required="required" col="col-md-6" placeholder="Enter name"/>
-                                <x-form.textbox labelName="Username" name="username" required="required" col="col-md-6" placeholder="Enter username"/>
+                                {{-- <x-form.textbox labelName="Username" name="username" required="required" col="col-md-6" placeholder="Enter username"/> --}}
                                 <x-form.textbox labelName="Phone No." name="phone" required="required" col="col-md-6" placeholder="Enter phone number"/>
                                 <x-form.textbox labelName="Email" name="email" type="email" col="col-md-6" placeholder="Enter email"/>
 

@@ -15,7 +15,7 @@ class ASMFormRequest extends FormRequest
     public function rules()
     {
         $this->rules['name']                  = ['required', 'string'];
-        $this->rules['username']              = ['required', 'string', 'max:30','unique:asms,username'];
+        // $this->rules['username']              = ['required', 'string', 'max:30','unique:asms,username'];
         $this->rules['phone']                 = ['required', 'string', 'max:15', 'unique:asms,phone'];
         $this->rules['email']                 = ['nullable', 'string', 'email', 'unique:asms,email'];
         // $this->rules['password']              = ['required', 'string', 'min:8', 'confirmed'];
@@ -26,7 +26,7 @@ class ASMFormRequest extends FormRequest
         $this->rules['monthly_target_value']  = ['nullable','numeric','gt:0'];
         $this->rules['district_id']           = ['required'];
         if(request()->update_id){
-            $this->rules['username'][3]              = 'unique:asms,username,'.request()->update_id;
+            // $this->rules['username'][3]              = 'unique:asms,username,'.request()->update_id;
             $this->rules['phone'][3]                 = 'unique:asms,phone,'.request()->update_id;
             $this->rules['email'][3]                 = 'unique:asms,email,'.request()->update_id;
             // $this->rules['password'][0]              = 'nullable';

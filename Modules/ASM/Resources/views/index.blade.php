@@ -33,7 +33,7 @@
                 <form method="POST" id="form-filter" class="col-md-12 px-0">
                     <div class="row">
                         <x-form.textbox labelName="Name" name="name" col="col-md-3" placeholder="Enter name" />
-                        <x-form.textbox labelName="Username" name="username" col="col-md-3" placeholder="Enter username" />
+                        {{-- <x-form.textbox labelName="Username" name="username" col="col-md-3" placeholder="Enter username" /> --}}
                         <x-form.textbox labelName="Phone No." name="phone" col="col-md-3" placeholder="Enter phone number" />
                         <x-form.textbox labelName="Email" name="email" col="col-md-3" placeholder="Enter email" />
                         <x-form.selectbox labelName="District" name="district_id" col="col-md-3" class="selectpicker">
@@ -47,7 +47,7 @@
                             <option value="1">Active</option>
                             <option value="2">Inactive</option>
                         </x-form.selectbox>
-                        <div class="col-md-6">
+                        <div class="col-md-9">
                             <div style="margin-top:28px;">       
                                 <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
                                 data-toggle="tooltip" data-theme="dark" title="Reset">
@@ -80,7 +80,7 @@
                                         <th>Sl</th>
                                         <th>Avatar</th>
                                         <th>Name</th>
-                                        <th>Username</th>
+                                        {{-- <th>Username</th> --}}
                                         <th>Monthly Target Value</th>
                                         <th>Warehouse</th>
                                         <th>District</th>
@@ -134,7 +134,7 @@ $(document).ready(function(){
             "type": "POST",
             "data": function (data) {
                 data.name         = $("#form-filter #name").val();
-                data.username     = $("#form-filter #username").val();
+                // data.username     = $("#form-filter #username").val();
                 data.phone        = $("#form-filter #phone").val();
                 data.email        = $("#form-filter #email").val();
                 data.district_id  = $("#form-filter #district_id option:selected").val();
@@ -144,9 +144,9 @@ $(document).ready(function(){
         },
         "columnDefs": [{
             @if (permission('asm-bulk-delete'))
-            "targets": [0,11],
+            "targets": [0,10],
             @else
-            "targets": [10],
+            "targets": [9],
             @endif
                 "orderable": false,
                 "className": "text-center"

@@ -3,7 +3,7 @@
         <table class="table table-borderless">
             <tr>
                 <td><b>Name</b></td><td><b>:</b></td><td>{{ $asm->name }}</td>
-                <td><b>Username</b></td><td><b>:</b></td><td>{{ $asm->username }}</td>
+                <td></td>
             </tr>
             <tr>
                 <td><b>Phone</b></td><td><b>:</b></td><td>{{ $asm->phone }}</td>
