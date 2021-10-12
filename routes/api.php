@@ -39,4 +39,7 @@ Route::group(['middleware' => ['jwt.verify','auth:api']],function ()
     Route::get('daily-summary-report','API\Admin\ReportController@daily_summary_report');
     Route::get('material-stock-report','API\Admin\ReportController@material_stock_report');
     Route::get('product-stock-report','API\Admin\ReportController@product_stock_report');
+    Route::get('vouchers','API\Admin\VoucherController@index');
+    Route::get('voucher/{voucher_no}/delete','API\Admin\VoucherController@destroy');
+    Route::post('voucher/approve','API\Admin\VoucherController@voucher_approve');
 });
