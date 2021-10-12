@@ -35,30 +35,25 @@ class MaterialStockLedgerController extends BaseController
         if ($request->ajax()) {
             if (permission('material-stock-ledger-access')) {
 
-                $material = Material::with('unit', 'category')->find($request->material_id);
-                $start_date = $request->start_date ? $request->start_date . ' 00:00:01' : date('Y-m-01') . ' 00:00:01';
-                $end_date = $request->end_date ? $request->end_date . ' 23:59:59' : date('Y-m-d') . ' 23:59:59';
+                $material    = Material::with('unit', 'category')->find($request->material_id);
+                $start_date  = $request->start_date ? $request->start_date . ' 00:00:01' : date('Y-m-01') . ' 00:00:01';
+                $end_date    = $request->end_date ? $request->end_date . ' 23:59:59' : date('Y-m-d') . ' 23:59:59';
                 $date_period = new DatePeriod(new DateTime($start_date), new DateInterval('P1D'), new DateTime($end_date));
                 $ledger_data = [];
+
                 $total_purchase_qty = $total_purchase_value = 0;
                 $total_production_qty = $total_production_value = 0;
                 $total_current_qty = $total_current_value = 0;
+
                 foreach ($date_period as $key => $date) {
                     $previous_data = $this->previous_data($request->material_id, $date->format('Y-m-d'));
                     $purchase_data   = $this->purchase_data($request->material_id,$date->format('Y-m-d'));
                     $production_data = $this->stock_out($request->material_id,$date->format('Y-m-d'));
-                    // $current_data = $this->current_data($request->material_id,$date->format('Y-m-d'));
-                    
-                    // dd($production_data);
+
                     $after_stock_out_current_qty = $previous_data['qty'] - ($production_data['qty']['production_material_qty'] + $production_data['qty']['returned_material_qty'] + $production_data['qty']['damage_material_qty']);
                     $after_stock_out_current_cost = $previous_data['qty'] * $previous_data['cost'];
                     $current_qty = $after_stock_out_current_qty + $purchase_data['qty'];
-                    // if($date->format('Y-m-d') == '2021-09-24'){
-                        // echo 'Pre Cost ='.$previous_data['cost'].'<br>'.$after_stock_out_current_qty.'<br>'.$after_stock_out_current_cost.'<br>';
-                        // echo 'Purchase ='.$purchase_data['value'].'<br>'.$current_qty;
-                        // exit;
-                        // dd($previous_data);
-                    // }
+                    
                     if(!empty($production_data['datetime']) && !empty($purchase_data['datetime']))
                     {
                         if($purchase_data['datetime'] > $production_data['datetime'])
@@ -70,23 +65,7 @@ class MaterialStockLedgerController extends BaseController
                     }else{
                         $current_cost = ($current_qty > 0) ? (($after_stock_out_current_cost + $purchase_data['value']) / ($previous_data['qty'] + $purchase_data['qty'])) : 0;
                     }
-                    // if($production_data['after_return_cost'] > 0)
-                    // {
-                    //     $current_cost = $production_data['after_return_cost'];
-                    //     // if($date->format('Y-m-d') == '2021-09-21'){ echo '<br>return = '.$current_cost;}
-                    // }else if($purchase_data['new_unit_cost'] > 0)
-                    // {
-                    //     $current_cost = $purchase_data['new_unit_cost'];
-                    //     // if($date->format('Y-m-d') == '2021-09-21'){ echo '<br>new = '.$current_cost;}
-                    // }else{
-                    //     $current_cost = ($current_qty > 0) ? (($after_stock_out_current_cost + $purchase_data['value']) / ($previous_data['qty'] + $purchase_data['qty'])) : 0;
-                    //     // if($date->format('Y-m-d') == '2021-09-21'){ echo '<br>old = '.$current_cost.'<br>';}
-                    // }
-                    // if($date->format('Y-m-d') == '2021-09-21')
-                    // {
-                    //     dd($current_cost);
-                    // }
-                    // $current_cost = $previous_data['cost'];
+
                     $current_value = $current_qty * $current_cost;
 
                     $total_purchase_qty += $purchase_data['qty'];
@@ -105,7 +84,7 @@ class MaterialStockLedgerController extends BaseController
                         'previous_cost'    => $previous_data['cost'],
                         'previous_qty'     => $previous_data['qty'],
                         'previous_value'   => $previous_data['value'],
-                        'purchase_cost'    => $purchase_data['cost'],
+                        'purchase_cost'    => $purchase_data['new_unit_cost'],
                         'purchase_qty'     => $purchase_data['qty'],
                         'purchase_value'   => $purchase_data['value'],
                         'purchase_numbers' => $purchase_data['purchase_numbers'],
@@ -121,8 +100,6 @@ class MaterialStockLedgerController extends BaseController
                         'current_qty'         => $current_qty,
                         'current_value'       => $current_value,
                     ];
-                    
-                    
                 }
                 $data = [
                     'ledger_data'            => $ledger_data,
@@ -133,7 +110,7 @@ class MaterialStockLedgerController extends BaseController
                     'total_current_qty'      => $total_current_qty,
                     'total_current_value'    => $total_current_value,
                 ];
-                // dd($ledger_data[1]);
+
                 return view('stockledger::material-ledger.data',$data)->render();
             }
         } else {
@@ -160,9 +137,8 @@ class MaterialStockLedgerController extends BaseController
         }
         $last_date = date('Y-m-d',strtotime('-2 day',strtotime($date)));
         $on_Date = date('Y-m-d',strtotime('-1 day',strtotime($date)));
-        // dd($last_date);
+
         //Purchase Calculation
-        
         $purchaseMaterial = DB::table('material_purchase as pm')
             ->selectRaw('pm.*,m.tax_method,p.shipping_cost,u.operator,u.operation_value,p.memo_no')
             ->join('materials as m', 'pm.material_id', '=', 'm.id')
@@ -216,10 +192,10 @@ class MaterialStockLedgerController extends BaseController
         $total_production_material_cost = $total_production_material_qty = $total_production_material_value = $total_damage_material_qty =  0;
         if (!$productionMaterial->isEmpty()) {
             foreach ($productionMaterial as $material) {
-                $total_production_material_cost += $material->rate;
+                $total_production_material_cost += $material->cost;
                 $total_production_material_qty += $material->used_qty;
                 $total_damage_material_qty = $material->damaged_qty;
-                $total_production_material_value += ($material->rate * $material->qty);
+                $total_production_material_value += ($material->cost * $material->qty);
             }
         }
 
@@ -245,32 +221,11 @@ class MaterialStockLedgerController extends BaseController
                     $return_qty = $material->return_qty / $material->operation_value;
                 }
                 $total_returned_material_qty += $return_qty;
-                $after_return_cost = $material->after_return_unit_cost;
+                $after_return_cost = $material->material_rate;
                 $after_return_datetime = $material->created_at;
             }
         }
 
-        // if($date == '2021-09-04'){
-        //     dd([
-        //         'total_material_purchased_cost' => $total_material_purchased_cost,
-        //         'total_purchased_material_qty' => $total_purchased_material_qty,
-        //         'total_purchased_net_cost' => $total_purchased_net_cost,
-
-        //         'total_production_material_cost' => $total_production_material_cost,
-        //         'total_production_material_qty' => $total_production_material_qty,
-        //         'total_production_material_value' => $total_production_material_value,
-
-        //         'total_returned_material_qty' => $total_returned_material_qty,
-        //         'after_return_cost' => $after_return_cost,
-
-        //         'total_damage_material_qty' => $total_damage_material_qty,
-        //         'after_purchase_datetime' => $after_purchase_datetime,
-        //         'after_return_datetime' => $after_return_datetime,
-
-        //     ]);
-        // }
-
-        
         if($opening_date == $date){
             $material_cost = $opening_cost;
             $total_qty     = $opening_stock_qty;
@@ -348,7 +303,6 @@ class MaterialStockLedgerController extends BaseController
                 $total_purchased_qty += $old_qty;
                 $purchase_number_list[] = $material->memo_no;
                 $new_unit_cost = $material->new_unit_cost;
-                $new_unit_cost = $material->new_unit_cost;
                 $datetime = $material->created_at;
             }
         }
@@ -357,7 +311,7 @@ class MaterialStockLedgerController extends BaseController
         $material_data = [
             'cost' => $per_unit_cost,
             'qty' => $total_purchased_qty,
-            'value' => $per_unit_cost * $total_purchased_qty,
+            'value' => $new_unit_cost * $total_purchased_qty,
             'purchase_numbers' => $purchase_numbers,
             'new_unit_cost' => $new_unit_cost,
             'datetime' => $datetime
@@ -385,14 +339,14 @@ class MaterialStockLedgerController extends BaseController
         $total_damage_material_qty = $total_damage_material_cost = $total_damage_material_value = 0;
         if (!$productionMaterial->isEmpty()) {
             foreach ($productionMaterial as $material) {
-                $total_production_material_cost = $material->rate;
-                $total_production_material_qty += ($material->used_qty + $material->damaged_qty);
-                $total_production_material_value += $material->rate * $material->qty;
+                $total_production_material_cost = $material->cost;
+                $total_production_material_qty += $material->used_qty;
+                $total_production_material_value += $material->cost * $material->used_qty;
                 $batch_number_list[] = $material->batch_no;
 
-                $total_damage_material_cost = $material->rate;
+                $total_damage_material_cost = $material->cost;
                 $total_damage_material_qty += $material->damaged_qty;
-                $total_damage_material_value += $material->rate * $material->damaged_qty;
+                $total_damage_material_value += $material->cost * $material->damaged_qty;
                 $damage_number_list[] = $material->batch_no;
             }
         }
@@ -455,133 +409,8 @@ class MaterialStockLedgerController extends BaseController
             'after_return_cost'=> $after_return_cost,
             'datetime'=>$datetime
         ];
-        // if($date == '2021-09-02'){
-        //     dd($material_data);
-        // }
-        
         return $material_data;
     }
 
-    // protected function current_data(int $id, $date) : array
-    // {
-    //     $material_data = [];
-    //     $opening_stock_qty = 0;
-    //     $opening_cost = 0;
-    //     $opening_date = '';
-    //     $opening_stock = DB::table('materials')->where('id',$id)->first();
-    //     if($opening_stock){
-    //         $opening_stock_qty = $opening_stock->opening_stock_qty ? $opening_stock->opening_stock_qty : 0;
-    //         $opening_cost = $opening_stock->opening_cost ? $opening_stock->opening_cost : 0;
-    //         if($opening_stock_qty){
-    //           $opening_date = date('Y-m-d',strtotime($opening_stock->created_at));  
-    //         }
-            
-    //     }
-    //     $purchaseMaterial = DB::table('material_purchase as pm')
-    //         ->selectRaw('pm.*,m.tax_method,p.shipping_cost,u.operator,u.operation_value')
-    //         ->join('materials as m', 'pm.material_id', '=', 'm.id')
-    //         ->join('purchases as p', 'pm.purchase_id', '=', 'p.id')
-    //         ->join('units as u', 'pm.purchase_unit_id', '=', 'u.id')
-    //         ->where('pm.material_id', $id)
-    //         ->whereDate('p.purchase_date',  '<=',$date)
-    //         ->get();
-        
-    //     $total_purchased_cost = $total_shipping_old_cost = $total_purchased_qty = 0;
-    //     if (!$purchaseMaterial->isEmpty()) {
-    //         foreach ($purchaseMaterial as $material) {
-    //             if ($material->tax_method == 1) {
-    //                 if ($material->operator == '*') {
-    //                     $material_old_cost = ($material->net_unit_cost + ($material->discount / $material->qty)) / $material->operation_value;
-    //                 } elseif ($material->operator == '/') {
-    //                     $material_old_cost = ($material->net_unit_cost + ($material->discount / $material->qty)) * $material->operation_value;
-    //                 }
-    //             } else {
-    //                 if ($material->operator == '*') {
-    //                     $material_old_cost = (($material->total + ($material->discount / $material->qty)) / $material->qty) / $material->operation_value;
-    //                 } elseif ($material->operator == '/') {
-    //                     $material_old_cost = (($material->total + ($material->discount / $material->qty)) / $material->qty) * $material->operation_value;
-    //                 }
-
-    //             }
-    //             if ($material->operator == '*') {
-    //                 $old_qty = $material->received * $material->operation_value;
-    //             } else {
-    //                 $old_qty = $material->received / $material->operation_value;
-    //             }
-    //             $total_purchased_cost += ($material_old_cost * $old_qty);
-    //             $total_shipping_old_cost += $material->shipping_cost;
-    //             $total_purchased_qty += $old_qty;
-    //         }
-    //     }
-        
-
-    //     $productionMaterial = DB::table('production_product_materials as pm')
-    //         ->selectRaw('pm.*')
-    //         ->join('productions as p', 'pm.production_product_id', '=', 'p.id')
-    //         ->where('pm.material_id', $id)
-    //         ->where('p.status', 1)
-    //         ->whereDate('p.start_date', '<=', $date)
-    //         ->get();
-        
-    //     $total_production_material_cost = $total_production_material_qty = $total_production_material_value =  0;
-    //     if (!$productionMaterial->isEmpty()) {
-    //         foreach ($productionMaterial as $material) {
-    //             $total_production_material_cost += $material->rate;
-    //             $total_production_material_qty += $material->qty;
-    //             $total_production_material_value += ($material->rate * $material->qty);
-    //         }
-    //     }
-
-    //     //Purchase Return Calculation
-    //     $purchaseReturnMaterial = DB::table('purchase_return_materials as pm')
-    //         ->selectRaw('pm.*,u.operator,u.operation_value,p.return_no')
-    //         ->join('materials as m', 'pm.material_id', '=', 'm.id')
-    //         ->join('purchase_returns as p', 'pm.purchase_return_id', '=', 'p.id')
-    //         ->join('units as u', 'pm.unit_id', '=', 'u.id')
-    //         ->where('pm.material_id', $id)
-    //         ->whereDate('p.return_date', '<=', $date)
-    //         ->get();
-        
-    //     $total_returned_material_qty = 0;
-    //     if (!$purchaseReturnMaterial->isEmpty()) {
-    //         foreach ($purchaseReturnMaterial as $material) {
-    //             if ($material->operator == '*') {
-    //                 $return_qty = $material->return_qty * $material->operation_value;
-    //             } else {
-    //                 $return_qty = $material->return_qty / $material->operation_value;
-    //             }
-    //             $total_returned_material_qty += $return_qty;
-    //         }
-    //     }
-
-
-    //     // if($date == '2021-09-02'){
-    //     //     dd($total_purchased_cost);
-    //     // }
-        
-    //     if($opening_date == $date){
-    //         $material_cost = $opening_cost;
-    //         $total_qty     = $opening_stock_qty;
-    //     }elseif ($date >= $opening_date) {
-    //         $material_cost = ($total_purchased_qty > 0) ? ($total_purchased_cost / $total_purchased_qty) : 0;
-    //         if($material_cost == 0)
-    //         {
-    //             $material_cost = $opening_cost;
-    //         }
-    //         $total_qty = ($total_purchased_qty + $opening_stock_qty) - ($total_production_material_qty + $total_returned_material_qty);
-    //     }else{
-    //         $material_cost = 0;
-    //         $total_qty     = 0; 
-            
-    //     }
-
-    //     // $old_cost = ($total_purchased_qty > 0) ? (($total_material_old_cost + $total_shipping_old_cost) / $total_purchased_qty) : 0;
-    //     // $total_qty = ($opening_stock_qty  + $total_purchased_qty) - $total_production_material_qty;
-    //     $material_data = [
-    //         'cost' => number_format($material_cost, 4, '.', ''),
-    //         'qty' => $total_qty,
-    //         'value' => number_format(($material_cost * $total_qty), 4, '.', ''),
-    //     ];
-    //     return $material_data;
-    // }
+    
 }

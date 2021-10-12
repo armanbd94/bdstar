@@ -84,7 +84,7 @@
                                                     <td class="unit-name text-center">{{ $unit_name }}</td>
                                                     <td><input type="text" class="purchase_qty_{{ $key+1 }} form-control text-center" name="materials[{{ $key+1 }}][purchase_qty]"  value="{{ $purchase_qty }}" readonly></td>
                                                     <td><input type="text" class="form-control return_qty_{{ $key+1 }} text-center" onkeyup="quantity_calculate('{{ $key+1 }}')" onchange="quantity_calculate('{{ $key+1 }}')" name="materials[{{ $key+1 }}][return_qty]" id="products_{{ $key+1 }}_return_qty" placeholder="0"></td>
-                                                    <td><input type="text" class="net_unit_cost_{{ $key+1 }} form-control text-right" name="materials[{{ $key+1 }}][net_unit_cost]" value="{{ $purchase_material->pivot->net_unit_cost }}"></td>
+                                                    <td><input type="text" class="net_unit_cost_{{ $key+1 }} form-control text-right" name="materials[{{ $key+1 }}][net_unit_cost]" value="{{ $purchase_material->pivot->new_unit_cost }}"></td>
                                                     <td><input type="text" class="deduction_rate_{{ $key+1 }} form-control text-right" onkeyup="quantity_calculate('{{ $key+1 }}')" onchange="quantity_calculate('{{ $key+1 }}')" name="materials[{{ $key+1 }}][deduction_rate]" placeholder="0.00"></td>
                                                     <td class="sub-total sub-total-{{ $key+1 }} text-right"></td>
                                                     <td class="text-center">

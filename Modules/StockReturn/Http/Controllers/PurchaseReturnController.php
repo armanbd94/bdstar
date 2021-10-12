@@ -65,7 +65,7 @@ class PurchaseReturnController extends BaseController
                     $no++;
                     $action = '';
                     if (permission('purchase-return-view')) {
-                        $action .= ' <a class="dropdown-item view_data" href="'.route("purchase.return.list.show",$value->id).'">'.self::ACTION_BUTTON['View'].'</a>';
+                        $action .= ' <a class="dropdown-item view_data" href="'.route("purchase.return.show",$value->id).'">'.self::ACTION_BUTTON['View'].'</a>';
                     }
 
                     if (permission('purchase-return-delete')) {

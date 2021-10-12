@@ -28,7 +28,7 @@ class Purchase extends BaseModel
     {
         return $this->belongsToMany(\Modules\Material\Entities\Material::class,'material_purchase','purchase_id',
         'material_id','id','id')
-        ->withTimeStamps()->withPivot('qty', 'received', 'purchase_unit_id', 'net_unit_cost', 'old_cost',
+        ->withTimeStamps()->withPivot('qty', 'received', 'purchase_unit_id', 'net_unit_cost','new_unit_cost', 'old_cost',
         'discount', 'tax_rate', 'tax', 'labor_cost', 'total'); 
     }
 
