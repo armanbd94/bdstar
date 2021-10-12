@@ -208,7 +208,7 @@ class SaleReturnController extends BaseController
                             'warehouse_id'        => $warehouse_id,
                             'voucher_no'          => $request->memo_no,
                             'voucher_type'        => 'Return',
-                            'voucher_date'        => $request->damage_date,
+                            'voucher_date'        => $request->return_date,
                             'description'         => 'Return Total SR Commission For Invoice NO - ' . $request->invoice_no . ' Sales Men ' .$salesmen->name,
                             'debit'               => $deducted_commission,
                             'credit'              => 0,
