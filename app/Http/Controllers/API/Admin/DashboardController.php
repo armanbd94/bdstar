@@ -30,6 +30,10 @@ class DashboardController extends APIController
                         ->whereDate('purchase_date','>=',$start_date)
                         ->whereDate('purchase_date','<=',$end_date)
                         ->sum('grand_total');
+            $expense = DB::table('expenses')
+            ->whereDate('date','>=',$start_date)
+            ->whereDate('date','<=',$end_date)
+            ->sum('amount');
             $sr_commission_due= DB::table('transactions as t')
             ->join('chart_of_accounts as coa','t.chart_of_account_id','=','coa.id')
             ->select(DB::raw("(SUM(t.credit) - SUM(t.debit)) as due_commission"))
@@ -68,6 +72,7 @@ class DashboardController extends APIController
                 'total_sale_amount' => $sale ? number_format($sale->sales_amount,2,'.','') : number_format(0,2,'.',''),
                 'total_collection_amount' => $sale ? number_format($sale->collection_amount,2,'.','') : number_format(0,2,'.',''),
                 'total_purchase_amount' => number_format($purchase,2,'.',''),
+                'total_expense_amount' => number_format($expense,2,'.',''),
                 'total_supplier_due_amount' => $supplier_due ? number_format($supplier_due->due,2,'.','') : number_format(0,2,'.',''),
                 'total_sr_commission_due_amount' =>  $sr_commission_due ? number_format( $sr_commission_due->due_commission,2,'.','') : number_format(0,2,'.',''),
                 'total_customer_dues' =>  number_format( $total_customer_dues,2,'.',''),
