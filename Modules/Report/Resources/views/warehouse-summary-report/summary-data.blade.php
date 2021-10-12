@@ -1,22 +1,3 @@
-<!-- ## Total Inventory Grand Value -->
-{{-- <div class="col-md-12 mb-5">
-    <div class="card card-custom card-border">
-        <div class="card-header bg-primary">
-            <div class="card-title text-center">
-                <h2 class="card-label text-white">Total Inventory Grand Value</h2>
-            </div>
-        </div>
-        <div class="card-body">
-            <h5>{{ number_format($total_stock_value,2,'.',',') }}Tk</h5>
-            @if($total_stock_value > 0)
-            <h5>{{ numberTowords($total_stock_value) }} Taka</h5>
-            @else
-            <h5>Zero Taka</h5>
-            @endif
-        </div>
-    </div>
-</div> --}}
-
 <!-- ## Product Sales Grand Value -->
 <div class="col-md-12 mb-5">
     <div class="card card-custom card-border">
@@ -38,6 +19,7 @@
         </div>
     </div>
 </div>
+
 <!-- ## Product Sales Grand Value -->
 <div class="col-md-12 mb-5">
     <div class="card card-custom card-border">
@@ -93,10 +75,12 @@
         </div>
         <div class="card-body">
             @if ($product_sale_data)
-            <h5>{{ number_format($product_sale_data->product_sales_due_value,2,'.',',') }}Tk</h5>
-            @if($product_sale_data->product_sales_due_value > 0)
-            <h5>{{ numberTowords($product_sale_data->product_sales_due_value) }} Taka</h5>
-            @endif
+                <h5>{{ number_format($product_sale_data->product_sales_due_value,2,'.',',') }}Tk</h5>
+                @if($product_sale_data->product_sales_due_value > 0)
+                <h5>{{ numberTowords($product_sale_data->product_sales_due_value) }} Taka</h5>
+                @else 
+                <h5>Zero Taka</h5>
+                @endif
             @else
             <h5>0.00 Tk</h5>
             <h5>Zero Taka</h5>
@@ -137,7 +121,7 @@
     <div class="card card-custom card-border">
         <div class="card-header bg-primary">
             <div class="card-title text-center">
-                <h3 class="card-label text-white">Sales Return Grand Value</h3>
+                <h3 class="card-label text-white">Sales Return & Damage Grand Value</h3>
             </div>
         </div>
         <div class="card-body">
@@ -150,8 +134,6 @@
         </div>
     </div>
 </div>
-
-
 
 <!-- ## Warehouse Expense Value -->
 <div class="col-md-12 mb-5">
@@ -188,6 +170,44 @@
             @endif
             @else
             <h5>0.00 Tk</h5>
+            <h5>Zero Taka</h5>
+            @endif
+        </div>
+    </div>
+</div>
+
+<!-- ## Supplier Due Value -->
+<div class="col-md-12 mb-5">
+    <div class="card card-custom card-border">
+        <div class="card-header bg-primary">
+            <div class="card-title text-center">
+                <h3 class="card-label text-white">Supplier Due</h3>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5>{{ number_format($total_supplier_due_amount,2,'.',',') }}Tk</h5>
+            @if($total_supplier_due_amount > 0)
+            <h5>{{ numberTowords($total_supplier_due_amount) }} Taka</h5>
+            @else
+            <h5>Zero Taka</h5>
+            @endif
+        </div>
+    </div>
+</div>
+
+<!-- ## SR Commission Due Value -->
+<div class="col-md-12 mb-5">
+    <div class="card card-custom card-border">
+        <div class="card-header bg-primary">
+            <div class="card-title text-center">
+                <h3 class="card-label text-white">Salesman Commission Due</h3>
+            </div>
+        </div>
+        <div class="card-body">
+            <h5>{{ number_format($total_sr_commission_due_amount,2,'.',',') }}Tk</h5>
+            @if($total_sr_commission_due_amount > 0)
+            <h5>{{ numberTowords($total_sr_commission_due_amount) }} Taka</h5>
+            @else
             <h5>Zero Taka</h5>
             @endif
         </div>

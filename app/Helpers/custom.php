@@ -260,7 +260,6 @@ if (!function_exists('numberTowords')) {
             17 => "Seventeen",
             18 => "Eighteen",
             19 => "Nineteen",
-            "014" => "Fourteen",
         );
         $tens = array(
             0 => "Zero",
@@ -296,7 +295,9 @@ if (!function_exists('numberTowords')) {
             }
 
             if ($i < 20) {
+                if(array_key_exists($i,$ones)){
                 $rettxt .= $ones[$i];
+                }
             } elseif ($i < 100) {
                 if (substr($i, 0, 1) != "0") {
                     $rettxt .= $tens[substr($i, 0, 1)];
@@ -323,7 +324,9 @@ if (!function_exists('numberTowords')) {
             if ($key > 0) {
                 $rettxt .= " " . $hundreds[$key] . " ";
             }
+            
         }
+        
         if ($decnum > 0) {
             $rettxt .= " AND ";
             if ($decnum < 20) {
@@ -337,3 +340,5 @@ if (!function_exists('numberTowords')) {
     }
 
 }
+
+

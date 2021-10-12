@@ -91,8 +91,7 @@
                                         <th class="text-center">Damage Qty</th>
                                         <th class="text-right">Net Unit Price</th>
                                         <th class="text-right">Subtotal</th>
-                                        <th>Action
-                                        <button type="button" class="btn btn-success btn-md add-product small-btn"><i class="fas fa-plus"></i></button></th>
+                                        <th>Action</th>
                                     </thead>
                                     <tbody>
                                         <!-- @if (!$sale->sale_products->isEmpty())
@@ -154,6 +153,7 @@
                                             <td class="text-right">
                                                 <input type="text" id="grandTotal" class="form-control text-right" name="grand_total_price" placeholder="0.00" readonly="readonly" />
                                             </td>
+                                            <td class="text-center"><button type="button" class="btn btn-success btn-sm add-product"><i class="fas fa-plus"></i></button></td>
                                         </tr>
                                     </tfoot>
                                 </table>
@@ -220,7 +220,7 @@ $(document).ready(function () {
             @if (!$products->isEmpty())
             <option value="0">Please Select</option>
             @foreach ($products as $product)
-                <option value="{{ $product->id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name }}</option>
+                <option value="{{ $product->product_id }}"  data-pro_code="{{ $product->code}}" data-pro_avl_qty="{{ $product->qty}}" data-pro_net_price="{{ $product->price}}" data-pro_net_tax_rate="{{ $product->tax_rate}}" data-pro_unit="{{ $product->unit_name}}" >{{ $product->name }}</option>
             @endforeach
             @endif
         </select></td>`;
@@ -230,7 +230,7 @@ $(document).ready(function () {
         cols += `<td><input type="text" class="fcs form-control damage_qty_${count} text-center" name="products[${count}][damage_qty]" id="products_${count}_damage_qty" onkeyup="quantity_calculate('${count}')" onchange="quantity_calculate('${count}')" value="0" data-row="${count}"></td>`;
         cols += `<td><input type="text" class="fcs text-right form-control net_unit_price net_unit_price_${count}" name="products[${count}][net_unit_price]" id="products_net_unit_price_${count}" data-row="${count}"></td>`;
         cols += `<td class="sub-total text-right sub-total-${count}" id="sub_total_tx_${count}" data-row="${count}"></td>`;
-        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger small-btn btn-md remove-product"><i class="fas fa-trash"></i></button></td>`;
+        cols += `<td class="text-center" data-row="${count}"><button type="button" class="btn btn-danger btn-sm remove-product"><i class="fas fa-trash"></i></button></td>`;
         cols += `<input type="hidden" class="product-id_vl_${count}" name="products[${count}][id]" id="products_id_vl_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="product-code_vl_${count}" name="products[${count}][code]" id="products_code_vl_${count}" data-row="${count}">`;
         cols += `<input type="hidden" class="product-batch_vl_${count}" name="products[${count}][batch_no]" id="products_batch_no_${count}"  data-row="${count}">`;
@@ -245,7 +245,7 @@ $(document).ready(function () {
     $('#product_table').on('click','.remove-product',function(){
         rowindex = $(this).closest('tr').index();
         $(this).closest('tr').remove();
-        
+        net_damage_calculation();
         if($('#product_table tbody tr').length >= 1){
             $('#save-btn').prop("disabled", false);
         }else{
@@ -283,7 +283,7 @@ function setReturnValue(row)
 }
 
 function quantity_calculate(row) {
-    var a = 0,o = 0,d = 0,p = 0;
+    
     var sold_qty = $(".sold_qty_" + row).val();
     var damage_qty = $(".damage_qty_" + row).val();
     var price_item = $(".net_unit_price_" + row).val();
@@ -299,18 +299,24 @@ function quantity_calculate(row) {
         var temp = price - deduction_amount;
         $(".subtotal_" + row).val(temp);
         $(".sub-total-" + row).text(parseFloat(temp).toFixed(2));
-
-        $(".subtotal").each(function () {
-            isNaN(this.value) || o == this.value.length || (a += parseFloat(this.value));
-        });
-        var tax_rate = parseFloat($('#tax_rate').val());
-        var total_tax_ammount = a * (tax_rate/100);
-        var grand_total = a + total_tax_ammount;
-        $("#total_price").val(a.toFixed(2, 2));
-        $("#total_tax_ammount").val(total_tax_ammount.toFixed(2, 2));
-        $("#grandTotal").val(grand_total.toFixed(2, 2));
+        net_damage_calculation();
+        
     }
 
+}
+
+function net_damage_calculation()
+{
+    var a = 0,o = 0,d = 0,p = 0;
+    $(".subtotal").each(function () {
+        isNaN(this.value) || o == this.value.length || (a += parseFloat(this.value));
+    });
+    var tax_rate = parseFloat($('#tax_rate').val());
+    var total_tax_ammount = a * (tax_rate/100);
+    var grand_total = a + total_tax_ammount;
+    $("#total_price").val(a.toFixed(2, 2));
+    $("#total_tax_ammount").val(total_tax_ammount.toFixed(2, 2));
+    $("#grandTotal").val(grand_total.toFixed(2, 2));
 }
 
 function save_data(){
@@ -350,7 +356,7 @@ function save_data(){
                 } else {
                     notification(data.status, data.message);
                     if (data.status == 'success') {
-                        window.location.replace("{{ route('damage') }}");
+                        window.location.replace("{{ route('damage.product') }}");
                     }
                 }
 
