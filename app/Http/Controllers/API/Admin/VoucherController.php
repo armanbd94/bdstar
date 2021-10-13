@@ -28,7 +28,7 @@ class VoucherController extends APIController
                 $q->where('t.warehouse_id',$warehouse_id);
             })
             ->groupBy('t.voucher_no')
-            ->paginate(1);
+            ->paginate(10);
             if(!$vouchers->isEmpty())
             {
                 $data = $vouchers;
