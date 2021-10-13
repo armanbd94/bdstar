@@ -154,7 +154,6 @@ $(document).ready(function(){
     }
 
     //Yearly Report Chart
-
     var YEARLYREPORTCHART = $('#yearlyReportChart');
     if(YEARLYREPORTCHART.length > 0)
     {
