@@ -27,7 +27,7 @@
                         <x-form.selectbox labelName="Warehouse" name="warehouse_id" col="col-md-3" required="required" onchange="getSalesmenList(this.value)" class="selectpicker">
                             @if (!$warehouses->isEmpty())
                             @foreach ($warehouses as $id => $name)
-                                <option value="{{ $id }}" {{ $id == 1 ? 'selected' : '' }} data-name="{{ $name }}">{{ $name }}</option>
+                                <option value="{{ $id }}" data-name="{{ $name }}">{{ $name }}</option>
                             @endforeach
                             @endif
                         </x-form.selectbox>
@@ -141,7 +141,7 @@ $(document).ready(function(){
             "type": "POST",
             "data": function (data) {
                 data.memo_no        = $("#form-filter #memo_no").val();
-                data.warehouse_id   = $("#form-filter #warehouse_id option:selected").val();
+                data.warehouse_id   = $("#form-filter #warehouse_id").val();
                 data.salesmen_id    = $("#form-filter #salesmen_id").val();
                 data.customer_id    = $("#form-filter #customer_id").val();
                 data.district_id    = $("#form-filter #district_id").val();
