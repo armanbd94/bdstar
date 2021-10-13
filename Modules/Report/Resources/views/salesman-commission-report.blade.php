@@ -68,7 +68,7 @@
                                         <th>Sl</th>
                                         <th>Salesman Name</th>
                                         <th>Total Sales Commission </th>
-                                        <th>Total Sales Return Deducted Commission</th>
+                                        <th>Total Deducted Commission</th>
                                         <th>Total Earned Commission</th>
                                     </tr>
                                 </thead>

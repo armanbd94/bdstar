@@ -48,9 +48,10 @@ class SalesmanCommissionReport extends BaseModel
         
         
         $query = DB::table('salesmen as sm')
-                ->selectRaw("SUM(s.total_commission) as total_commission, SUM(sr.deducted_sr_commission) as total_deducted_commission,sm.name, sm.phone")
+                ->selectRaw("SUM(s.total_commission) as total_commission, SUM(sr.deducted_sr_commission) as total_return_deducted_commission,SUM(d.deducted_sr_commission) as total_damage_deducted_commission,sm.name, sm.phone")
                 ->leftjoin('sales as s','sm.id','=','s.salesmen_id')
                 ->leftjoin('sale_returns as sr','s.memo_no','=','sr.memo_no')
+                ->leftjoin('damages as d','s.memo_no','=','d.memo_no')
                 ->leftjoin('warehouses as w','s.warehouse_id','=','w.id')
                 ->groupBy('s.salesmen_id');
 

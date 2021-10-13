@@ -46,12 +46,13 @@ class SalesmanCommissionReportController extends BaseController
             $no = $request->input('start');
             foreach ($list as $value) {
                 $no++;
-                $earned_commission = ($value->total_commission ? $value->total_commission : 0) - ($value->total_deducted_commission ? $value->total_deducted_commission : 0);
+                $total_deducted_commission = (($value->total_return_deducted_commission ? $value->total_return_deducted_commission : 0) + ($value->total_damage_deducted_commission ? $value->total_damage_deducted_commission : 0));
+                $earned_commission = ($value->total_commission ? $value->total_commission : 0) - $total_deducted_commission;
                 $row = [];
                 $row[] = $no;
                 $row[] = $value->name.' - '.$value->phone;
                 $row[] = number_format($value->total_commission,2);
-                $row[] = number_format($value->total_deducted_commission,2);
+                $row[] = number_format($total_deducted_commission,2);
                 $row[] = number_format($earned_commission,2);
                 $data[] = $row;
             }
