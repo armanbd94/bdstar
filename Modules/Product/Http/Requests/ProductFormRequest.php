@@ -22,7 +22,7 @@ class ProductFormRequest extends FormRequest
         $this->rules['tax_id']            = ['nullable','numeric'];
         $this->rules['tax_method']        = ['required','numeric'];
         $this->rules['description']       = ['nullable','string'];
-        $this->rules['image']             = ['nullable','image','mimes:png,jpg,jpeg,svg,webp'];
+        $this->rules['image']             = ['nullable','image','mimes:png,jpg,jpeg,svg,webp','max:2048'];
         
         if(request()->update_id){
             $this->rules['name'][2] = 'unique:products,name,'.request()->update_id;

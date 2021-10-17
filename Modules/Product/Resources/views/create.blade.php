@@ -116,13 +116,13 @@
                         
                                         </div>
                                     </div>
+                                    <div class="text-center"><span class="text-muted">Maximum Allowed File Size 2MB and Format (png,jpg,jpeg,svg,webp)</span></div>
                                     <input type="hidden" name="old_image" id="old_image">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-
                         <div class="form-group col-md-12 mt-5">
                             <label for="description">Description</label>
                             <textarea class="form-control" name="description" id="description"></textarea>

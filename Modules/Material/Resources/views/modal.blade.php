@@ -102,6 +102,7 @@
                     
                                     </div>
                                 </div>
+                                <div class="text-center"><span class="text-muted">Maximum Allowed File Size 2MB and Format (png,jpg,jpeg,svg,webp)</span></div>
                                 <input type="hidden" name="old_material_image" id="old_material_image">
                             </div>
                         </div>

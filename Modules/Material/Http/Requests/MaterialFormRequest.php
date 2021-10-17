@@ -15,7 +15,7 @@ class MaterialFormRequest extends FormRequest
     {
         $rules['material_name']        = ['required','string','unique:materials,material_name'];
         $rules['material_code']        = ['required','string','unique:materials,material_code'];
-        $rules['material_image']       = ['nullable','image','mimes:png,jpg,jpeg,svg'];
+        $rules['material_image']       = ['nullable','image','mimes:png,jpg,jpeg,svg,webp','max:2048'];
         $rules['type']                 = ['required'];
         $rules['category_id']          = ['required'];
         $rules['unit_id']              = ['required'];
