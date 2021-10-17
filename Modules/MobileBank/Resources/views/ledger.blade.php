@@ -53,7 +53,7 @@
                                 @endforeach
                             @endif
                         </x-form.selectbox>
-                        <div class="col-md-1">
+                        <div class="col-md-6">
                             <div style="margin-top:28px;">    
                                 <div style="margin-top:28px;">    
                                     <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
