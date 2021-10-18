@@ -43,7 +43,7 @@
                                     </div>
                                 </div>
 
-                                <x-form.selectbox labelName="Barcode Symbology" name="barcode_symbology" required="required" col="col-md-4" class="selectpicker">
+                                <x-form.selectbox labelName="Barcode Symbol" name="barcode_symbology" required="required" col="col-md-4" class="selectpicker">
                                     @foreach (BARCODE_SYMBOL as $key => $value)
                                         <option value="{{ $key }}" {{ ($key == 1) ? 'selected' : '' }}>{{ $value }}</option>
                                     @endforeach
