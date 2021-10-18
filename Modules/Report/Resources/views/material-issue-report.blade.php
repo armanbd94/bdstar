@@ -39,10 +39,11 @@
                             @endforeach
                             @endif
                         </x-form.selectbox>
-                        <x-form.textbox labelName="Product Name" name="product_name" col="col-md-6" />
+                        <x-form.textbox labelName="Product Name" name="product_name" col="col-md-4" />
                         <input type="hidden" class="form-control" name="product_id" id="product_id">
                     
-                        <div class="col-md-6">      
+                        <div class="col-md-8">   
+                            <div style="margin-top:28px;">       
                                 <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
                                 data-toggle="tooltip" data-theme="dark" title="Reset">
                                 <i class="fas fa-undo-alt"></i></button>
@@ -50,6 +51,7 @@
                                 <button id="btn-filter" class="btn btn-primary btn-sm btn-elevate btn-icon mr-2 float-right" type="button"
                                 data-toggle="tooltip" data-theme="dark" title="Search">
                                 <i class="fas fa-search"></i></button>
+                            </div>
                         </div>
                     </div>
                 </form>

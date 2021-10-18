@@ -35,7 +35,7 @@
         <div class="card card-custom">
             <div class="card-header flex-wrap py-5">
                 <form method="POST" id="form-filter" class="col-md-12 px-0">
-                    <div class="row justify-content-center">
+                    <div class="row">
                         <x-form.selectbox labelName="Supplier" name="supplier_id" col="col-md-3" class="selectpicker">
                             @if (!$suppliers->isEmpty())
                             @foreach ($suppliers as $supplier)
@@ -52,9 +52,8 @@
                             </div>
                         </div>
                         
-                        <div class="col-md-1">
-                            <div style="margin-top:28px;">    
-                                <div style="margin-top:28px;">    
+                        <div class="col-md-6">
+                            <div style="margin-top:28px;">     
                                     <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button"
                                     data-toggle="tooltip" data-theme="dark" title="Reset">
                                     <i class="fas fa-undo-alt"></i></button>
@@ -62,7 +61,6 @@
                                     <button id="btn-filter" class="btn btn-primary btn-sm btn-elevate btn-icon mr-2 float-right" type="button"
                                     data-toggle="tooltip" data-theme="dark" title="Search">
                                     <i class="fas fa-search"></i></button>
-                                </div>
                             </div>
                         </div>
                     </div>
