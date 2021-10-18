@@ -25,7 +25,7 @@ class PersonalLoanController extends BaseController
     public function index()
     {
         if(permission('personal-loan-access')){
-            $this->setPageData('Manage Personal Loan','Manage Personal Loan','fas fa-warehouse',[['name'=>'Loan','link'=>'javascript::void();'],['name' => 'Manage Personal Loan']]);
+            $this->setPageData('Manage Personal Loan','Manage Personal Loan','far fa-money-bill-alt',[['name'=>'Loan','link'=>'javascript::void();'],['name' => 'Manage Personal Loan']]);
             $data = [
                 'voucher_no'             => self::VOUCHER_PREFIX.'-'.date('Ymd').rand(1,999),
                 'person_employees' => LoanPeople::toBase()->where('status', 1)->get()
