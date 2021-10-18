@@ -88,7 +88,7 @@
                             <div class="form-group col-md-4" style="padding-top: 25px;">
                                 <div class="custom-control custom-checkbox">
                                     <input type="checkbox" class="custom-control-input" id="opening_stock">
-                                    <label class="custom-control-label" for="opening_stock">This product has opening stock</label>
+                                    <label class="custom-control-label" for="opening_stock">This material has opening stock</label>
                                 </div>
                             </div>
                         </div>

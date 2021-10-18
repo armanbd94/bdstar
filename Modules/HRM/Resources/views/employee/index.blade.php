@@ -80,7 +80,7 @@
                             <option value="1">Active</option>
                             <option value="2">Inactive</option>
                         </x-form.selectbox>
-                        <div class="col-md-12">
+                        <div class="col-md-3">
                             <div style="margin-top:28px;">
                                 <div style="margin-top:28px;">
                                     <button id="btn-reset" class="btn btn-danger btn-sm btn-elevate btn-icon float-right" type="button" data-toggle="tooltip" data-theme="dark" title="Reset">
