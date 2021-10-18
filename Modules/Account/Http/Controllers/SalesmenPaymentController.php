@@ -21,7 +21,7 @@ class SalesmenPaymentController extends BaseController
     public function index()
     {
         if(permission('salesmen-payment-access')){
-            $this->setPageData('Salesmen Payment','Salesmen Payment','far fa-money-bill-alt',[['name'=>'Accounts'],['name'=>'Salesmen Payment']]);
+            $this->setPageData('Salesman Payment','Salesman Payment','far fa-money-bill-alt',[['name'=>'Accounts'],['name'=>'Salesman Payment']]);
             $voucher_no = 'SPM-'.date('ymd').rand(1,999);
             $salesmen = DB::table('salesmen')->where([['status',1]])->select('name','id','phone')->get() ;
             return view('account::salesmen-payment.index',compact('voucher_no','salesmen'));
