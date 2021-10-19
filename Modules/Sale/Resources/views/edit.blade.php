@@ -46,6 +46,7 @@
                         @csrf
                         <div class="row">
                             <input type="hidden" name="sale_id" id="sale_id" value="{{ $sale->id }}">
+                            <input type="hidden" name="warehouse_id" id="warehouse_id" value="$sale->warehouse_id" >
                             <div class="form-group col-md-3 required">
                                 <label for="memo_no">Memo No.</label>
                                 <input type="text" class="form-control" name="memo_no" id="memo_no" value="{{  $sale->memo_no }}"  />
@@ -55,11 +56,6 @@
                                 <input type="text" class="form-control date" name="sale_date" id="sale_date" value="{{ $sale->sale_date }}" readonly />
                             </div>
 
-                            <div class="form-group col-md-3 required">
-                                <label>Depo</label>
-                                <input type="text" class="form-control" value="{{  $sale->warehouse->name }}" readonly  />
-                                <input type="hidden" class="form-control" value="{{  $sale->warehouse_id }}" id="warehouse_id"  />
-                            </div>
                             <div class="form-group col-md-3 required">
                                 <label>Order Received By.</label>
                                 <input type="text" class="form-control" value="{{  $sale->salesmen->name }}" readonly  />

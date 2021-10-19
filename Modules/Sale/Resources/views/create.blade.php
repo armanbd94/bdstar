@@ -40,6 +40,7 @@
                         @csrf
                         <div class="row">
                             <input type="hidden" name="sale_id" id="sale_id" >
+                            <input type="hidden" name="warehouse_id" id="warehouse_id" value="1" >
                             <div class="form-group col-md-3 required">
                                 <label for="memo_no">Memo No.</label>
                                 <input type="text" class="fcs form-control" name="memo_no" id="memo_no" value="{{  $memo_no }}"/>
@@ -48,13 +49,7 @@
                                 <label for="sale_date">Sale Date</label>
                                 <input type="text" class="fcs form-control date" name="sale_date" id="sale_date" value="{{ date('Y-m-d') }}" readonly />
                             </div>
-                            <x-form.selectbox labelName="Depo" name="warehouse_id" col="col-md-3" required="required" class="fcs">
-                                @if (!$warehouses->isEmpty())
-                                @foreach ($warehouses as $id => $name)
-                                    <option value="{{ $id }}" {{ $id == 1 ? 'selected' : '' }}>{{ $name }}</option>
-                                @endforeach
-                                @endif
-                            </x-form.selectbox>
+
                             <x-form.selectbox labelName="Order Received By" name="salesmen_id" col="col-md-3" class="fcs" onchange="getRouteList(this.value)">
                                 @if (!$salesmen->isEmpty())
                                 @foreach ($salesmen as $value)

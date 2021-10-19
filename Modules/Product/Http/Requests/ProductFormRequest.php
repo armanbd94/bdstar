@@ -22,7 +22,7 @@ class ProductFormRequest extends FormRequest
         $this->rules['tax_id']            = ['nullable','numeric'];
         $this->rules['tax_method']        = ['required','numeric'];
         $this->rules['description']       = ['nullable','string'];
-        $this->rules['image']             = ['nullable','image','mimes:png,jpg,jpeg,svg,webp','max:2048'];
+        $this->rules['image']             = ['nullable','image','mimes:png,jpg,jpeg,svg,webp'];
         
         if(request()->update_id){
             $this->rules['name'][2] = 'unique:products,name,'.request()->update_id;
@@ -30,13 +30,14 @@ class ProductFormRequest extends FormRequest
             
         }
         $this->rules['base_unit_id']    = ['required'];
-        $this->rules['unit_id']         = ['required'];
+        // $this->rules['unit_id']         = ['required'];
         $this->rules['alert_quantity']  = ['nullable','numeric','gte:0'];
         $this->rules['base_unit_price'] = ['required','numeric','gt:0'];
-        $this->rules['unit_price']      = ['required','numeric','gt:0'];
+        // $this->rules['unit_price']      = ['required','numeric','gt:0'];
         
-        $this->messages['unit_id.required']      = 'The unit field is required';
-        $this->messages['base_unit_id.required'] = 'The base unit field is required';
+        // $this->messages['unit_id.required']      = 'The unit field is required';
+        $this->messages['base_unit_id.required'] = 'The unit field is required';
+        $this->messages['base_unit_price.required'] = 'The price field is required';
        
         $collection = collect(request());
         if($collection->has('materials')){

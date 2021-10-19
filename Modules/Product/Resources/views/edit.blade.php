@@ -71,7 +71,7 @@
                                 </x-form.selectbox>
                                 
                                 <div class="form-group col-md-4 required">
-                                    <label for="base_unit_id">Base Unit</label>
+                                    <label for="base_unit_id">Unit</label>
                                     <select name="base_unit_id" id="base_unit_id"  onchange="populate_unit(this.value,1)" class="form-control selectpicker" data-live-search="true"  data-live-search-placeholder="Search">
                                         <option value="">Select Please</option>
                                         @if (!$units->isEmpty())
@@ -84,7 +84,7 @@
                                     </select>
                                 </div>
         
-                                <div class="form-group col-md-4 required">
+                                {{-- <div class="form-group col-md-4 required">
                                     <label for="unit_id">Unit</label>
                                     <select name="unit_id" id="unit_id"  class="form-control selectpicker" data-live-search="true"  data-live-search-placeholder="Search">
                                         <option value="">Select Please</option>
@@ -99,10 +99,10 @@
                                         @endforeach
                                     @endif
                                     </select>
-                                </div>
+                                </div> --}}
                                 
-                                <x-form.textbox labelName="Unit Price" name="unit_price" value="{{ $product->unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
-                                <x-form.textbox labelName="Base Unit Price" name="base_unit_price" value="{{ $product->base_unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
+                                {{-- <x-form.textbox labelName="Unit Price" name="unit_price" value="{{ $product->unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/> --}}
+                                <x-form.textbox labelName="Price" name="base_unit_price" value="{{ $product->base_unit_price }}" required="required" col="col-md-4 price" placeholder="Enter product price"/>
                                 <x-form.textbox labelName="Alert Quantity" name="alert_quantity" value="{{ $product->alert_quantity }}"  col="col-md-4 alert-qty" placeholder="Enter product alert qty"/>
                                 
 

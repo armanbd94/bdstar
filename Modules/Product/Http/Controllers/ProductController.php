@@ -70,22 +70,12 @@ class ProductController extends BaseController
                         $action .= ' <a class="dropdown-item" href="'.url("product/view/".$value->id).'">'.self::ACTION_BUTTON['View'].'</a>';
                     }
                     if(permission('product-delete')){
-                        // $sale_product = SaleProduct::where('product_id',$value->id)->get()->count();
-                        // $purchase_product = PurchaseProduct::where('product_id',$value->id)->get()->count();
-                        // if($sale_product == 0 && $purchase_product == 0){
                         $action .= ' <a class="dropdown-item delete_data"  data-id="' . $value->id . '" data-name="' . $value->name . '">'.self::ACTION_BUTTON['Delete'].'</a>';
-                        // }
                     }
 
                     $row = [];
                     if(permission('product-bulk-delete')){
-                        // $sale_product = SaleProduct::where('product_id',$value->id)->get()->count();
-                        // $purchase_product = PurchaseProduct::where('product_id',$value->id)->get()->count();
-                        // if($sale_product == 0 && $purchase_product == 0){
                         $row[] = row_checkbox($value->id);//custom helper function to show the table each row checkbox
-                        // }else{
-                        //     $row[] = '';
-                        // }
                     }
 
                     $row[] = $no;
@@ -94,11 +84,11 @@ class ProductController extends BaseController
                     $row[] = $value->category->name;
                     $row[] = number_format($value->cost,2,'.','');
                     $row[] = $value->base_unit->unit_name.' ('.$value->base_unit->unit_code.')';
-                    $row[] = $value->unit->unit_name.' ('.$value->unit->unit_code.')';
-                    $row[] = number_format($value->unit_price,2,'.','');
+                    // $row[] = $value->unit->unit_name.' ('.$value->unit->unit_code.')';
+                    // $row[] = number_format($value->unit_price,2,'.','');
                     $row[] = number_format($value->base_unit_price,2,'.','');
-                    $row[] = $value->unit_qty ?? 0;
-                    $row[] = $value->base_unit_qty ?? 0;
+                    // $row[] = $value->unit_qty ?? 0;
+                    $row[] = (!$value->warehouse_product->isEmpty()) ? number_format($value->warehouse_product[0]->qty,2,'.','') : 0;
                     $row[] = $value->alert_quantity ?? 0;
                     $row[] = permission('product-edit') ? change_status($value->id,$value->status, $value->name) : STATUS_LABEL[$value->status];
                     $row[] = action_button($action);//custom helper function for action button
@@ -230,7 +220,7 @@ class ProductController extends BaseController
 
         if(permission('product-view')){
             $this->setPageData('Product Details','Product Details','fas fa-paste',[['name'=>'Product','link'=> route('product')],['name' => 'Product Details']]);
-            $product = $this->model->with('category','tax','unit','base_unit','product_material')->findOrFail($id);
+            $product = $this->model->with('category','tax','base_unit','product_material')->findOrFail($id);
             return view('product::details',compact('product'));
         }else{
             return $this->access_blocked();
