@@ -192,7 +192,7 @@ class SaleController extends BaseController
                         'salesmen_id'    => $request->salesmen_id,
                         'customer_id'    => $customer->id,
                         'item'           => $request->item,
-                        'total_qty'      => $request->total_qty,
+                        'total_qty'      => $request->total_qty+$request->total_free_qty,
                         'total_free_qty' => $request->total_free_qty,
                         'total_discount' => $request->total_discount ? $request->total_discount : 0,
                         'total_tax'      => $request->total_tax ? $request->total_tax : 0,
@@ -295,7 +295,12 @@ class SaleController extends BaseController
                     }        
                     $data = $this->sale_balance_add($sale->id,$request->memo_no,$request->grand_total,$total_tax,
                     $sum_direct_cost,$customer->coa->id,$customer->name,$request->sale_date,$payment_data, $warehouse_id,$salesmen->coa->id,$salesmen->name,$request->total_commission);
-                    $output  = $this->store_message($sale, $request->sale_id);
+                    if($sale)
+                    {
+                        $output = ['status'=>'success','message'=>'Data has been saved successfully','sale_id'=>$sale->id];
+                    }else{
+                        $output = ['status'=>'error','message'=>'Failed to save data!','sale_id'=>''];
+                    }
                     DB::commit();
                 } catch (Exception $e) {
                     DB::rollback();
@@ -498,13 +503,13 @@ class SaleController extends BaseController
     {
         if($request->ajax()){
             if(permission('sale-edit')){
-                 //dd($request->all());
+                //  dd($request->all());
                 DB::beginTransaction();
                 try {
                     
                     $sale_data = [
                         'item'           => $request->item,
-                        'total_qty'      => $request->total_qty,
+                        'total_qty'      => $request->total_qty+$request->total_free_qty,
                         'total_free_qty'      => $request->total_free_qty,
                         'total_discount' => $request->total_discount ? $request->total_discount : 0,
                         'total_tax'      => $request->total_tax ? $request->total_tax : 0,
@@ -620,7 +625,7 @@ class SaleController extends BaseController
                         }
                     }
                     $customer = Customer::with('coa')->find( $saleData->customer_id);
-                    $salesmen  = Salesmen::with('coa')->find($request->salesmen_id);
+                    $salesmen  = Salesmen::with('coa')->find($saleData->salesmen_id);
                     $sale = $saleData->update($sale_data);
                     $sum_direct_cost = array_sum($direct_cost);
                     $total_tax = ($request->total_tax ? $request->total_tax : 0) + ($request->order_tax ? $request->order_tax : 0);
