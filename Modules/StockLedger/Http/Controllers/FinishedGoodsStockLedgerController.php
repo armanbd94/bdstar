@@ -28,7 +28,7 @@ class FinishedGoodsStockLedgerController extends BaseController
         if ($request->ajax()) {
             if (permission('product-ledger-access')) {
 
-                $product = Product::with('unit', 'category')->find($request->product_id);
+                $product = Product::with('base_unit', 'category')->find($request->product_id);
                 $start_date = $request->start_date ? $request->start_date . ' 00:00:01' : date('Y-m-01') . ' 00:00:01';
                 $end_date = $request->end_date ? $request->end_date . ' 23:59:59' : date('Y-m-d') . ' 23:59:59';
                 $date_period = new DatePeriod(new DateTime($start_date), new DateInterval('P1D'), new DateTime($end_date));
@@ -40,40 +40,40 @@ class FinishedGoodsStockLedgerController extends BaseController
                     $previous_qty = $this->previous_data($request->product_id, $date->format('Y-m-d'));
                     $sold_data   = $this->sold_data($request->product_id,$date->format('Y-m-d'));
                     $production = $this->production_data($request->product_id,$date->format('Y-m-d'));
-                    $current_qty = $this->current_data($request->product_id,$date->format('Y-m-d'));
-
+                    // $current_qty = $this->current_data($request->product_id,$date->format('Y-m-d'));
+                    $current_qty = (($previous_qty + $production['qty']) - $sold_data['qty']);
                     $total_sold_qty += $sold_data['qty'];
                     $total_sold_value += $sold_data['value'];
                     $total_production_qty += $production['qty'];
-                    $total_production_value += $product->price * $production['qty'];
+                    $total_production_value += $product->base_unit_price * $production['qty'];
 
                     $total_current_qty = $current_qty;
-                    $total_current_value = $product->price * $current_qty;
+                    $total_current_value = $product->base_unit_price * $current_qty;
 
                     $ledger_data[] = [
                         'date'             => $date->format('Y-m-d'),
                         'name'             => $product->name,
                         'category'         => $product->category->name,
-                        'unit_name'        => $product->unit->unit_name,
+                        'unit_name'        => $product->base_unit->unit_name,
 
-                        'previous_cost'    => ($previous_qty > 0) ? $product->price : 0,
+                        'previous_cost'    => ($previous_qty > 0) ? $product->base_unit_price : 0,
                         'previous_qty'     => $previous_qty,
-                        'previous_value'   => $product->price * $previous_qty,
+                        'previous_value'   => $product->base_unit_price * $previous_qty,
 
                         'sold_cost'        => $sold_data['cost'],
                         'sold_qty'         => $sold_data['qty'],
                         'sold_value'       => $sold_data['value'],
                         'sold_numbers'      => $sold_data['sold_numbers'],
 
-                        'production_cost'  => ($production['qty'] > 0) ? $product->price : 0,
+                        'production_cost'  => ($production['qty'] > 0) ? $product->base_unit_price : 0,
                         'production_qty'   => $production['qty'],
-                        'production_value' => $product->price * $production['qty'],
+                        'production_value' => $product->base_unit_price * $production['qty'],
                         'batch_numbers'      => $production['batch_numbers'],
                         'return_numbers'      => $production['return_numbers'],
 
-                        'current_cost'     => ($current_qty > 0) ? $product->price : 0,
+                        'current_cost'     => ($current_qty > 0) ? $product->base_unit_price : 0,
                         'current_qty'      => $current_qty,
-                        'current_value'    => $product->price * $current_qty,
+                        'current_value'    => $product->base_unit_price * $current_qty,
                     ];
                     
                     
