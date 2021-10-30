@@ -48,10 +48,10 @@
         <td class="text-right">{{ $value['sold_value'] }}</td>
         @endif
         <td class="text-right">{{ $value['current_qty'] }}</td>
-        @if(permission('finish-goods-stock-price-view'))
+        {{-- @if(permission('finish-goods-stock-price-view')) --}}
         <td class="text-right">{{ $value['current_cost'] }}</td>
         <td class="text-right">{{ $value['current_value'] }}</td>
-        @endif
+        {{-- @endif --}}
     </tr>
 @endforeach
 <tr class="bg-primary text-white">
@@ -79,10 +79,10 @@
     <td class="text-right font-weight-bolder">{{ number_format($total_sold_value,4, '.', ',') }}</td>
     @endif
     <td class="text-right font-weight-bolder">{{ $total_current_qty }}</td>
-    @if(permission('finish-goods-stock-price-view'))
+    {{-- @if(permission('finish-goods-stock-price-view')) --}}
     <td></td>
     <td class="text-right font-weight-bolder">{{ number_format($total_current_value,4, '.', ',') }}</td>
-    @endif
+    {{-- @endif --}}
 </tr>
 @else   
 <tr>

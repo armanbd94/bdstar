@@ -88,10 +88,10 @@
                                         @endif
                                        
                                         <th class="text-right">Curr. Qty</th>
-                                        @if(permission('finish-goods-stock-price-view'))
+                                        {{-- @if(permission('finish-goods-stock-price-view')) --}}
                                         <th class="text-right">Curr. Rate</th>
                                         <th class="text-right">Curr. Value</th>
-                                        @endif
+                                        {{-- @endif --}}
                                     </tr>
                                 </thead>
                                 <tbody></tbody>
