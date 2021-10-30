@@ -40,22 +40,24 @@
                                     <x-form.textarea labelName="Address" name="address" value="{{ config('settings.address')}}" required="required" col="col-md-6" placeholder="Enter title"/>
                                     <div class="col-md-6">
                                         <div class="row">
-                                            <div class="form-group col-md-6">
-                                                <label for="logo" class="form-control-label">Logo</label>
+                                            <div class="form-group col-md-6 text-center">
+                                                <label for="logo" class="form-control-label">Logo</label> 
                                                 <div class="col=md-12 px-0  text-center">
                                                     <div id="site_logo">
                                     
                                                     </div>
                                                 </div>
+                                                <div class="text-center"><span class="text-muted">Maximum Allowed File Size 2MB and Format PNG</span></div>
                                                 <input type="hidden" name="old_logo" value="{{ config('settings.logo')}}">
                                             </div>
-                                            <div class="form-group col-md-6">
+                                            <div class="form-group col-md-6 text-center">
                                                 <label for="favicon" class="form-control-label">Favicon</label>
                                                 <div class="col=md-12 px-0  text-center">
                                                     <div id="site_favicon">
                                     
                                                     </div>
                                                 </div>
+                                                <div class="text-center"><span class="text-muted">Maximum Allowed File Size 2MB and Format PNG</span></div>
                                                 <input type="hidden" name="old_favicon" value="{{ config('settings.favicon')}}">
                                             </div>
                                         </div>
@@ -75,7 +77,7 @@
                                     </div>
 
                                     <div class="form-group col-md-6">
-                                        <label>Tine Zone</label>
+                                        <label>Time Zone</label>
                                         <select name="timezone" id="timezone" class="selectpicker form-control" data-live-search="true" title="Select TimeZone">
                                             <option value="">Select Please</option>
                                             @foreach($zones_array as $zone)

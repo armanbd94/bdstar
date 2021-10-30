@@ -31,7 +31,7 @@
         <!--begin::Card-->
         <div class="card card-custom">
             <div class="card-header flex-wrap py-5">
-            Todays Attendance Adding
+            Today's Attendance Adding
             </div>
             <div class="card-body">
                 <!--begin: Datatable-->
@@ -45,8 +45,8 @@
                                         <th>Employee Name</th>
                                         <th>Designation</th>
                                         <th>Department</th>
-                                        <th>Todays In Time</th>
-                                        <th>Todays Out Time</th>
+                                        <th>Today's In Time</th>
+                                        <th>Today's Out Time</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>

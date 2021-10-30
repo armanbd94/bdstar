@@ -131,7 +131,7 @@
                         </div>
                         <div class="col-md-2">
                             <div class="row">
-                                <div class="form-group col-md-12 mb-0">
+                                <div class="form-group col-md-12 mb-0 text-center">
                                     <label for="logo" class="form-control-label">Product Image</label>
                                     <div class="col=md-12 px-0  text-center">
                                         <div id="image">
