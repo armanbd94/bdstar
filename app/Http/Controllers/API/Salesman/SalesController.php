@@ -137,7 +137,8 @@ class SalesController extends APIController
                 'salesmen_id'        => auth()->user()->id,
                 'customer_id'        => $customer->id,
                 'item'               => $request->item,
-                'total_qty'          => $request->total_qty,
+                'total_qty'          => $request->total_qty+$request->total_free_qty,
+                'total_free_qty'     => $request->total_free_qty,
                 'total_discount'     => 0,
                 'total_tax'          => $request->total_tax ? $request->total_tax : 0,
                 'total_price'        => $request->total_price,
@@ -193,6 +194,7 @@ class SalesController extends APIController
                         'sale_id'          => $sale->id,
                         'product_id'       => $value['id'],
                         'qty'              => $value['qty'],
+                        'free_qty'         => $value['free_qty'],
                         'sale_unit_id'     => $unit ? $unit->id : null,
                         'net_unit_price'   => $value['net_unit_price'],
                         'discount'         => 0,
@@ -442,7 +444,7 @@ class SalesController extends APIController
             $products = DB::table('sale_products as sp')
                 ->leftJoin('products as p','sp.product_id','=','p.id')
                 ->leftJoin('units as u','sp.sale_unit_id','=','u.id')
-                ->selectRaw('p.name,p.code,u.unit_name,sp.qty,sp.net_unit_price,sp.tax,sp.total')
+                ->selectRaw('p.name,p.code,u.unit_name,sp.qty,sp.free_qty,sp.net_unit_price,sp.tax,sp.total')
                 ->where('sp.sale_id',$sale->id)
                 ->get();
             if($products)

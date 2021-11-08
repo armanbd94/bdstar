@@ -303,29 +303,25 @@ $(document).ready(function () {
     //Update product qty
     $('#product_table').on('keyup','.qty',function(){
         rowindex = $(this).closest('tr').index();
-        let free_qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val();
-        if(parseFloat($(this).val()) == ''){
-            free_qty = 0;
-        }
+        // let free_qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val();
+        // if(parseFloat($(this).val()) == ''){
+        //     free_qty = 0;
+        // }
         if(parseFloat($(this).val()) < 1 && parseFloat($(this).val()) != ''){
             $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val(1);
             notification('error','Qunatity can\'t be less than 1');
         }
-        checkQuantity($(this).val(),true,free_qty,rowindex,input=2);
+        checkQuantity($(this).val(),true,free_qty=0,rowindex,input=2);
     });
 
     //Update product free qty
     $('#product_table').on('keyup','.free_qty',function(){
         rowindex = $(this).closest('tr').index();
-        let qty = $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .qty').val();
-        if(parseFloat(qty) == ''){
-            qty = 0;
+        if(parseFloat($(this).val()) < 0){
+            notification('error','Free qty must be greater than 0');
+            $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val('');
         }
-        if(parseFloat($(this).val()) > parseFloat(qty)){
-            console.log(qty);
-            $('#product_table tbody tr:nth-child('+(rowindex + 1)+') .free_qty').val(0);
-        }
-        // checkQuantity(qty,true,$(this).val(),rowindex,input=2);
+        calculateTotal();
     });
 
     $('#product_table').on('keyup','.net_unit_price',function(){
@@ -557,6 +553,7 @@ $(document).ready(function () {
                 total_free_qty += parseFloat($(this).val());
             }
         });
+        console.log(total_free_qty);
         $('#total-free-qty').text(total_free_qty);
         $('input[name="total_free_qty"]').val(total_free_qty);
 
