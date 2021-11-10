@@ -137,7 +137,7 @@ class SalesController extends APIController
                 'salesmen_id'        => auth()->user()->id,
                 'customer_id'        => $customer->id,
                 'item'               => $request->item,
-                'total_qty'          => $request->total_qty+$request->total_free_qty,
+                'total_qty'          => $request->total_qty + ($request->total_free_qty ? $request->total_free_qty : 0 ),
                 'total_free_qty'     => $request->total_free_qty,
                 'total_discount'     => 0,
                 'total_tax'          => $request->total_tax ? $request->total_tax : 0,
