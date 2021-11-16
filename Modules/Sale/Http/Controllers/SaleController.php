@@ -728,8 +728,7 @@ class SaleController extends BaseController
                         $old_document = $saleData ? $saleData->document : '';
         
                         if(!$saleData->sale_products->isEmpty())
-                        {
-                            
+                        {                            
                             foreach ($saleData->sale_products as  $sale_product) {
                                 $sold_qty = $sale_product->pivot->qty ? $sale_product->pivot->qty : 0;
                                 $sale_unit = Unit::find($sale_product->pivot->sale_unit_id);

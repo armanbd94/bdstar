@@ -419,7 +419,6 @@ class PurchaseController extends BaseController
         }
     }
 
-
     public function show(int $id)
     {
         if(permission('purchase-view')){

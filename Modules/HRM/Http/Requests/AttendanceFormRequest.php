@@ -2,7 +2,7 @@
 
 namespace Modules\HRM\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\FormRequest;
 
 class AttendanceFormRequest extends FormRequest
 {
@@ -11,15 +11,27 @@ class AttendanceFormRequest extends FormRequest
      *
      * @return array
      */
+
     public function rules()
     {
-        $rules['date']      = ['required','string'];
-        $rules['deletable'] = ['required'];
-        if(request()->update_id)
-        {
-            //$rules['date'] = 'unique:departments,name,'.request()->update_id;
-        }
-        return $rules;
+        return [
+            'date'      => 'required|date|date_format:Y-m-d',
+            'deletable' => 'required',
+            'start_time' => 'required',
+            'end_time' => 'required',
+            'emp_id' => 'required'
+        ];
+    }
+    
+    public function messages()
+    {
+        return [
+            'date.required' => 'The date field is required',
+            'deletable.required'      => 'The deletable field is required',
+            'emp_id.required'      => 'The employee field is required',
+            'start_time.required'      => 'The start time field is required',
+            'end_time.required'      => 'The end time field is required'
+        ];
     }
 
     /**
