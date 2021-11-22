@@ -183,7 +183,7 @@ class SalesController extends APIController
             if($request->has('products'))
             {
                 foreach ($request->products as $key => $value) {
-                    $unit = Unit::find($value['base_unit_id']);
+                    $unit = Unit::find($value['sale_unit_id']);
                     if($unit->operator == '*'){
                         $qty = $value['qty'] * $unit->operation_value;
                     }else{

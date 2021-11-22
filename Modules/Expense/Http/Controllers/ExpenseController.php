@@ -133,7 +133,7 @@ class ExpenseController extends BaseController
 
     private function expense_balance_add(array $data) {
         $voucher_type = 'Expense';
-        // customer Debit
+      
         $expense_acc = array(
             'chart_of_account_id' => $data['expense_coa_id'],
             'warehouse_id'        => $data['warehouse_id'],
