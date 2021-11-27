@@ -20,7 +20,7 @@ class ProductSearchController extends APIController
             ->leftjoin('units as u','p.base_unit_id','=','u.id')
             ->selectRaw('wp.*,p.name,p.code,p.image,p.base_unit_id,p.base_unit_price as price,p.tax_method,t.name as tax_name,t.rate as tax_rate,u.unit_name,u.unit_code')
             ->where([['wp.warehouse_id',auth()->user()->warehouse_id],['wp.qty','>',0]])
-            ->orderBy('p.name','asc')
+            ->orderBy('p.id','asc')
             ->get();
             
             if(!$products->isEmpty())
@@ -28,7 +28,7 @@ class ProductSearchController extends APIController
                 foreach($products as $row)
                 {
                     $temp_array       = array();
-                    $temp_array['id']             = $row->id;
+                    $temp_array['id']             = $row->product_id;
                     $temp_array['name']           = $row->name;
                     $temp_array['code']           = $row->code;
                     $temp_array['base_unit_id']   = $row->base_unit_id;

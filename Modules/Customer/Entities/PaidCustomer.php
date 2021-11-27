@@ -38,7 +38,7 @@ class PaidCustomer extends BaseModel
     {
         $this->_upazila_id = $upazila_id;
     }
-    public function seRouteID($route_id)
+    public function setRouteID($route_id)
     {
         $this->_route_id = $route_id;
     }
