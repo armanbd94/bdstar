@@ -122,7 +122,8 @@ class SalaryGeneratePaymentController extends BaseController
         //dd($data);
         $voucher_type = 'Employee Salary';
         $employeeInfo = Employee::where('id',$data['supplier_debit_transaction_id'])->first();
-        $debit_account = ChartOfAccount::where('name',$employeeInfo->id.'-'.$employeeInfo->name.'-'.$employeeInfo->wallet_number)->first();
+        //$debit_account = ChartOfAccount::where('name',$employeeInfo->id.'-'.$employeeInfo->name.'-'.$employeeInfo->wallet_number)->first();
+        $debit_account = ChartOfAccount::where('name',$employeeInfo->id.'-'.$employeeInfo->name.'-E')->first();
 
 
         if($data['payment_type'] == 1){

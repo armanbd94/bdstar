@@ -38,11 +38,11 @@
                         <x-form.selectbox labelName="Employee" name="employee_id" col="col-md-3" class="selectpicker">
                             @if (!$employees->isEmpty())
                                 @foreach ($employees as $value)
-                                    <option value="{{ $value->id }}">{{ $value->name.' - '.$value->employee_id  }}</option>
+                                    <option value="{{ $value->id }}">{{ $value->name.' - '.$value->employee_id.' | '.$value->department->name.' | '.$value->current_designation->name  }}</option>
                                 @endforeach
                             @endif
                         </x-form.selectbox>
-                        <x-form.selectbox labelName="Department" name="department_id" col="col-md-3" onchange="getDivisionList(this.value)" class="selectpicker">
+                        <!--<x-form.selectbox labelName="Department" name="department_id" col="col-md-3" onchange="getDivisionList(this.value)" class="selectpicker">
                             @if (!$departments->isEmpty())
                             @foreach ($departments as $department)
                             <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -55,7 +55,7 @@
                                     <option value="{{ $value->id }}">{{ $value->name }}</option>
                                 @endforeach
                             @endif
-                        </x-form.selectbox>                        
+                        </x-form.selectbox> -->                       
                         <div class="col-md-1">
                             <div style="margin-top:28px;">    
                                 <div style="margin-top:28px;">        

@@ -87,8 +87,8 @@ class AttendanceController extends BaseController
                 $ex = explode(" ", $request->start_time);
                 $dataIn = array(
                     "employee_id" => $request->emp_id,
-                    "employee_route_id" => $request->employee_route_id,
-                    "wallet_number" => $request->wallet_number,
+                    "employee_route_id" => ($request->employee_route_id) ? $request->employee_route_id : '',
+                    "wallet_number" => ($request->wallet_number) ? $request->wallet_number : '',
                     "date_time" => $mDateTime,
                     "date" => date('Y-m-d', strtotime($request->date)),
                     "time" => trim($ex[0] . ":" . "00"),
@@ -103,8 +103,8 @@ class AttendanceController extends BaseController
                 $exOut = explode(" ", $request->end_time);
                 $dataOut = array(
                     "employee_id" => $request->emp_id,
-                    "employee_route_id" => $request->employee_route_id,
-                    "wallet_number" => $request->wallet_number,
+                    "employee_route_id" => ($request->employee_route_id) ? $request->employee_route_id : '',
+                    "wallet_number" => ($request->wallet_number) ? $request->wallet_number : '',
                     "date_time" => $mDateTimeOut,
                     "date" => date('Y-m-d', strtotime($request->date)),
                     "time" => trim($exOut[0] . ":" . "00"),

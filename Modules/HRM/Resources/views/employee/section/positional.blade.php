@@ -23,8 +23,8 @@
         value="{{ isset($employee) ? $employee->employee_id : '' }}" col="col-md-4" required="required" />
     <x-form.textbox labelName="Finger/Device ID" name="finger_id"
         value="{{ isset($employee) ? $employee->finger_id : '' }}" col="col-md-4" required="required" />
-    <x-form.textbox labelName="Wallet Number" name="wallet_number"
-        value="{{ isset($employee) ? $employee->wallet_number : '' }}" col="col-md-4" required="required" />
+    <!--<x-form.textbox labelName="Wallet Number" name="wallet_number"
+        value="{{ isset($employee) ? $employee->wallet_number : '' }}" col="col-md-4" required="required" />-->
 
     <x-form.selectbox labelName="Current Shift" name="shift_id" required="required" col="col-md-4" class="selectpicker">
         @if (!$shifts->isEmpty())
@@ -115,8 +115,8 @@
     <x-form.textbox labelName="Termination Date" name="termination_date"
         value="{{ isset($employee) ? $employee->termination_date : '' }}" class="date" col="col-md-4" />
 
-    <div class="form-group col-md-4">
-        <label for="contract_end">Holiday*</label>
+    <div class="form-group col-md-4" required="required">
+        <label for="contract_end">Holiday<span style="color:red">*</span></label>
         <select name="holiday[]" required="required" class="selectpicker" multiple>
             @if (!$weeklyholiday->isEmpty())
             @foreach ($weeklyholiday as $weeklyh)

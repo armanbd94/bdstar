@@ -31,7 +31,7 @@ class SalaryGenerateController extends BaseController
     {
         if (permission('salary-generate-access')) {
             $this->setPageData('Salary Generate Manage', 'Salary Generate Manage', 'fas fa-shopping-cart', [['name' => 'Salary Generate Manage']]);
-            $employees = Employee::where('status', 1)->get();
+            $employees = Employee::with('current_designation','department')->where('status', 1)->get();
             $employees_route = EmployeeRoute::toBase()->where('status', 1)->get();
             return view('hrm::salary-generate.index', compact('employees', 'employees_route'));
         } else {
@@ -132,7 +132,7 @@ class SalaryGenerateController extends BaseController
 
             $data = [
                 'deletable' => self::DELETABLE,
-                'employees'  => Employee::where('status', 1)->get(),
+                'employees'  => Employee::with('current_designation','department')->where('status', 1)->get(),
                 'designations'  => Designation::activeDesignations(),
                 'departments'  => Department::activeDepartments(),
                 'leaves'  => Leave::activeLeaves(),
@@ -154,7 +154,7 @@ class SalaryGenerateController extends BaseController
             $this->setPageData('Add Salary Generate', 'Add Salary Generate', 'fas fa-shopping-cart', [['name' => 'Add Salary Generate']]);
             $data = [
                 'deletable' => self::DELETABLE,
-                'employees'  => Employee::where('status', 1)->get(),
+                'employees'  => Employee::with('current_designation','department')->where('status', 1)->get(),
                 'designations'  => Designation::activeDesignations(),
                 'departments'  => Department::activeDepartments(),
                 'leaves'  => Leave::activeLeaves(),
@@ -360,7 +360,8 @@ class SalaryGenerateController extends BaseController
                 $employeeInfo = Employee::find($employee_id);
 
                 //$debit_account = ChartOfAccount::where('name', $employeeInfo->id . '-' . $employeeInfo->name . '-' . $employeeInfo->wallet_number)->first();
-                $credit_account = ChartOfAccount::where('name',$employeeInfo->id.'-'.$employeeInfo->name.'-'.$employeeInfo->wallet_number)->first();
+                //$credit_account = ChartOfAccount::where('name',$employeeInfo->id.'-'.$employeeInfo->name.'-'.$employeeInfo->wallet_number)->first();
+                $credit_account = ChartOfAccount::where('name',$employeeInfo->id.'-'.$employeeInfo->name.'-E')->first();
                 //Official Loan People which is Debit for the company
                 $credit_voucher_transaction[] = array(
                     'chart_of_account_id' => $credit_account->id,

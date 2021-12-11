@@ -31,7 +31,7 @@ class EmployeeFormRequest extends FormRequest
         $this->rules['department_id']          = ['required'];
         $this->rules['division_id']            = ['required'];
         $this->rules['employee_id']            = ['required'];
-        $this->rules['wallet_number']            = ['required'];
+        //$this->rules['wallet_number']            = ['required'];
         $this->rules['finger_id']            = ['required'];
         $this->rules['shift_id']               = ['required'];
         $this->rules['current_designation_id'] = ['required'];

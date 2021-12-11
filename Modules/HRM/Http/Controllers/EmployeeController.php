@@ -268,12 +268,15 @@ class EmployeeController extends BaseController
                         if (empty($request->update_id)) {
                             $coa_max_code      = ChartOfAccount::where('level', 3)->where('code', 'like', '50202%')->max('code');
                             $code              = $coa_max_code ? ($coa_max_code + 1) : 502020001;
-                            $head_name         = $employee->id . '-' . $employee->name . '-' . $employee->wallet_number;
+                            //$head_name         = $employee->id . '-' . $employee->name . '-' . $employee->wallet_number;
+                            $head_name         = $employee->id . '-' . $employee->name . '-E';
                             $employee_coa_data = $this->employee_coa($code, $head_name);
                             $employee_coa      = ChartOfAccount::create($employee_coa_data);
                         } else {
-                            $old_head_name = $request->update_id . '-' . $request->old_name . '-' . $request->old_wallet_number;
-                            $new_head_name = $request->update_id . '-' . $request->name . '-' . $request->wallet_number;
+                            //$old_head_name = $request->update_id . '-' . $request->old_name . '-' . $request->old_wallet_number;
+                            //$new_head_name = $request->update_id . '-' . $request->name . '-' . $request->wallet_number;
+                            $old_head_name = $request->update_id . '-' . $request->old_name . '-E';
+                            $new_head_name = $request->update_id . '-' . $request->name . '-E';
                             $employee_coa  = ChartOfAccount::where(['name' => $old_head_name])->first();
                             if ($employee_coa) {
                                 $employee_coa->update(['name' => $new_head_name]);
