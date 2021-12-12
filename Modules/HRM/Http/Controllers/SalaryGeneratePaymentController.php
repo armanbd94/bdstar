@@ -193,7 +193,7 @@ class SalaryGeneratePaymentController extends BaseController
         );
         
         Transaction::insert($expense_acc);
-        $payment_transaction        = Transaction::updateOrCreate(['id'=> $data['transaction_id']],$payment);
+        $payment_transaction  = Transaction::updateOrCreate(['id'=> $data['transaction_id']],$payment);
 
 
          if($payment_transaction){

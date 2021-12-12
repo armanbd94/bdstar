@@ -9,7 +9,7 @@ use Modules\Account\Entities\ChartOfAccount;
 
 class SalaryGeneratePayment extends BaseModel
 {
-    protected $fillable = ['salary_generated_id', 'account_id', 'transaction_id','employee_transaction_id ','voucher_no','voucher_date',
+    protected $fillable = ['salary_generated_id', 'account_id', 'transaction_id','employee_transaction_id','voucher_no','voucher_date',
      'amount', 'payment_method', 'cheque_no', 'payment_note', 'created_by', 'modified_by'];
 
      public function purchase()
