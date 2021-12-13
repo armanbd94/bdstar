@@ -89,7 +89,7 @@ class DamageProductController extends BaseController
                     $row[] = $value->upazila_name;
                     $row[] = $value->route_name;
                     $row[] = $value->area_name;
-                    $row[] = $value->total_damage_qty.'('.$value->total_damage_qty.')';
+                    $row[] = $value->total_damage_items.'('.$value->total_damage_qty.')';
                     $row[] = date('d-M-Y',strtotime($value->damage_date));
                     $row[] = number_format($value->grand_total,2,'.','');
                     $row[] = number_format($value->deducted_sr_commission,2,'.','');
