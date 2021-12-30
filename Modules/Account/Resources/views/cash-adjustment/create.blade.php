@@ -72,7 +72,7 @@ $('.date').datetimepicker({format: 'YYYY-MM-DD',ignoreReadonly: true});
 function store_data(){
     let form = document.getElementById('cash-adjustment-form');
     let formData = new FormData(form);
-    let url = "{{url('cash-adjustment')}}";
+    let url = "{{url('cash-adjustment/store')}}";
     $.ajax({
         url: url,
         type: "POST",
