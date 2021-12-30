@@ -53,7 +53,7 @@ class CashAdjustment extends BaseModel
         $query = DB::table('transactions as t')
         ->leftjoin('warehouses as w','t.warehouse_id','=','w.id')
         ->selectRaw("t.*,w.name as warehouse_name")
-        ->where('t.voucher_type','CHV');
+        ->where('t.voucher_type','ADJUSTMENT');
         //search query
         if (!empty($this->_start_date)) {
             $query->where('t.voucher_date', '>=',$this->_start_date);
@@ -93,7 +93,7 @@ class CashAdjustment extends BaseModel
     {
         $query =  DB::table('transactions as t')
         ->selectRaw("t.*")
-        ->where('t.voucher_type','CHV');
+        ->where('t.voucher_type','ADJUSTMENT');
         if (!empty($this->_start_date)) {
             $query->where('t.voucher_date', '>=',$this->_start_date);
         }
