@@ -86,7 +86,7 @@ class ProductionProduct extends BaseModel
         pro.name as product_name,pro.code as product_code,u.unit_name as base_unit_name,u.unit_code as base_unit_code');
         //search query
         if (!empty($this->_batch_no)) {
-            $query->where('pp.batch_no', $this->_batch_no);
+            $query->where('p.batch_no', $this->_batch_no);
         }
         if (!empty($this->_start_date) && !empty($this->_end_date)) {
             $query->whereDate('p.start_date','>=', $this->_start_date)
